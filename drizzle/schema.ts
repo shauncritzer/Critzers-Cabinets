@@ -20,13 +20,96 @@ export const users = mysqlTable("users", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
-});
-
-export type User = typeof users.$inferSelect;
+});export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
- * Quotes table - stores all cabinet quote requests
+ * Products table for hardware store (Top Knobs catalog)
+ */
+export const products = mysqlTable("products", {
+  id: int("id").autoincrement().primaryKey(),
+  sku: varchar("sku", { length: 100 }).notNull().unique(),
+  name: text("name").notNull(),
+  description: text("description"),
+  collection: varchar("collection", { length: 255 }),
+  finish: varchar("finish", { length: 255 }),
+  category: varchar("category", { length: 100 }),
+  listPrice: varchar("list_price", { length: 20 }),
+  dealerPrice: varchar("dealer_price", { length: 20 }),
+  retailPrice: varchar("retail_price", { length: 20 }),
+  dimensions: text("dimensions"),
+  weight: varchar("weight", { length: 50 }),
+  upc: varchar("upc", { length: 50 }),
+  imageUrl: text("image_url"),
+  inStock: mysqlEnum("in_stock", ["yes", "no", "unknown"]).default("unknown"),
+  featured: mysqlEnum("featured", ["yes", "no"]).default("no"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Product = typeof products.$inferSelect;
+export type InsertProduct = typeof products.$inferInsert;
+
+/**
+ * Shopping cart items
+ */
+export const cartItems = mysqlTable("cart_items", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").references(() => users.id),
+  sessionId: varchar("session_id", { length: 255 }),
+  productId: int("product_id").notNull().references(() => products.id),
+  quantity: int("quantity").notNull().default(1),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type CartItem = typeof cartItems.$inferSelect;
+export type InsertCartItem = typeof cartItems.$inferInsert;
+
+/**
+ * Orders
+ */
+export const orders = mysqlTable("orders", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("user_id").references(() => users.id),
+  orderNumber: varchar("order_number", { length: 50 }).notNull().unique(),
+  customerName: varchar("customer_name", { length: 255 }).notNull(),
+  customerEmail: varchar("customer_email", { length: 320 }).notNull(),
+  customerPhone: varchar("customer_phone", { length: 50 }),
+  shippingAddress: text("shipping_address"),
+  subtotal: varchar("subtotal", { length: 20 }),
+  shipping: varchar("shipping", { length: 20 }),
+  tax: varchar("tax", { length: 20 }),
+  total: varchar("total", { length: 20 }),
+  status: mysqlEnum("status", ["pending", "processing", "shipped", "delivered", "cancelled"]).default("pending"),
+  paymentStatus: mysqlEnum("payment_status", ["pending", "paid", "failed", "refunded"]).default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type Order = typeof orders.$inferSelect;
+export type InsertOrder = typeof orders.$inferInsert;
+
+/**
+ * Order items
+ */
+export const orderItems = mysqlTable("order_items", {
+  id: int("id").autoincrement().primaryKey(),
+  orderId: int("order_id").notNull().references(() => orders.id),
+  productId: int("product_id").notNull().references(() => products.id),
+  sku: varchar("sku", { length: 100 }).notNull(),
+  productName: varchar("product_name", { length: 500 }).notNull(),
+  quantity: int("quantity").notNull(),
+  price: varchar("price", { length: 20 }).notNull(),
+  subtotal: varchar("subtotal", { length: 20 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export type OrderItem = typeof orderItems.$inferSelect;
+export type InsertOrderItem = typeof orderItems.$inferInsert;
+
+/**
+ * Stores all cabinet quote requests
  */
 export const quotes = mysqlTable("quotes", {
   id: int("id").autoincrement().primaryKey(),

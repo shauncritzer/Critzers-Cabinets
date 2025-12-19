@@ -4,6 +4,9 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
+import { like, or, and, eq, sql } from "drizzle-orm";
+import { products } from "../drizzle/schema";
+import { getDb } from "./db";
 import {
   createQuote,
   getQuoteById,
@@ -313,6 +316,57 @@ When you have enough information, summarize what you've learned and offer to gen
         }
         await updatePricingFormula(input.id, input.updates);
         return { success: true };
+      }),
+  }),
+  
+  // Shop/Hardware Store
+  shop: router({
+    getProducts: publicProcedure
+      .input(z.object({
+        search: z.string().optional(),
+        category: z.string().optional(),
+        finish: z.string().optional(),
+        limit: z.number().default(50),
+        offset: z.number().default(0),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { products: [], total: 0 };
+
+        const conditions = [];
+        
+        if (input.search) {
+          conditions.push(
+            or(
+              like(products.name, `%${input.search}%`),
+              like(products.sku, `%${input.search}%`),
+              like(products.description, `%${input.search}%`)
+            )
+          );
+        }
+        
+        if (input.category) {
+          conditions.push(eq(products.category, input.category));
+        }
+        
+        if (input.finish) {
+          conditions.push(eq(products.finish, input.finish));
+        }
+
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        
+        const [productsList, countResult] = await Promise.all([
+          db.select().from(products)
+            .where(whereClause)
+            .limit(input.limit)
+            .offset(input.offset),
+          db.select({ count: sql<number>`count(*)` }).from(products).where(whereClause)
+        ]);
+
+        return {
+          products: productsList,
+          total: countResult[0]?.count || 0,
+        };
       }),
   }),
 });

@@ -51,18 +51,26 @@ describe("Quote System", () => {
       expect(typeof result.quoteId).toBe("number");
     });
 
-    it("requires customer name and email", async () => {
+    it("validates customer email format", async () => {  
       const { ctx } = createAuthContext();
       const caller = appRouter.createCaller(ctx);
 
-      // Test with missing email
+      // Test with invalid email format - should reject
       await expect(
         caller.quotes.create({
           customerName: "John Doe",
-          customerEmail: "",
+          customerEmail: "invalid-email",
           conversationData: "{}",
         })
       ).rejects.toThrow();
+      
+      // Test with valid email - should succeed
+      const result = await caller.quotes.create({
+        customerName: "John Doe",
+        customerEmail: "john@example.com",
+        conversationData: "{}",
+      });
+      expect(result).toHaveProperty("quoteId");
     });
   });
 

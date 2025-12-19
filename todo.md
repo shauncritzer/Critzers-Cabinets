@@ -76,3 +76,13 @@
 - [x] Add company history and story
 - [x] Import contact information
 - [x] Add services descriptions
+
+## Hardware E-Commerce Store
+- [x] Create products database schema
+- [x] Import 7,358 Top Knobs products from Excel
+- [ ] Scrape and import product images from dealer portal
+- [x] Build product catalog page with search and filters
+- [ ] Create product detail pages
+- [ ] Implement shopping cart functionality
+- [ ] Add checkout and payment processing
+- [ ] Integrate shipping calculation

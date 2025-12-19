@@ -17,6 +17,9 @@ export default function Home() {
             <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               About
             </Link>
+            <Link href="/shop" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Shop Hardware
+            </Link>
             <Link href="/gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground">
               Gallery
             </Link>
