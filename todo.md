@@ -65,3 +65,14 @@
 - [ ] Security audit
 - [ ] Create user documentation
 - [ ] Deploy to production
+
+## Bugs to Fix
+- [x] Fix nested anchor tag error on home page
+
+## Content Migration from critzerscabinets.com
+- [x] Scrape and import About page content
+- [x] Add team photos and bios
+- [ ] Import project gallery photos
+- [x] Add company history and story
+- [x] Import contact information
+- [x] Add services descriptions

@@ -14,11 +14,14 @@ export default function Home() {
             <span className="text-xl font-bold text-foreground">Critzer's Cabinets</span>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/gallery">
-              <a className="text-sm font-medium text-muted-foreground hover:text-foreground">Gallery</a>
+            <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              About
             </Link>
-            <Link href="/dashboard">
-              <a className="text-sm font-medium text-muted-foreground hover:text-foreground">Dashboard</a>
+            <Link href="/gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Gallery
+            </Link>
+            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
+              Dashboard
             </Link>
             <Link href="/quote">
               <Button>Get a Quote</Button>
@@ -162,9 +165,10 @@ export default function Home() {
             <div>
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><Link href="/quote"><a className="hover:text-foreground">Get a Quote</a></Link></li>
-                <li><Link href="/gallery"><a className="hover:text-foreground">Gallery</a></Link></li>
-                <li><Link href="/dashboard"><a className="hover:text-foreground">Dashboard</a></Link></li>
+                <li><Link href="/about" className="hover:text-foreground">About</Link></li>
+                <li><Link href="/quote" className="hover:text-foreground">Get a Quote</Link></li>
+                <li><Link href="/gallery" className="hover:text-foreground">Gallery</Link></li>
+                <li><Link href="/dashboard" className="hover:text-foreground">Dashboard</Link></li>
               </ul>
             </div>
             <div>
