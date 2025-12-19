@@ -89,4 +89,179 @@ export async function getUserByOpenId(openId: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+import { quotes, projects, gallery, pricingFormulas, customerUploads, InsertQuote, InsertProject, InsertGalleryItem, InsertPricingFormula, InsertCustomerUpload } from "../drizzle/schema";
+import { desc, and } from "drizzle-orm";
+
+// ============================================
+// QUOTES
+// ============================================
+
+export async function createQuote(quote: InsertQuote) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(quotes).values(quote);
+  return result[0].insertId;
+}
+
+export async function getQuoteById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(quotes).where(eq(quotes.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getQuotesByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(quotes).where(eq(quotes.userId, userId)).orderBy(desc(quotes.createdAt));
+}
+
+export async function getAllQuotes() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(quotes).orderBy(desc(quotes.createdAt));
+}
+
+export async function updateQuote(id: number, updates: Partial<InsertQuote>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(quotes).set(updates).where(eq(quotes.id, id));
+}
+
+export async function deleteQuote(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(quotes).where(eq(quotes.id, id));
+}
+
+// ============================================
+// PROJECTS
+// ============================================
+
+export async function createProject(project: InsertProject) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(projects).values(project);
+  return result[0].insertId;
+}
+
+export async function getProjectById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+  
+  const result = await db.select().from(projects).where(eq(projects.id, id)).limit(1);
+  return result[0];
+}
+
+export async function getProjectsByUserId(userId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(projects).where(eq(projects.userId, userId)).orderBy(desc(projects.createdAt));
+}
+
+export async function getAllProjects() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(projects).orderBy(desc(projects.createdAt));
+}
+
+export async function updateProject(id: number, updates: Partial<InsertProject>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(projects).set(updates).where(eq(projects.id, id));
+}
+
+// ============================================
+// GALLERY
+// ============================================
+
+export async function createGalleryItem(item: InsertGalleryItem) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(gallery).values(item);
+  return result[0].insertId;
+}
+
+export async function getAllGalleryItems() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(gallery).orderBy(gallery.displayOrder, desc(gallery.createdAt));
+}
+
+export async function getFeaturedGalleryItems() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(gallery).where(eq(gallery.featured, 1)).orderBy(gallery.displayOrder);
+}
+
+export async function updateGalleryItem(id: number, updates: Partial<InsertGalleryItem>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(gallery).set(updates).where(eq(gallery.id, id));
+}
+
+export async function deleteGalleryItem(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.delete(gallery).where(eq(gallery.id, id));
+}
+
+// ============================================
+// PRICING FORMULAS
+// ============================================
+
+export async function createPricingFormula(formula: InsertPricingFormula) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(pricingFormulas).values(formula);
+  return result[0].insertId;
+}
+
+export async function getAllPricingFormulas() {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(pricingFormulas).where(eq(pricingFormulas.active, 1));
+}
+
+export async function updatePricingFormula(id: number, updates: Partial<InsertPricingFormula>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  await db.update(pricingFormulas).set(updates).where(eq(pricingFormulas.id, id));
+}
+
+// ============================================
+// CUSTOMER UPLOADS
+// ============================================
+
+export async function createCustomerUpload(upload: InsertCustomerUpload) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const result = await db.insert(customerUploads).values(upload);
+  return result[0].insertId;
+}
+
+export async function getUploadsByQuoteId(quoteId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  
+  return db.select().from(customerUploads).where(eq(customerUploads.quoteId, quoteId)).orderBy(desc(customerUploads.createdAt));
+}
