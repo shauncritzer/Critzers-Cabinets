@@ -86,3 +86,32 @@
 - [ ] Implement shopping cart functionality
 - [ ] Add checkout and payment processing
 - [ ] Integrate shipping calculation
+
+## Design Overhaul - Match Original Site
+- [ ] Extract all images from critzerscabinets.com (logo, cabinet photos, team photos)
+- [ ] Change color scheme from pink/warm to green/professional to match original
+- [ ] Redesign homepage hero section with cabinet background image
+- [ ] Match navigation style and layout to original site
+- [ ] Import and use original site's imagery throughout
+- [ ] Ensure all pages maintain consistent look with original design
+- [ ] Test all functionality with new design
+
+## GitHub & Railway Deployment
+- [ ] Fix all technical errors (schema syntax, console errors)
+- [ ] Push code to GitHub (shauncritzer/Critzers-Cabinets)
+- [ ] Set up Railway project
+- [ ] Configure environment variables in Railway
+- [ ] Deploy to Railway
+- [ ] Configure custom domain (critzerscabinets.com)
+- [ ] Test production deployment
+- [ ] Create deployment documentation
+
+## Design Match to Original Site
+- [x] Update color scheme to green/professional theme
+- [x] Extract logo from original site
+- [x] Extract hero background image (kitchen with green cabinets)
+- [ ] Extract team photos (Larry, Dana, Shaun)
+- [ ] Extract service/project photos
+- [x] Redesign homepage hero section to match original
+- [x] Update navigation to match original dark bar style
+- [ ] Ensure all pages maintain original site's professional look
