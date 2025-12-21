@@ -97,8 +97,8 @@
 - [ ] Test all functionality with new design
 
 ## GitHub & Railway Deployment
-- [ ] Fix all technical errors (schema syntax, console errors)
-- [ ] Push code to GitHub (shauncritzer/Critzers-Cabinets)
+- [x] Fix all technical errors (schema syntax, console errors)
+- [x] Push code to GitHub (shauncritzer/Critzers-Cabinets)
 - [ ] Set up Railway project
 - [ ] Configure environment variables in Railway
 - [ ] Deploy to Railway
