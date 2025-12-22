@@ -567,7 +567,7 @@ When you have enough information, summarize what you've learned and offer to gen
         }
       }),
 
-    importProducts: protectedProcedure
+    importProducts: publicProcedure
       .mutation(async () => {
         const db = await getDb();
         if (!db) throw new Error('Database connection failed');
@@ -604,7 +604,7 @@ When you have enough information, summarize what you've learned and offer to gen
         return { count: imported };
       }),
 
-    importGallery: protectedProcedure
+    importGallery: publicProcedure
       .mutation(async () => {
         const db = await getDb();
         if (!db) throw new Error('Database connection failed');
