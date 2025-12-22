@@ -192,3 +192,30 @@
 - [x] Add workshop/fabrication photos section (4 placeholder sections added)
 - [x] Update About page layout to accommodate new images
 - [x] Add placeholder images with upload instructions
+
+## Railway Deployment Issues (Loom Review #2 - Dec 22, 2025)
+
+### Navigation Bar
+- [ ] Fix logo disappearing on About Us and other pages
+- [ ] Make navigation consistent across all pages (show full menu everywhere)
+- [ ] Ensure "Critzer's Cabinets" logo shows on all pages
+
+### Gallery Images
+- [ ] Fix gallery images not loading on Railway (work in Manus preview but not Railway)
+- [ ] Investigate static asset deployment from `/client/public/images/gallery/`
+- [ ] Verify image paths are correct for production build
+
+### Shop Hardware
+- [ ] Fix shop hardware page not working on Railway
+- [ ] Verify database connection to MySQL from Railway
+- [ ] Check if products are accessible from Railway deployment
+
+### Dashboard
+- [ ] Fix dashboard not working on Railway
+- [ ] Investigate why it works in Manus preview but not Railway
+
+### Database Connection
+- [ ] Verify Railway can connect to MySQL database
+- [ ] Check if gallery_items table is accessible
+- [ ] Check if products table is accessible
+- [ ] Verify DATABASE_URL environment variable is correct

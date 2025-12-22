@@ -5,7 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { like, or, and, eq, sql } from "drizzle-orm";
-import { products, cartItems } from "../drizzle/schema";
+import { products, cartItems, gallery } from "../drizzle/schema";
 import { getDb } from "./db";
 import {
   createQuote,
@@ -565,6 +565,136 @@ When you have enough information, summarize what you've learned and offer to gen
             message: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
           };
         }
+      }),
+
+    importProducts: protectedProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Import products from the Excel file
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const xlsx = await import('xlsx');
+
+        const filePath = path.join(process.cwd(), 'TopKnobsJanuary2026PriceList.xlsx');
+        const fileBuffer = await fs.readFile(filePath);
+        const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data: any[] = xlsx.utils.sheet_to_json(worksheet);
+
+        let imported = 0;
+        for (const row of data) {
+          try {
+            await db.insert(products).values({
+              sku: row['Item Number'] || '',
+              name: row['Item Description'] || '',
+              collection: row['Collection'] || null,
+              finish: row['Finish'] || null,
+              retailPrice: row['Retail Price'] || null,
+              category: 'Hardware',
+            });
+            imported++;
+          } catch (error) {
+            // Skip duplicates
+          }
+        }
+
+        return { count: imported };
+      }),
+
+    importGallery: protectedProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const galleryData = [
+          {
+            title: 'Cherry Bathroom Vanity',
+            description: 'Traditional cherry vanity with elegant details and custom storage solutions',
+            afterImageUrl: '/images/gallery/omega-1.jpg',
+            category: 'Bathroom',
+            style: 'Traditional',
+            cabinetType: 'Vanity',
+            featured: 1,
+          },
+          {
+            title: 'Classic White Kitchen with Island',
+            description: 'Timeless white cabinetry featuring a spacious center island and premium finishes',
+            afterImageUrl: '/images/gallery/omega-2.jpg',
+            category: 'Kitchen',
+            style: 'Traditional',
+            cabinetType: 'Full Kitchen',
+            featured: 1,
+          },
+          {
+            title: 'Warm Cherry Kitchen',
+            description: 'Rich cherry wood cabinets creating an inviting and sophisticated cooking space',
+            afterImageUrl: '/images/gallery/omega-3.jpg',
+            category: 'Kitchen',
+            style: 'Traditional',
+            cabinetType: 'Full Kitchen',
+            featured: 1,
+          },
+          {
+            title: 'Sophisticated White Kitchen',
+            description: 'Modern white cabinetry with clean lines and functional design',
+            afterImageUrl: '/images/gallery/omega-4.jpg',
+            category: 'Kitchen',
+            style: 'Contemporary',
+            cabinetType: 'Full Kitchen',
+            featured: 1,
+          },
+          {
+            title: 'Modern Two-Tone Kitchen',
+            description: 'Contemporary design featuring contrasting cabinet colors and sleek hardware',
+            afterImageUrl: '/images/gallery/omega-5.jpg',
+            category: 'Kitchen',
+            style: 'Contemporary',
+            cabinetType: 'Full Kitchen',
+            featured: 1,
+          },
+          {
+            title: 'Espresso Contemporary Kitchen',
+            description: 'Dark espresso cabinets with modern styling and premium appliances',
+            afterImageUrl: '/images/gallery/omega-6.jpg',
+            category: 'Kitchen',
+            style: 'Contemporary',
+            cabinetType: 'Full Kitchen',
+            featured: 0,
+          },
+          {
+            title: 'Casual Modern Kitchen',
+            description: 'Relaxed contemporary design with functional layout and stylish finishes',
+            afterImageUrl: '/images/gallery/omega-7.jpg',
+            category: 'Kitchen',
+            style: 'Casual',
+            cabinetType: 'Full Kitchen',
+            featured: 0,
+          },
+          {
+            title: 'Bold Blue Bathroom',
+            description: 'Statement-making blue vanity with modern fixtures and ample storage',
+            afterImageUrl: '/images/gallery/omega-8.jpg',
+            category: 'Bathroom',
+            style: 'Contemporary',
+            cabinetType: 'Vanity',
+            featured: 0,
+          },
+        ];
+
+        let imported = 0;
+        for (const item of galleryData) {
+          try {
+            await db.insert(gallery).values(item);
+            imported++;
+          } catch (error) {
+            // Skip duplicates
+          }
+        }
+
+        return { count: imported };
       }),
   }),
 });
