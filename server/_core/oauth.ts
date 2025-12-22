@@ -3,6 +3,7 @@ import type { Express, Request, Response } from "express";
 import * as db from "../db";
 import { getSessionCookieOptions } from "./cookies";
 import { sdk } from "./sdk";
+import { ENV } from "./env";
 
 function getQueryParam(req: Request, key: string): string | undefined {
   const value = req.query[key];
@@ -10,6 +11,21 @@ function getQueryParam(req: Request, key: string): string | undefined {
 }
 
 export function registerOAuthRoutes(app: Express) {
+  // Skip OAuth routes if not configured (for Railway deployment without Manus)
+  if (!ENV.oAuthServerUrl || !ENV.appId) {
+    console.warn('[OAuth] OAuth not configured - skipping OAuth routes. Set OAUTH_SERVER_URL and VITE_APP_ID to enable authentication.');
+
+    // Provide a fallback route that explains OAuth is not configured
+    app.get("/api/oauth/callback", (req: Request, res: Response) => {
+      res.status(503).json({
+        error: "OAuth not configured",
+        message: "Authentication is not available. This site is running without Manus OAuth integration."
+      });
+    });
+
+    return;
+  }
+
   app.get("/api/oauth/callback", async (req: Request, res: Response) => {
     const code = getQueryParam(req, "code");
     const state = getQueryParam(req, "state");
