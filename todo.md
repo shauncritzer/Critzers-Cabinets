@@ -167,3 +167,28 @@
 - [ ] Test gallery page with new images
 - [ ] Save checkpoint
 - [ ] Push to GitHub for Railway auto-deploy
+
+## New Features Implementation (Dec 22, 2025)
+
+### Shopping Cart System
+- [x] Add cart backend procedures (addToCart, getCart, updateQuantity, removeItem, clearCart)
+- [x] Create cart UI component with item list and totals
+- [x] Add "Add to Cart" buttons to shop page
+- [x] Build cart page with quantity controls
+- [x] Add cart icon to navigation with item count badge
+- [ ] Implement checkout flow (payment processing)
+
+### Product Image Upload Tool
+- [x] Create admin-only image upload page
+- [x] Build bulk upload interface (drag & drop)
+- [x] Implement SKU matching logic
+- [x] Add image preview before upload
+- [x] Upload images to S3 storage
+- [x] Update product records with image URLs
+- [x] Show upload progress and results
+
+### About Page Enhancements
+- [x] Add team photo section (already existed with team member cards)
+- [x] Add workshop/fabrication photos section (4 placeholder sections added)
+- [x] Update About page layout to accommodate new images
+- [x] Add placeholder images with upload instructions

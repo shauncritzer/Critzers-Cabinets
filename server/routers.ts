@@ -5,7 +5,7 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { like, or, and, eq, sql } from "drizzle-orm";
-import { products } from "../drizzle/schema";
+import { products, cartItems } from "../drizzle/schema";
 import { getDb } from "./db";
 import {
   createQuote,
@@ -367,6 +367,204 @@ When you have enough information, summarize what you've learned and offer to gen
           products: productsList,
           total: countResult[0]?.count || 0,
         };
+      }),
+  }),
+
+  // Shopping cart
+  cart: router({
+    addToCart: publicProcedure
+      .input(z.object({
+        productId: z.number(),
+        quantity: z.number().min(1).default(1),
+        sessionId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId || `guest_${Date.now()}`;
+
+        // Check if item already in cart
+        const existing = await db.select().from(cartItems)
+          .where(
+            and(
+              eq(cartItems.productId, input.productId),
+              userId ? eq(cartItems.userId, userId) : eq(cartItems.sessionId, sessionId)
+            )
+          )
+          .limit(1);
+
+        if (existing.length > 0) {
+          // Update quantity
+          await db.update(cartItems)
+            .set({ quantity: existing[0].quantity + input.quantity })
+            .where(eq(cartItems.id, existing[0].id));
+          return { success: true, action: 'updated' };
+        } else {
+          // Add new item
+          await db.insert(cartItems).values({
+            productId: input.productId,
+            quantity: input.quantity,
+            userId: userId || null,
+            sessionId: userId ? null : sessionId,
+          });
+          return { success: true, action: 'added' };
+        }
+      }),
+
+    getCart: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) return { items: [], total: 0 };
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+          imageUrl: products.imageUrl,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId 
+              ? eq(cartItems.userId, userId)
+              : sessionId
+                ? eq(cartItems.sessionId, sessionId)
+                : sql`1=0`
+          );
+
+        const total = items.reduce((sum, item) => {
+          const price = parseFloat(item.retailPrice || '0');
+          return sum + (price * item.quantity);
+        }, 0);
+
+        return { items, total, count: items.length };
+      }),
+
+    updateQuantity: publicProcedure
+      .input(z.object({
+        cartItemId: z.number(),
+        quantity: z.number().min(0),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        if (input.quantity === 0) {
+          await db.delete(cartItems).where(eq(cartItems.id, input.cartItemId));
+          return { success: true, action: 'removed' };
+        } else {
+          await db.update(cartItems)
+            .set({ quantity: input.quantity })
+            .where(eq(cartItems.id, input.cartItemId));
+          return { success: true, action: 'updated' };
+        }
+      }),
+
+    removeItem: publicProcedure
+      .input(z.object({
+        cartItemId: z.number(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        await db.delete(cartItems).where(eq(cartItems.id, input.cartItemId));
+        return { success: true };
+      }),
+
+    clearCart: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        await db.delete(cartItems).where(
+          userId
+            ? eq(cartItems.userId, userId)
+            : sessionId
+              ? eq(cartItems.sessionId, sessionId)
+              : sql`1=0`
+        );
+
+        return { success: true };
+      }),
+  }),
+
+  // Admin tools
+  admin: router({
+    uploadProductImage: protectedProcedure
+      .input(z.object({
+        sku: z.string(),
+        imageData: z.string(), // base64 encoded image
+        mimeType: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Find product by SKU
+        const product = await db.select()
+          .from(products)
+          .where(eq(products.sku, input.sku))
+          .limit(1);
+
+        if (product.length === 0) {
+          return {
+            success: false,
+            matched: false,
+            message: `No product found with SKU: ${input.sku}`,
+          };
+        }
+
+        try {
+          // Convert base64 to buffer
+          const buffer = Buffer.from(input.imageData, 'base64');
+          
+          // Upload to S3
+          const { storagePut } = await import('./storage');
+          const fileExtension = input.mimeType.split('/')[1] || 'jpg';
+          const fileKey = `products/${input.sku.toLowerCase()}.${fileExtension}`;
+          
+          const { url } = await storagePut(
+            fileKey,
+            buffer,
+            input.mimeType
+          );
+
+          // Update product with image URL
+          await db.update(products)
+            .set({ imageUrl: url })
+            .where(eq(products.id, product[0].id));
+
+          return {
+            success: true,
+            matched: true,
+            message: `Image uploaded for ${product[0].name}`,
+            url,
+          };
+        } catch (error) {
+          return {
+            success: false,
+            matched: true,
+            message: `Upload failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          };
+        }
       }),
   }),
 });

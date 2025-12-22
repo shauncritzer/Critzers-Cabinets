@@ -6,12 +6,22 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "wouter";
 import { Search, ShoppingCart, Filter } from "lucide-react";
 import { trpc } from "@/lib/trpc";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [category, setCategory] = useState("all");
   const [finish, setFinish] = useState("all");
+  const [sessionId, setSessionId] = useState<string>("");
+
+  useEffect(() => {
+    let sid = localStorage.getItem("cart_session_id");
+    if (!sid) {
+      sid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("cart_session_id", sid);
+    }
+    setSessionId(sid);
+  }, []);
   
   // Fetch products from database
   const { data: productsData, isLoading } = trpc.shop.getProducts.useQuery({
@@ -23,6 +33,24 @@ export default function Shop() {
   
   const products = productsData?.products || [];
   const total = productsData?.total || 0;
+
+  // Cart data
+  const { data: cartData, refetch: refetchCart } = trpc.cart.getCart.useQuery(
+    { sessionId },
+    { enabled: !!sessionId }
+  );
+
+  const addToCart = trpc.cart.addToCart.useMutation({
+    onSuccess: () => {
+      refetchCart();
+    },
+  });
+
+  const handleAddToCart = (productId: number) => {
+    addToCart.mutate({ productId, quantity: 1, sessionId });
+  };
+
+  const cartCount = cartData?.count || 0;
 
   return (
     <div className="min-h-screen">
@@ -46,7 +74,17 @@ export default function Shop() {
             <Link href="/quote">
               <Button>Get a Quote</Button>
             </Link>
-            <Button variant="outline" size="icon">
+            <Link href="/cart">
+              <Button variant="outline" size="icon" className="relative">
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
+                    {cartCount}
+                  </span>
+                )}
+              </Button>
+            </Link>
+            <Button variant="outline" size="icon" className="hidden">
               <ShoppingCart className="h-5 w-5" />
             </Button>
           </div>
@@ -192,8 +230,12 @@ export default function Shop() {
                         </p>
                       )}
                     </div>
-                    <Button size="sm">
-                      Add to Cart
+                    <Button 
+                      size="sm"
+                      onClick={() => handleAddToCart(product.id)}
+                      disabled={addToCart.isPending}
+                    >
+                      {addToCart.isPending ? "Adding..." : "Add to Cart"}
                     </Button>
                   </div>
                 </CardContent>

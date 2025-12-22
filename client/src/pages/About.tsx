@@ -209,6 +209,71 @@ export default function About() {
         </div>
       </section>
 
+      {/* Workshop & Fabrication */}
+      <section className="container py-20">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="text-center space-y-4">
+            <h2 className="text-3xl font-bold">Our Workshop</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              State-of-the-art fabrication facility where craftsmanship meets precision
+            </p>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
+              <img 
+                src="/images/workshop/fabrication.jpg" 
+                alt="Cabinet fabrication workshop"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🏭</div><p class="text-sm text-muted-foreground text-center">Workshop photo coming soon</p></div>';
+                }}
+              />
+            </div>
+            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
+              <img 
+                src="/images/workshop/showroom.jpg" 
+                alt="Cabinet showroom"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🏪</div><p class="text-sm text-muted-foreground text-center">Showroom photo coming soon</p></div>';
+                }}
+              />
+            </div>
+            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
+              <img 
+                src="/images/workshop/tools.jpg" 
+                alt="Professional woodworking tools"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🔨</div><p class="text-sm text-muted-foreground text-center">Tools & equipment photo coming soon</p></div>';
+                }}
+              />
+            </div>
+            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
+              <img 
+                src="/images/workshop/materials.jpg" 
+                alt="Quality materials and finishes"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🪵</div><p class="text-sm text-muted-foreground text-center">Materials & finishes photo coming soon</p></div>';
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="text-center">
+            <p className="text-muted-foreground">
+              Visit our showroom at <strong>661 Berkmar Court, Charlottesville, VA</strong> to see our craftsmanship firsthand
+            </p>
+          </div>
+        </div>
+      </section>
+
       {/* Contact CTA */}
       <section className="container py-20">
         <div className="max-w-4xl mx-auto">
