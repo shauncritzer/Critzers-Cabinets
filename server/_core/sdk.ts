@@ -79,10 +79,24 @@ class OAuthService {
 const createOAuthHttpClient = (): AxiosInstance => {
   // Use a placeholder URL if OAuth is not configured to prevent Invalid URL errors
   const baseURL = ENV.oAuthServerUrl || 'http://localhost:3000';
-  return axios.create({
+  const client = axios.create({
     baseURL,
     timeout: AXIOS_TIMEOUT_MS,
   });
+
+  // Add request interceptor to handle missing OAuth configuration
+  client.interceptors.request.use(
+    (config) => {
+      if (!ENV.oAuthServerUrl) {
+        console.warn('[OAuth] OAuth server URL not configured - request will fail');
+        return Promise.reject(new Error('OAuth not available - OAUTH_SERVER_URL not configured'));
+      }
+      return config;
+    },
+    (error) => Promise.reject(error)
+  );
+
+  return client;
 };
 
 class SDKServer {
