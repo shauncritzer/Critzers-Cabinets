@@ -1,0 +1,55 @@
+{
+  "query": "SELECT id, sku, name, category, finish, retail_price, image_url FROM products LIMIT 5;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, sku, name, category, finish, retail_price, image_url FROM products LIMIT 5;",
+  "rows": [
+    {
+      "id": "1",
+      "sku": "M1",
+      "name": "Oxford Pull 3 3/4\" (c-c) - German Bronze",
+      "category": "Hardware",
+      "finish": "GBZ",
+      "retail_price": "NULL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "2",
+      "sku": "M2",
+      "name": "Oxford Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "category": "Hardware",
+      "finish": "PTL",
+      "retail_price": "NULL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "3",
+      "sku": "M3",
+      "name": "Oxford Pull 3 3/4\" (c-c) - Dark Antique Brass",
+      "category": "Hardware",
+      "finish": "DAB",
+      "retail_price": "NULL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "4",
+      "sku": "M4V",
+      "name": "Tudor Pull 2 1/2\" w/Vertical Backplate - German Bronze **DISCONTINUED - LIMITED AVAILABILITY**",
+      "category": "Hardware",
+      "finish": "GBZ",
+      "retail_price": "NULL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "5",
+      "sku": "M5H",
+      "name": "Tudor Pull 2 1/8\" w/Horizontal Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "category": "Hardware",
+      "finish": "PTL",
+      "retail_price": "NULL",
+      "image_url": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tcategory\tfinish\tretail_price\timage_url\n1\tM1\tOxford Pull 3 3/4\" (c-c) - German Bronze\tHardware\tGBZ\tNULL\tNULL\n2\tM2\tOxford Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tHardware\tPTL\tNULL\tNULL\n3\tM3\tOxford Pull 3 3/4\" (c-c) - Dark Antique Brass\tHardware\tDAB\tNULL\tNULL\n4\tM4V\tTudor Pull 2 1/2\" w/Vertical Backplate - German Bronze **DISCONTINUED - LIMITED AVAILABILITY**\tHardware\tGBZ\tNULL\tNULL\n5\tM5H\tTudor Pull 2 1/8\" w/Horizontal Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tHardware\tPTL\tNULL\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 55
+}

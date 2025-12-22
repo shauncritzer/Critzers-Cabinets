@@ -105,10 +105,12 @@
 - [x] Configure proper build process to generate dist directory
 - [x] Update Railway build/start commands for production
 - [x] Verify database connection works on Railway
-- [ ] Remove Manus-specific dependencies causing frontend crashes
-- [ ] Fix Invalid URL TypeError in frontend JavaScript
-- [ ] Make OAuth system optional for standalone deployment
-- [ ] Test all pages on live site after code fixes
+- [x] Remove Manus-specific dependencies causing frontend crashes
+- [x] Fix Invalid URL TypeError in frontend JavaScript
+- [x] Make OAuth system optional for standalone deployment
+- [x] Push fixes to GitHub
+- [ ] Verify Railway auto-deploys the fixed code
+- [ ] Test all pages on live site after deployment
 - [ ] Configure custom domain (critzerscabinets.com)
 - [ ] Create deployment documentation
 
@@ -121,3 +123,27 @@
 - [x] Redesign homepage hero section to match original
 - [x] Update navigation to match original dark bar style
 - [ ] Ensure all pages maintain original site's professional look
+
+## Loom Video Review Feedback (Dec 22, 2025)
+
+### Critical Changes
+- [x] **REMOVE "AI-powered" branding from all pages** (user doesn't want to advertise as AI - wants it to feel more personal/human)
+- [x] Fix Shop Hardware page - products not displaying (7,358 products imported but not showing) - RESOLVED: Products are loading correctly
+- [ ] Get shopping cart feature working
+- [ ] Scrape product images from Top Knobs and upload to site
+
+### UI/UX Improvements
+- [x] Add logo to quote page top navigation
+- [x] Make contact info (email/phone) clickable on About page and homepage footer
+- [ ] Move gallery images to start at top of page
+- [ ] Add pictures to About page
+- [ ] Add more images throughout site (user will provide)
+
+### Content Additions
+- [ ] Add more content/write-up to homepage
+- [ ] Create gallery with user-provided images
+- [ ] Populate gallery with project photos
+
+### Questions to Address
+- [ ] Clarify API usage - is quote system using Manus API credits?
+- [ ] Clarify dashboard feature plans

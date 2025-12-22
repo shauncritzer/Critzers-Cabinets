@@ -216,28 +216,30 @@ export default function About() {
             <CardContent className="pt-12 pb-12 text-center space-y-6">
               <h2 className="text-3xl font-bold">Ready to Start Your Project?</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                Get an instant quote with our AI-powered consultation, or contact us directly 
+                Get an instant quote with our online consultation system, or contact us directly 
                 to discuss your custom cabinet needs.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/quote">
                   <Button size="lg" className="gap-2">
-                    Get AI Quote <ArrowRight className="h-4 w-4" />
+                    Get Your Quote <ArrowRight className="h-4 w-4" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="gap-2">
-                  <Phone className="h-4 w-4" /> (434) 973-1691
-                </Button>
+                <a href="tel:+14349731691">
+                  <Button size="lg" variant="outline" className="gap-2">
+                    <Phone className="h-4 w-4" /> (434) 973-1691
+                  </Button>
+                </a>
               </div>
               <div className="pt-6 space-y-2 text-sm text-muted-foreground">
                 <div className="flex items-center justify-center gap-2">
                   <MapPin className="h-4 w-4" />
                   <span>661 Berkmar Court, Charlottesville, VA</span>
                 </div>
-                <div className="flex items-center justify-center gap-2">
+                <a href="mailto:info@critzerscabinets.com" className="flex items-center justify-center gap-2 hover:text-foreground transition-colors">
                   <Mail className="h-4 w-4" />
                   <span>info@critzerscabinets.com</span>
-                </div>
+                </a>
               </div>
             </CardContent>
           </Card>

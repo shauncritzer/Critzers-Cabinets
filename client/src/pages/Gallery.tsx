@@ -14,14 +14,16 @@ export default function Gallery() {
         <div className="container flex h-16 items-center justify-between">
           <Link href="/">
             <a className="flex items-center gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="font-semibold">Back to Home</span>
+              <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-10 w-10" />
+              <span className="text-xl font-bold">Critzer's Cabinets</span>
             </a>
           </Link>
-          <div className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-primary"></div>
-            <span className="text-xl font-bold">Critzer's Cabinets</span>
-          </div>
+          <Link href="/">
+            <Button variant="outline" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Home
+            </Button>
+          </Link>
         </div>
       </header>
 

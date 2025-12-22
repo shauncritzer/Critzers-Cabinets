@@ -73,13 +73,13 @@ export default function Home() {
               service and satisfaction.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              From hand-drawn designs to AI-powered quotes, Critzer's Cabinet Creations brings four decades of craftsmanship 
+              From hand-drawn designs to instant online quotes, Critzer's Cabinet Creations brings four decades of craftsmanship 
               into the digital age. Get your custom cabinet quote in minutes, not days.
             </p>
             <div className="flex gap-4 justify-center pt-4">
               <Link href="/quote">
                 <Button size="lg" className="bg-primary hover:bg-primary/90">
-                  Start AI Consultation
+                  Get Your Free Quote
                 </Button>
               </Link>
               <Link href="/gallery">
@@ -136,7 +136,7 @@ export default function Home() {
         <div className="container text-center space-y-6">
           <h2 className="text-3xl font-bold">Ready to Transform Your Space?</h2>
           <p className="text-lg max-w-2xl mx-auto">
-            Get an instant preliminary quote with our AI-powered consultation, or browse our hardware store 
+            Get an instant preliminary quote with our expert consultation system, or browse our hardware store 
             to find the perfect finishing touches for your project.
           </p>
           <div className="flex gap-4 justify-center">
@@ -170,9 +170,9 @@ export default function Home() {
               <div className="space-y-2 text-sm text-secondary-foreground/80">
                 <p>661 Berkmar Court</p>
                 <p>Charlottesville, VA</p>
-                <p>Phone: (434) 973-1691</p>
-                <p>Fax: (434) 973-9712</p>
-                <p>Email: info@critzerscabinets.com</p>
+                <p>Phone: <a href="tel:+14349731691" className="hover:text-white transition-colors">(434) 973-1691</a></p>
+                <p>Fax: <a href="tel:+14349739712" className="hover:text-white transition-colors">(434) 973-9712</a></p>
+                <p>Email: <a href="mailto:info@critzerscabinets.com" className="hover:text-white transition-colors">info@critzerscabinets.com</a></p>
               </div>
             </div>
             <div>
