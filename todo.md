@@ -99,11 +99,17 @@
 ## GitHub & Railway Deployment
 - [x] Fix all technical errors (schema syntax, console errors)
 - [x] Push code to GitHub (shauncritzer/Critzers-Cabinets)
-- [ ] Set up Railway project
-- [ ] Configure environment variables in Railway
-- [ ] Deploy to Railway
+- [x] Set up Railway project
+- [x] Configure environment variables in Railway
+- [x] Fix MODULE_NOT_FOUND error for '/app/dist/index.js'
+- [x] Configure proper build process to generate dist directory
+- [x] Update Railway build/start commands for production
+- [x] Verify database connection works on Railway
+- [ ] Remove Manus-specific dependencies causing frontend crashes
+- [ ] Fix Invalid URL TypeError in frontend JavaScript
+- [ ] Make OAuth system optional for standalone deployment
+- [ ] Test all pages on live site after code fixes
 - [ ] Configure custom domain (critzerscabinets.com)
-- [ ] Test production deployment
 - [ ] Create deployment documentation
 
 ## Design Match to Original Site

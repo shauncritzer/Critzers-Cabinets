@@ -76,11 +76,14 @@ class OAuthService {
   }
 }
 
-const createOAuthHttpClient = (): AxiosInstance =>
-  axios.create({
-    baseURL: ENV.oAuthServerUrl,
+const createOAuthHttpClient = (): AxiosInstance => {
+  // Use a placeholder URL if OAuth is not configured to prevent Invalid URL errors
+  const baseURL = ENV.oAuthServerUrl || 'http://localhost:3000';
+  return axios.create({
+    baseURL,
     timeout: AXIOS_TIMEOUT_MS,
   });
+};
 
 class SDKServer {
   private readonly client: AxiosInstance;
