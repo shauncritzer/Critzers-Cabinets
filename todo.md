@@ -135,7 +135,7 @@
 ### UI/UX Improvements
 - [x] Add logo to quote page top navigation
 - [x] Make contact info (email/phone) clickable on About page and homepage footer
-- [ ] Move gallery images to start at top of page
+- [x] Move gallery images to start at top of page (gallery now displays 8 Omega images)
 - [ ] Add pictures to About page
 - [ ] Add more images throughout site (user will provide)
 
@@ -147,3 +147,23 @@
 ### Questions to Address
 - [ ] Clarify API usage - is quote system using Manus API credits?
 - [ ] Clarify dashboard feature plans
+
+## Image Collection & Upload (Dec 22, 2025)
+
+### Product Images (Top Knobs)
+- [ ] Extract product images from TK_2026_Catalog.pdf
+- [ ] Match images to products in database by SKU
+- [ ] Upload images to S3 storage
+- [ ] Update product records with image URLs
+
+### Gallery Images
+- [x] Scrape gallery photos from old critzerscabinets.com website (site already points to new version)
+- [x] Scrape high-quality cabinet images from Omega Cabinetry website
+- [x] Upload gallery images to project public folder
+- [x] Create gallery items in database with images (8 items added)
+
+### Deployment
+- [ ] Test image display on shop page
+- [ ] Test gallery page with new images
+- [ ] Save checkpoint
+- [ ] Push to GitHub for Railway auto-deploy
