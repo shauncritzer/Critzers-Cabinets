@@ -13,6 +13,8 @@ export default function Shop() {
   const [category, setCategory] = useState("all");
   const [finish, setFinish] = useState("all");
   const [sessionId, setSessionId] = useState<string>("");
+  const [offset, setOffset] = useState(0);
+  const [limit] = useState(50);
 
   useEffect(() => {
     let sid = localStorage.getItem("cart_session_id");
@@ -22,13 +24,14 @@ export default function Shop() {
     }
     setSessionId(sid);
   }, []);
-  
+
   // Fetch products from database
   const { data: productsData, isLoading } = trpc.shop.getProducts.useQuery({
     search: searchQuery,
     category: category !== "all" ? category : undefined,
     finish: finish !== "all" ? finish : undefined,
-    limit: 50,
+    limit,
+    offset,
   });
   
   const products = productsData?.products || [];
@@ -58,7 +61,7 @@ export default function Shop() {
       <nav className="border-b bg-card sticky top-0 z-50">
         <div className="container flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-primary"></div>
+            <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-10 w-10" />
             <span className="text-xl font-bold text-foreground">Critzer's Cabinets</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -224,13 +227,17 @@ export default function Shop() {
                   
                   <div className="flex items-center justify-between pt-2">
                     <div>
-                      {product.retailPrice && (
+                      {product.retailPrice && parseFloat(product.retailPrice) > 0 ? (
                         <p className="text-lg font-bold text-primary">
                           ${parseFloat(product.retailPrice).toFixed(2)}
                         </p>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          Call for pricing
+                        </p>
                       )}
                     </div>
-                    <Button 
+                    <Button
                       size="sm"
                       onClick={() => handleAddToCart(product.id)}
                       disabled={addToCart.isPending}
@@ -243,11 +250,16 @@ export default function Shop() {
             ))}
           </div>
         )}
-        
+
         {products.length > 0 && products.length < total && (
           <div className="text-center mt-12">
-            <Button variant="outline" size="lg">
-              Load More Products
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => setOffset(offset + limit)}
+              disabled={isLoading}
+            >
+              Load More Products ({products.length} of {total})
             </Button>
           </div>
         )}
