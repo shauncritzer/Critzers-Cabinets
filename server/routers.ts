@@ -599,14 +599,35 @@ When you have enough information, summarize what you've learned and offer to gen
 
         let imported = 0;
         let skipped = 0;
+        let discontinued = 0;
+        let noPricing = 0;
 
         for (const row of data) {
           // Try multiple column name variations
           const sku = row['Item Number'] || row['SKU'] || row['Item #'] || row['Part Number'] || '';
           const name = row['Item Description'] || row['Description'] || row['Product Name'] || '';
+          const retailPrice = row['Retail Price'] || row['List Price'] || row['Price'] || null;
 
+          // Skip if no SKU or name
           if (!sku && !name) {
             skipped++;
+            continue;
+          }
+
+          // FILTER OUT DISCONTINUED PRODUCTS
+          if (name && (
+            name.toUpperCase().includes('DISCONTINUED') ||
+            name.toUpperCase().includes('DEMO') ||
+            name.toUpperCase().includes('LIMITED AVAILABILITY')
+          )) {
+            discontinued++;
+            continue;
+          }
+
+          // FILTER OUT PRODUCTS WITH NO VALID PRICING
+          const priceNum = retailPrice ? parseFloat(String(retailPrice).replace(/[$,]/g, '')) : 0;
+          if (!priceNum || priceNum <= 0) {
+            noPricing++;
             continue;
           }
 
@@ -616,8 +637,9 @@ When you have enough information, summarize what you've learned and offer to gen
               name: String(name).trim() || String(sku).trim(),
               collection: row['Collection'] || row['Series'] || null,
               finish: row['Finish'] || row['Color'] || null,
-              retailPrice: row['Retail Price'] || row['List Price'] || row['Price'] || null,
+              retailPrice: String(priceNum.toFixed(2)),
               category: row['Category'] || 'Hardware',
+              inStock: 'yes', // Default to in stock, can be updated later
             });
             imported++;
           } catch (error) {
@@ -626,8 +648,20 @@ When you have enough information, summarize what you've learned and offer to gen
           }
         }
 
-        console.log(`Import complete: ${imported} imported, ${skipped} skipped`);
-        return { count: imported, skipped, total: data.length };
+        console.log(`Import complete:`);
+        console.log(`  - Imported: ${imported} products`);
+        console.log(`  - Skipped (discontinued): ${discontinued}`);
+        console.log(`  - Skipped (no pricing): ${noPricing}`);
+        console.log(`  - Skipped (other): ${skipped}`);
+        console.log(`  - Total processed: ${data.length}`);
+
+        return {
+          count: imported,
+          skipped: skipped + discontinued + noPricing,
+          discontinued,
+          noPricing,
+          total: data.length
+        };
       }),
 
     importGallery: publicProcedure

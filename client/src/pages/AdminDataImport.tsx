@@ -58,9 +58,24 @@ export default function AdminDataImport() {
             {importing ? "Importing..." : "Import Products"}
           </Button>
           {results.products !== undefined && (
-            <p className="mt-4 text-green-600">
-              ✓ Imported {results.products} products successfully!
-            </p>
+            <div className="mt-4 space-y-2">
+              <p className="text-green-600 font-semibold">
+                ✓ Imported {results.products} active products successfully!
+              </p>
+              {(results as any).discontinued > 0 && (
+                <p className="text-sm text-gray-600">
+                  Skipped {(results as any).discontinued} discontinued items
+                </p>
+              )}
+              {(results as any).noPricing > 0 && (
+                <p className="text-sm text-gray-600">
+                  Skipped {(results as any).noPricing} items without pricing
+                </p>
+              )}
+              <p className="text-sm text-gray-500">
+                Total processed: {(results as any).total || 'N/A'} rows
+              </p>
+            </div>
           )}
         </Card>
 
