@@ -578,30 +578,56 @@ When you have enough information, summarize what you've learned and offer to gen
         const xlsx = await import('xlsx');
 
         const filePath = path.join(process.cwd(), 'TopKnobsJanuary2026PriceList.xlsx');
+
+        // Check if file exists
+        try {
+          await fs.access(filePath);
+        } catch (error) {
+          throw new Error(`Excel file not found at: ${filePath}`);
+        }
+
         const fileBuffer = await fs.readFile(filePath);
         const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         const data: any[] = xlsx.utils.sheet_to_json(worksheet);
 
+        console.log(`Found ${data.length} rows in Excel file`);
+        if (data.length > 0) {
+          console.log('Available columns:', Object.keys(data[0]));
+        }
+
         let imported = 0;
+        let skipped = 0;
+
         for (const row of data) {
+          // Try multiple column name variations
+          const sku = row['Item Number'] || row['SKU'] || row['Item #'] || row['Part Number'] || '';
+          const name = row['Item Description'] || row['Description'] || row['Product Name'] || '';
+
+          if (!sku && !name) {
+            skipped++;
+            continue;
+          }
+
           try {
             await db.insert(products).values({
-              sku: row['Item Number'] || '',
-              name: row['Item Description'] || '',
-              collection: row['Collection'] || null,
-              finish: row['Finish'] || null,
-              retailPrice: row['Retail Price'] || null,
-              category: 'Hardware',
+              sku: String(sku).trim(),
+              name: String(name).trim() || String(sku).trim(),
+              collection: row['Collection'] || row['Series'] || null,
+              finish: row['Finish'] || row['Color'] || null,
+              retailPrice: row['Retail Price'] || row['List Price'] || row['Price'] || null,
+              category: row['Category'] || 'Hardware',
             });
             imported++;
           } catch (error) {
-            // Skip duplicates
+            // Skip duplicates or errors
+            skipped++;
           }
         }
 
-        return { count: imported };
+        console.log(`Import complete: ${imported} imported, ${skipped} skipped`);
+        return { count: imported, skipped, total: data.length };
       }),
 
     importGallery: publicProcedure
