@@ -76,17 +76,17 @@ export default function Gallery() {
                     )}
                     <div className="flex flex-wrap gap-2 text-xs">
                       {item.roomType && (
-                        <span className="bg-secondary px-2 py-1 rounded">
+                        <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded">
                           {item.roomType}
                         </span>
                       )}
                       {item.style && (
-                        <span className="bg-secondary px-2 py-1 rounded">
+                        <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded">
                           {item.style}
                         </span>
                       )}
                       {item.cabinetType && (
-                        <span className="bg-secondary px-2 py-1 rounded">
+                        <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded">
                           {item.cabinetType}
                         </span>
                       )}
