@@ -12,6 +12,8 @@ import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
 import Gallery from "./pages/Gallery";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderConfirmation from "./pages/OrderConfirmation";
 import ProductImageUpload from "@/pages/ProductImageUpload";
 import AdminDataImport from "@/pages/AdminDataImport";
 import Login from "@/pages/Login";
@@ -28,6 +30,8 @@ function Router() {
       <Route path={"/admin"} component={Admin} />
       <Route path={"/gallery"} component={Gallery} />
       <Route path={"/cart"} component={Cart} />
+      <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/order-confirmation"} component={OrderConfirmation} />
       <Route path={"/login"} component={Login} />
         <Route path="/admin/product-images" component={ProductImageUpload} />
         <Route path="/admin/data-import" component={AdminDataImport} />
