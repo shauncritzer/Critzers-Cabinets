@@ -567,6 +567,22 @@ When you have enough information, summarize what you've learned and offer to gen
         }
       }),
 
+    clearProducts: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Delete all products from database
+        try {
+          await db.delete(products);
+          console.log('All products cleared from database');
+          return { success: true, message: 'All products deleted successfully' };
+        } catch (error) {
+          console.error('Error clearing products:', error);
+          throw new Error('Failed to clear products');
+        }
+      }),
+
     importProducts: publicProcedure
       .mutation(async () => {
         const db = await getDb();
