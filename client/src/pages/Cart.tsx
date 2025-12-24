@@ -223,9 +223,11 @@ export default function Cart() {
                         ${total.toFixed(2)}
                       </span>
                     </div>
-                    <Button className="w-full" size="lg">
-                      Proceed to Checkout
-                    </Button>
+                    <Link href="/checkout">
+                      <Button className="w-full" size="lg">
+                        Proceed to Checkout
+                      </Button>
+                    </Link>
                   </div>
                   <p className="text-xs text-center text-muted-foreground">
                     Secure checkout powered by Critzer's Cabinets

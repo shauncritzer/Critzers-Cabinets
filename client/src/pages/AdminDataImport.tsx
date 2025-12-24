@@ -10,9 +10,25 @@ export default function AdminDataImport() {
     gallery?: number;
     error?: string;
   }>({});
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
 
   const importProductsMutation = trpc.admin.importProducts.useMutation();
   const importGalleryMutation = trpc.admin.importGallery.useMutation();
+  const clearProductsMutation = trpc.admin.clearProducts.useMutation();
+
+  const handleClearProducts = async () => {
+    setImporting(true);
+    setResults({});
+    try {
+      await clearProductsMutation.mutateAsync();
+      setResults({ products: 0 });
+      setShowClearConfirm(false);
+    } catch (error: any) {
+      setResults({ error: error.message });
+    } finally {
+      setImporting(false);
+    }
+  };
 
   const handleImportProducts = async () => {
     setImporting(true);
@@ -48,19 +64,81 @@ export default function AdminDataImport() {
         <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Import Products</h2>
           <p className="text-gray-600 mb-4">
-            Import 7,358 Top Knobs products from the Excel file into the Railway database.
+            Import Top Knobs products from the Excel file into the Railway database.
           </p>
-          <Button
-            onClick={handleImportProducts}
-            disabled={importing}
-            size="lg"
-          >
-            {importing ? "Importing..." : "Import Products"}
-          </Button>
+
+          <div className="flex gap-3 mb-4">
+            <Button
+              onClick={handleImportProducts}
+              disabled={importing}
+              size="lg"
+            >
+              {importing ? "Importing..." : "Import Products"}
+            </Button>
+
+            <Button
+              onClick={() => setShowClearConfirm(true)}
+              disabled={importing}
+              size="lg"
+              variant="destructive"
+            >
+              Clear All Products
+            </Button>
+          </div>
+
+          {showClearConfirm && (
+            <div className="bg-red-50 border border-red-200 rounded p-4 mb-4">
+              <p className="text-red-800 font-semibold mb-2">⚠️ Are you sure?</p>
+              <p className="text-red-700 text-sm mb-3">
+                This will delete ALL products from the database. This action cannot be undone.
+              </p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleClearProducts}
+                  disabled={importing}
+                  size="sm"
+                  variant="destructive"
+                >
+                  Yes, Delete All Products
+                </Button>
+                <Button
+                  onClick={() => setShowClearConfirm(false)}
+                  size="sm"
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+
           {results.products !== undefined && (
-            <p className="mt-4 text-green-600">
-              ✓ Imported {results.products} products successfully!
-            </p>
+            <div className="mt-4 space-y-2">
+              {results.products === 0 ? (
+                <p className="text-green-600 font-semibold">
+                  ✓ All products cleared from database!
+                </p>
+              ) : (
+                <>
+                  <p className="text-green-600 font-semibold">
+                    ✓ Imported {results.products} active products successfully!
+                  </p>
+                  {(results as any).discontinued > 0 && (
+                    <p className="text-sm text-gray-600">
+                      Skipped {(results as any).discontinued} discontinued items
+                    </p>
+                  )}
+                  {(results as any).noPricing > 0 && (
+                    <p className="text-sm text-gray-600">
+                      Skipped {(results as any).noPricing} items without pricing
+                    </p>
+                  )}
+                  <p className="text-sm text-gray-500">
+                    Total processed: {(results as any).total || 'N/A'} rows
+                  </p>
+                </>
+              )}
+            </div>
           )}
         </Card>
 

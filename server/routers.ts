@@ -5,8 +5,10 @@ import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
 import { like, or, and, eq, sql } from "drizzle-orm";
-import { products, cartItems, gallery } from "../drizzle/schema";
+import { products, cartItems, gallery, orders, orderItems } from "../drizzle/schema";
 import { getDb } from "./db";
+import { createPaymentIntent, calculateShipping, calculateTax } from "./stripe";
+import { sendOrderConfirmation, sendAdminOrderNotification } from "./email";
 import {
   createQuote,
   getQuoteById,
@@ -506,6 +508,311 @@ When you have enough information, summarize what you've learned and offer to gen
       }),
   }),
 
+  // Checkout
+  checkout: router({
+    // Calculate cart totals with shipping and tax
+    calculateTotals: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+        shippingMethod: z.enum(['standard', 'expedited', 'express']).default('standard'),
+      }))
+      .query(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        // Get cart items
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId
+              ? eq(cartItems.userId, userId)
+              : sessionId
+                ? eq(cartItems.sessionId, sessionId)
+                : sql`1=0`
+          );
+
+        if (items.length === 0) {
+          return {
+            subtotal: 0,
+            shipping: 0,
+            tax: 0,
+            total: 0,
+            shippingMethod: '',
+          };
+        }
+
+        // Calculate subtotal
+        const subtotal = items.reduce((sum, item) => {
+          const price = parseFloat(item.retailPrice || '0');
+          return sum + (price * item.quantity);
+        }, 0);
+
+        // Calculate shipping
+        const shippingCalc = calculateShipping(subtotal, input.shippingMethod);
+
+        // Calculate tax
+        const tax = calculateTax(subtotal, shippingCalc.shippingCost);
+
+        // Calculate total
+        const total = subtotal + shippingCalc.shippingCost + tax;
+
+        return {
+          subtotal: subtotal.toFixed(2),
+          shipping: shippingCalc.shippingCost.toFixed(2),
+          shippingMethod: shippingCalc.shippingMethod,
+          tax: tax.toFixed(2),
+          total: total.toFixed(2),
+        };
+      }),
+
+    // Create payment intent for Stripe
+    createPaymentIntent: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+        customerEmail: z.string().email(),
+        shippingMethod: z.enum(['standard', 'expedited', 'express']).default('standard'),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        // Get cart items with full details
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId
+              ? eq(cartItems.userId, userId)
+              : sessionId
+                ? eq(cartItems.sessionId, sessionId)
+                : sql`1=0`
+          );
+
+        if (items.length === 0) {
+          throw new Error('Cart is empty');
+        }
+
+        // Calculate totals
+        const subtotal = items.reduce((sum, item) => {
+          const price = parseFloat(item.retailPrice || '0');
+          return sum + (price * item.quantity);
+        }, 0);
+
+        const shippingCalc = calculateShipping(subtotal, input.shippingMethod);
+        const tax = calculateTax(subtotal, shippingCalc.shippingCost);
+        const total = subtotal + shippingCalc.shippingCost + tax;
+
+        // Generate order number
+        const orderNumber = `CRT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
+        // Create Stripe Payment Intent
+        const paymentIntent = await createPaymentIntent(
+          total,
+          input.customerEmail,
+          orderNumber,
+          {
+            orderNumber,
+            itemCount: items.length.toString(),
+            shippingMethod: input.shippingMethod,
+          }
+        );
+
+        return {
+          clientSecret: paymentIntent.client_secret,
+          orderNumber,
+          amount: total,
+        };
+      }),
+
+    // Complete order after successful payment
+    completeOrder: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+        paymentIntentId: z.string(),
+        orderNumber: z.string(),
+        customerName: z.string(),
+        customerEmail: z.string().email(),
+        customerPhone: z.string().optional(),
+        shippingAddress: z.string(),
+        shippingCity: z.string(),
+        shippingState: z.string(),
+        shippingZip: z.string(),
+        shippingMethod: z.enum(['standard', 'expedited', 'express']),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        // Get cart items
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId
+              ? eq(cartItems.userId, userId)
+              : sessionId
+                ? eq(cartItems.sessionId, sessionId)
+                : sql`1=0`
+          );
+
+        if (items.length === 0) {
+          throw new Error('Cart is empty');
+        }
+
+        // Calculate totals
+        const subtotal = items.reduce((sum, item) => {
+          const price = parseFloat(item.retailPrice || '0');
+          return sum + (price * item.quantity);
+        }, 0);
+
+        const shippingCalc = calculateShipping(subtotal, input.shippingMethod);
+        const tax = calculateTax(subtotal, shippingCalc.shippingCost);
+        const total = subtotal + shippingCalc.shippingCost + tax;
+
+        // Create order
+        const [order] = await db.insert(orders).values({
+          userId: userId || null,
+          sessionId: sessionId || null,
+          orderNumber: input.orderNumber,
+          customerName: input.customerName,
+          customerEmail: input.customerEmail,
+          customerPhone: input.customerPhone || null,
+          shippingAddress: input.shippingAddress,
+          shippingCity: input.shippingCity,
+          shippingState: input.shippingState,
+          shippingZip: input.shippingZip,
+          shippingMethod: shippingCalc.shippingMethod,
+          subtotal: subtotal.toFixed(2),
+          shipping: shippingCalc.shippingCost.toFixed(2),
+          tax: tax.toFixed(2),
+          total: total.toFixed(2),
+          status: 'pending',
+          paymentStatus: 'paid',
+          stripePaymentIntentId: input.paymentIntentId,
+        });
+
+        const orderId = order.insertId;
+
+        // Create order items
+        for (const item of items) {
+          const price = parseFloat(item.retailPrice || '0');
+          const itemSubtotal = price * item.quantity;
+
+          await db.insert(orderItems).values({
+            orderId: Number(orderId),
+            productId: item.productId,
+            sku: item.productSku || '',
+            productName: item.productName || '',
+            quantity: item.quantity,
+            price: price.toFixed(2),
+            subtotal: itemSubtotal.toFixed(2),
+          });
+        }
+
+        // Clear cart
+        await db.delete(cartItems).where(
+          userId
+            ? eq(cartItems.userId, userId)
+            : sessionId
+              ? eq(cartItems.sessionId, sessionId)
+              : sql`1=0`
+        );
+
+        // Send order confirmation emails
+        const orderEmailData = {
+          orderNumber: input.orderNumber,
+          customerName: input.customerName,
+          customerEmail: input.customerEmail,
+          orderItems: items.map(item => ({
+            name: item.productName || '',
+            sku: item.productSku || '',
+            quantity: item.quantity,
+            price: (parseFloat(item.retailPrice || '0')).toFixed(2),
+            subtotal: (parseFloat(item.retailPrice || '0') * item.quantity).toFixed(2),
+          })),
+          subtotal: subtotal.toFixed(2),
+          shipping: shippingCalc.shippingCost.toFixed(2),
+          tax: tax.toFixed(2),
+          total: total.toFixed(2),
+          shippingAddress: `${input.shippingAddress}\n${input.shippingCity}, ${input.shippingState} ${input.shippingZip}`,
+          shippingMethod: shippingCalc.shippingMethod,
+        };
+
+        // Send emails (don't await to avoid blocking)
+        sendOrderConfirmation(orderEmailData).catch(err => {
+          console.error('Failed to send order confirmation:', err);
+        });
+        sendAdminOrderNotification(orderEmailData).catch(err => {
+          console.error('Failed to send admin notification:', err);
+        });
+
+        return {
+          success: true,
+          orderId: Number(orderId),
+          orderNumber: input.orderNumber,
+        };
+      }),
+
+    // Get order details
+    getOrder: publicProcedure
+      .input(z.object({
+        orderNumber: z.string(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const [order] = await db.select()
+          .from(orders)
+          .where(eq(orders.orderNumber, input.orderNumber))
+          .limit(1);
+
+        if (!order) {
+          throw new Error('Order not found');
+        }
+
+        const items = await db.select()
+          .from(orderItems)
+          .where(eq(orderItems.orderId, order.id));
+
+        return {
+          ...order,
+          items,
+        };
+      }),
+  }),
+
   // Admin tools
   admin: router({
     uploadProductImage: protectedProcedure
@@ -567,6 +874,22 @@ When you have enough information, summarize what you've learned and offer to gen
         }
       }),
 
+    clearProducts: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Delete all products from database
+        try {
+          await db.delete(products);
+          console.log('All products cleared from database');
+          return { success: true, message: 'All products deleted successfully' };
+        } catch (error) {
+          console.error('Error clearing products:', error);
+          throw new Error('Failed to clear products');
+        }
+      }),
+
     importProducts: publicProcedure
       .mutation(async () => {
         const db = await getDb();
@@ -599,14 +922,35 @@ When you have enough information, summarize what you've learned and offer to gen
 
         let imported = 0;
         let skipped = 0;
+        let discontinued = 0;
+        let noPricing = 0;
 
         for (const row of data) {
           // Try multiple column name variations
           const sku = row['Item Number'] || row['SKU'] || row['Item #'] || row['Part Number'] || '';
           const name = row['Item Description'] || row['Description'] || row['Product Name'] || '';
+          const retailPrice = row['Retail Price'] || row['List Price'] || row['Price'] || null;
 
+          // Skip if no SKU or name
           if (!sku && !name) {
             skipped++;
+            continue;
+          }
+
+          // FILTER OUT DISCONTINUED PRODUCTS
+          if (name && (
+            name.toUpperCase().includes('DISCONTINUED') ||
+            name.toUpperCase().includes('DEMO') ||
+            name.toUpperCase().includes('LIMITED AVAILABILITY')
+          )) {
+            discontinued++;
+            continue;
+          }
+
+          // FILTER OUT PRODUCTS WITH NO VALID PRICING
+          const priceNum = retailPrice ? parseFloat(String(retailPrice).replace(/[$,]/g, '')) : 0;
+          if (!priceNum || priceNum <= 0) {
+            noPricing++;
             continue;
           }
 
@@ -616,8 +960,9 @@ When you have enough information, summarize what you've learned and offer to gen
               name: String(name).trim() || String(sku).trim(),
               collection: row['Collection'] || row['Series'] || null,
               finish: row['Finish'] || row['Color'] || null,
-              retailPrice: row['Retail Price'] || row['List Price'] || row['Price'] || null,
+              retailPrice: String(priceNum.toFixed(2)),
               category: row['Category'] || 'Hardware',
+              inStock: 'yes', // Default to in stock, can be updated later
             });
             imported++;
           } catch (error) {
@@ -626,8 +971,20 @@ When you have enough information, summarize what you've learned and offer to gen
           }
         }
 
-        console.log(`Import complete: ${imported} imported, ${skipped} skipped`);
-        return { count: imported, skipped, total: data.length };
+        console.log(`Import complete:`);
+        console.log(`  - Imported: ${imported} products`);
+        console.log(`  - Skipped (discontinued): ${discontinued}`);
+        console.log(`  - Skipped (no pricing): ${noPricing}`);
+        console.log(`  - Skipped (other): ${skipped}`);
+        console.log(`  - Total processed: ${data.length}`);
+
+        return {
+          count: imported,
+          skipped: skipped + discontinued + noPricing,
+          discontinued,
+          noPricing,
+          total: data.length
+        };
       }),
 
     importGallery: publicProcedure
@@ -730,6 +1087,97 @@ When you have enough information, summarize what you've learned and offer to gen
         }
 
         return { count: imported };
+      }),
+
+    // Order Management
+    getAllOrders: publicProcedure
+      .query(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const allOrders = await db.select()
+          .from(orders)
+          .orderBy(sql`${orders.createdAt} DESC`);
+
+        return allOrders;
+      }),
+
+    getOrderWithItems: publicProcedure
+      .input(z.object({
+        orderId: z.number(),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const [order] = await db.select()
+          .from(orders)
+          .where(eq(orders.id, input.orderId))
+          .limit(1);
+
+        if (!order) {
+          throw new Error('Order not found');
+        }
+
+        const items = await db.select()
+          .from(orderItems)
+          .where(eq(orderItems.orderId, order.id));
+
+        return {
+          ...order,
+          items,
+        };
+      }),
+
+    updateOrderStatus: publicProcedure
+      .input(z.object({
+        orderId: z.number(),
+        status: z.enum(["pending", "processing", "shipped", "delivered", "cancelled"]),
+        trackingNumber: z.string().optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const updateData: any = {
+          status: input.status,
+        };
+
+        if (input.trackingNumber) {
+          updateData.trackingNumber = input.trackingNumber;
+        }
+
+        if (input.notes) {
+          updateData.notes = input.notes;
+        }
+
+        await db.update(orders)
+          .set(updateData)
+          .where(eq(orders.id, input.orderId));
+
+        // If status is shipped and tracking number provided, send shipping confirmation email
+        if (input.status === 'shipped' && input.trackingNumber) {
+          const [order] = await db.select()
+            .from(orders)
+            .where(eq(orders.id, input.orderId))
+            .limit(1);
+
+          if (order) {
+            const { sendShippingConfirmation } = await import('./email');
+            sendShippingConfirmation(
+              order.customerEmail,
+              order.customerName,
+              order.orderNumber,
+              input.trackingNumber,
+              'USPS' // Default to USPS, can be made configurable
+            ).catch(err => {
+              console.error('Failed to send shipping confirmation:', err);
+            });
+          }
+        }
+
+        return { success: true };
       }),
   }),
 });
