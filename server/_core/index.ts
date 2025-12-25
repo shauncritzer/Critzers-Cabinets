@@ -7,6 +7,7 @@ import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { runMigrations } from "../migrate-safe.js";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -28,6 +29,16 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 }
 
 async function startServer() {
+  // Run database migrations before starting server
+  try {
+    console.log('Running database migrations...');
+    await runMigrations();
+    console.log('Database migrations complete!\n');
+  } catch (error) {
+    console.error('Failed to run migrations:', error);
+    // Continue anyway - migrations might not be needed
+  }
+
   const app = express();
   const server = createServer(app);
   // Configure body parser with larger size limit for file uploads
