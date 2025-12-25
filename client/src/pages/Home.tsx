@@ -67,14 +67,13 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <h2 className="text-4xl font-bold text-foreground">Welcome to Critzer's Cabinet Creations</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Critzer's Cabinet Creations, Inc. is family-owned and operated and has been in business since 1986. 
-              We try hard to earn and keep our customers respect and trust by offering courteous service at an honest value. 
-              With every Critzer "creation" comes the pride of workmanship and dedication to providing unparalleled customer 
-              service and satisfaction.
+              For 40 years, Critzer's Cabinet Creations has been Charlottesville's trusted kitchen and bath design center.
+              As authorized dealers for Omega Cabinetry, Wolf Cabinetry, and Top Knobs hardware, we combine expert design
+              services with quality products to transform your space.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              From hand-drawn designs to instant online quotes, Critzer's Cabinet Creations brings four decades of craftsmanship 
-              into the digital age. Get your custom cabinet quote in minutes, not days.
+              From professional design consultations to instant online hardware shopping, we bring four decades of experience
+              into the digital age. Get your custom cabinet design quote in minutes, not days.
             </p>
             <div className="flex gap-4 justify-center pt-4">
               <Link href="/quote">
@@ -95,8 +94,8 @@ export default function Home() {
       {/* Services Section */}
       <section className="py-16 bg-muted/30">
         <div className="container">
-          <h2 className="text-3xl font-bold text-center mb-12">Our Core Services</h2>
-          <div className="grid md:grid-cols-3 gap-8">
+          <h2 className="text-3xl font-bold text-center mb-12">What We Do</h2>
+          <div className="grid md:grid-cols-4 gap-8">
             <Card className="text-center">
               <CardHeader>
                 <CardTitle className="text-2xl">Kitchen & Bath Design</CardTitle>
@@ -109,11 +108,12 @@ export default function Home() {
             </Card>
             <Card className="text-center">
               <CardHeader>
-                <CardTitle className="text-2xl">Custom Cabinets</CardTitle>
+                <CardTitle className="text-2xl">Quality Cabinetry</CardTitle>
               </CardHeader>
               <CardContent>
                 <CardDescription className="text-base">
-                  High-quality, custom-built cabinetry tailored to your space, from wood to laminate, full custom to stock.
+                  Authorized dealer for Omega and Wolf cabinetry - offering everything from full custom to stock options
+                  in a wide range of wood species and finishes.
                 </CardDescription>
               </CardContent>
             </Card>
@@ -125,6 +125,19 @@ export default function Home() {
                 <CardDescription className="text-base">
                   A wide selection of materials including granite, marble, quartz, and custom laminates.
                 </CardDescription>
+              </CardContent>
+            </Card>
+            <Card className="text-center bg-emerald-50 border-emerald-200">
+              <CardHeader>
+                <CardTitle className="text-2xl">Hardware Store</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-base">
+                  Shop premium Top Knobs cabinet hardware online. Free shipping on orders $100+, with fast delivery.
+                </CardDescription>
+                <Link href="/shop">
+                  <Button className="mt-4">Shop Now</Button>
+                </Link>
               </CardContent>
             </Card>
           </div>
@@ -196,6 +209,16 @@ export default function Home() {
                 <div>
                   <Link href="/quote" className="text-secondary-foreground/80 hover:text-white transition-colors">
                     Get a Quote
+                  </Link>
+                </div>
+                <div>
+                  <Link href="/shipping-policy" className="text-secondary-foreground/80 hover:text-white transition-colors">
+                    Shipping Policy
+                  </Link>
+                </div>
+                <div>
+                  <Link href="/return-policy" className="text-secondary-foreground/80 hover:text-white transition-colors">
+                    Return Policy
                   </Link>
                 </div>
               </div>
