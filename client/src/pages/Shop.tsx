@@ -7,6 +7,7 @@ import { Link } from "wouter";
 import { Search, ShoppingCart, Filter } from "lucide-react";
 import { trpc } from "@/lib/trpc";
 import { useState, useEffect } from "react";
+import Navigation from "@/components/Navigation";
 
 export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -57,42 +58,8 @@ export default function Shop() {
 
   return (
     <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="border-b bg-card sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-10 w-10" />
-            <span className="text-xl font-bold text-foreground">Critzer's Cabinets</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/about" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              About
-            </Link>
-            <Link href="/gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Gallery
-            </Link>
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link href="/quote">
-              <Button>Get a Quote</Button>
-            </Link>
-            <Link href="/cart">
-              <Button variant="outline" size="icon" className="relative">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center">
-                    {cartCount}
-                  </span>
-                )}
-              </Button>
-            </Link>
-            <Button variant="outline" size="icon" className="hidden">
-              <ShoppingCart className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-      </nav>
+      {/* Shared Navigation */}
+      <Navigation />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-secondary/30 to-background py-12">

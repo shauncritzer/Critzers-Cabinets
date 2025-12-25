@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 
 export default function Cart() {
@@ -76,15 +77,12 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Shared Navigation */}
+      <Navigation />
+      
       {/* Header */}
-      <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-16">
+      <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-12">
         <div className="container">
-          <Link href="/shop">
-            <Button variant="ghost" className="text-white hover:bg-white/20 mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Continue Shopping
-            </Button>
-          </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Shopping Cart</h1>
           <p className="text-emerald-100 text-lg">
             {count === 0 ? "Your cart is empty" : `${count} item${count !== 1 ? 's' : ''} in your cart`}

@@ -2,12 +2,16 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
+import Navigation from "@/components/Navigation";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Shared Navigation */}
+      <Navigation transparent />
+      
       {/* Hero Section with Background Image */}
       <div 
         className="relative bg-cover bg-center min-h-[600px] flex flex-col"
@@ -17,34 +21,6 @@ export default function Home() {
           backgroundSize: "cover"
         }}
       >
-        {/* Navigation Bar */}
-        <nav className="bg-secondary/95 backdrop-blur-sm border-b border-white/10">
-          <div className="container">
-            <div className="flex items-center justify-between py-4">
-              <Link href="/" className="flex items-center gap-3">
-                <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-12 w-12" />
-                <span className="text-xl font-bold text-secondary-foreground">Critzer's Cabinets</span>
-              </Link>
-              <div className="flex items-center gap-6">
-                <Link href="/about" className="text-sm font-medium text-secondary-foreground hover:text-white transition-colors">
-                  About Us
-                </Link>
-                <Link href="/shop" className="text-sm font-medium text-secondary-foreground hover:text-white transition-colors">
-                  Shop Hardware
-                </Link>
-                <Link href="/gallery" className="text-sm font-medium text-secondary-foreground hover:text-white transition-colors">
-                  Gallery
-                </Link>
-                <Link href="/dashboard" className="text-sm font-medium text-secondary-foreground hover:text-white transition-colors">
-                  Dashboard
-                </Link>
-                <Link href="/quote">
-                  <Button className="bg-primary hover:bg-primary/90">Get a Quote</Button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </nav>
 
         {/* Hero Content */}
         <div className="flex-1 flex items-center justify-center">

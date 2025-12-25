@@ -2,30 +2,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "wouter";
 import { ArrowRight, Phone, Mail, MapPin } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 export default function About() {
   return (
     <div className="min-h-screen">
-      {/* Navigation */}
-      <nav className="border-b bg-card">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded bg-primary"></div>
-            <span className="text-xl font-bold text-foreground">Critzer's Cabinets</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/gallery" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Gallery
-            </Link>
-            <Link href="/dashboard" className="text-sm font-medium text-muted-foreground hover:text-foreground">
-              Dashboard
-            </Link>
-            <Link href="/quote">
-              <Button>Get a Quote</Button>
-            </Link>
-          </div>
-        </div>
-      </nav>
+      {/* Shared Navigation */}
+      <Navigation />
 
       {/* Hero Section */}
       <section className="bg-gradient-to-b from-secondary/30 to-background py-20">
@@ -79,9 +62,9 @@ export default function About() {
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">Custom Cabinets</h3>
+                <h3 className="font-semibold mb-2">Omega Cabinetry</h3>
                 <p className="text-sm text-muted-foreground">
-                  From wood to laminate, full custom to stock options
+                  Authorized dealer of Omega semi-custom and stock cabinets
                 </p>
               </CardContent>
             </Card>
@@ -95,9 +78,9 @@ export default function About() {
             </Card>
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-semibold mb-2">Full Installation</h3>
+                <h3 className="font-semibold mb-2">Installation Coordination</h3>
                 <p className="text-sm text-muted-foreground">
-                  Professional installation for new homes and renovations
+                  We coordinate professional installation for your project
                 </p>
               </CardContent>
             </Card>
@@ -209,66 +192,48 @@ export default function About() {
         </div>
       </section>
 
-      {/* Workshop & Fabrication */}
+      {/* Our Partners */}
       <section className="container py-20">
         <div className="max-w-6xl mx-auto space-y-12">
           <div className="text-center space-y-4">
-            <h2 className="text-3xl font-bold">Our Workshop</h2>
+            <h2 className="text-3xl font-bold">Our Partners</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              State-of-the-art fabrication facility where craftsmanship meets precision
+              We proudly partner with industry-leading manufacturers to bring you the best products
             </p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
-              <img 
-                src="/images/workshop/fabrication.jpg" 
-                alt="Cabinet fabrication workshop"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🏭</div><p class="text-sm text-muted-foreground text-center">Workshop photo coming soon</p></div>';
-                }}
-              />
-            </div>
-            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
-              <img 
-                src="/images/workshop/showroom.jpg" 
-                alt="Cabinet showroom"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🏪</div><p class="text-sm text-muted-foreground text-center">Showroom photo coming soon</p></div>';
-                }}
-              />
-            </div>
-            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
-              <img 
-                src="/images/workshop/tools.jpg" 
-                alt="Professional woodworking tools"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🔨</div><p class="text-sm text-muted-foreground text-center">Tools & equipment photo coming soon</p></div>';
-                }}
-              />
-            </div>
-            <div className="aspect-video bg-gradient-to-br from-primary/10 to-secondary/10 rounded-lg overflow-hidden flex items-center justify-center">
-              <img 
-                src="/images/workshop/materials.jpg" 
-                alt="Quality materials and finishes"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  e.currentTarget.parentElement!.innerHTML = '<div class="flex flex-col items-center gap-4 p-8"><div class="text-6xl">🪵</div><p class="text-sm text-muted-foreground text-center">Materials & finishes photo coming soon</p></div>';
-                }}
-              />
-            </div>
+          <div className="grid gap-8 md:grid-cols-2">
+            <Card className="p-8">
+              <div className="text-center space-y-4">
+                <h3 className="text-2xl font-bold">Omega Cabinetry</h3>
+                <p className="text-muted-foreground">
+                  We are an authorized dealer of Omega Cabinetry from Waterloo, Iowa. 
+                  Omega offers semi-custom and stock cabinet options with exceptional quality 
+                  and endless customization possibilities for every room in your home.
+                </p>
+                <a href="https://www.omegacabinetry.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                  Visit Omega Cabinetry →
+                </a>
+              </div>
+            </Card>
+            <Card className="p-8">
+              <div className="text-center space-y-4">
+                <h3 className="text-2xl font-bold">Top Knobs</h3>
+                <p className="text-muted-foreground">
+                  As an authorized Top Knobs dealer, we offer their complete line of 
+                  premium cabinet hardware including knobs, pulls, hinges, and accessories. 
+                  Browse our online store for over 7,000 products.
+                </p>
+                <Link href="/shop" className="text-primary hover:underline">
+                  Shop Hardware →
+                </Link>
+              </div>
+            </Card>
           </div>
 
           <div className="text-center">
             <p className="text-muted-foreground">
-              Visit our showroom at <strong>661 Berkmar Court, Charlottesville, VA</strong> to see our craftsmanship firsthand
+              Visit our showroom at <strong>661 Berkmar Court, Charlottesville, VA</strong> to see samples and discuss your project
             </p>
           </div>
         </div>

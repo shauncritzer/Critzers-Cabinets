@@ -9,6 +9,7 @@ import { Loader2, Send, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 import { Streamdown } from "streamdown";
+import Navigation from "@/components/Navigation";
 
 type Message = {
   role: "user" | "assistant";
@@ -103,23 +104,8 @@ export default function Quote() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/">
-            <a className="flex items-center gap-2">
-              <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-10 w-10" />
-              <span className="text-xl font-bold">Critzer's Cabinets</span>
-            </a>
-          </Link>
-          <Link href="/">
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
-        </div>
-      </header>
+      {/* Shared Navigation */}
+      <Navigation />
 
       <div className="container py-8">
         <div className="max-w-4xl mx-auto">

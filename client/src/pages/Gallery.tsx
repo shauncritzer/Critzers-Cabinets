@@ -3,29 +3,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { trpc } from "@/lib/trpc";
 import { Loader2, ArrowLeft } from "lucide-react";
 import { Link } from "wouter";
+import Navigation from "@/components/Navigation";
 
 export default function Gallery() {
   const { data: galleryItems, isLoading } = trpc.gallery.getAll.useQuery();
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card">
-        <div className="container flex h-16 items-center justify-between">
-          <Link href="/">
-            <a className="flex items-center gap-2">
-              <img src="/images/logo.png" alt="Critzer's Cabinets Logo" className="h-10 w-10" />
-              <span className="text-xl font-bold">Critzer's Cabinets</span>
-            </a>
-          </Link>
-          <Link href="/">
-            <Button variant="outline" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
-        </div>
-      </header>
+      {/* Shared Navigation */}
+      <Navigation />
 
       <div className="container py-12">
         <div className="space-y-8">

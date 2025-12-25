@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Loader2, ArrowLeft, ShoppingCart } from "lucide-react";
 import CheckoutForm from "@/components/CheckoutForm";
+import Navigation from "@/components/Navigation";
 
 // Initialize Stripe - In production, this will use the STRIPE_PUBLISHABLE_KEY env var
 const stripePromise = loadStripe(
@@ -103,17 +104,12 @@ export default function Checkout() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      {/* Shared Navigation */}
+      <Navigation />
+      
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-12">
         <div className="container">
-          <Button
-            variant="ghost"
-            className="text-white hover:bg-white/20 mb-4"
-            onClick={() => setLocation("/cart")}
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Cart
-          </Button>
           <h1 className="text-4xl md:text-5xl font-bold mb-2">Checkout</h1>
           <p className="text-emerald-100 text-lg">
             {step === "info" ? "Enter your shipping information" : "Complete your payment"}
