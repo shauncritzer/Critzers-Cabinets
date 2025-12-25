@@ -16,6 +16,9 @@ import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
 import ProductImageUpload from "@/pages/ProductImageUpload";
 import AdminDataImport from "@/pages/AdminDataImport";
+import AdminOrders from "@/pages/AdminOrders";
+import ShippingPolicy from "@/pages/ShippingPolicy";
+import ReturnPolicy from "@/pages/ReturnPolicy";
 import Login from "@/pages/Login";
 
 function Router() {
@@ -32,9 +35,12 @@ function Router() {
       <Route path={"/cart"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />
       <Route path={"/order-confirmation"} component={OrderConfirmation} />
+      <Route path={"/shipping-policy"} component={ShippingPolicy} />
+      <Route path={"/return-policy"} component={ReturnPolicy} />
       <Route path={"/login"} component={Login} />
         <Route path="/admin/product-images" component={ProductImageUpload} />
         <Route path="/admin/data-import" component={AdminDataImport} />
+        <Route path="/admin/orders" component={AdminOrders} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
