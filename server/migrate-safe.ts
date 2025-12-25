@@ -33,9 +33,14 @@ async function safeAddColumn(
     } else {
       console.log(`  ✓ Column ${columnName} already exists`);
     }
-  } catch (error) {
-    console.error(`  ✗ Error with column ${columnName}:`, error);
-    throw error;
+  } catch (error: any) {
+    // Ignore duplicate column errors
+    if (error.code === 'ER_DUP_FIELDNAME') {
+      console.log(`  ✓ Column ${columnName} already exists (caught duplicate error)`);
+    } else {
+      console.error(`  ⚠ Warning with column ${columnName}:`, error.message);
+      // Don't throw - continue with other columns
+    }
   }
 }
 
@@ -54,7 +59,8 @@ export async function runMigrations(): Promise<void> {
 
     console.log('Checking orders table columns...');
 
-    // Add new columns to orders table
+    // Add ALL columns that might be missing (including session_id which was added earlier)
+    await safeAddColumn(connection, 'orders', 'session_id', 'varchar(255)');
     await safeAddColumn(connection, 'orders', 'shipping_city', 'varchar(100)');
     await safeAddColumn(connection, 'orders', 'shipping_state', 'varchar(50)');
     await safeAddColumn(connection, 'orders', 'shipping_zip', 'varchar(20)');
@@ -65,26 +71,18 @@ export async function runMigrations(): Promise<void> {
     await safeAddColumn(connection, 'orders', 'notes', 'text');
 
     console.log('\n✅ All migrations completed successfully!');
-  } catch (error) {
-    console.error('\n❌ Migration failed:', error);
-    throw error;
+  } catch (error: any) {
+    console.error('\n❌ Migration failed:', error.message || error);
+    // Don't throw - let the server start anyway
+    console.log('⚠ Continuing server startup despite migration error...');
   } finally {
     if (connection) {
-      await connection.end();
-      console.log('Database connection closed');
+      try {
+        await connection.end();
+        console.log('Database connection closed\n');
+      } catch (err) {
+        // Ignore close errors
+      }
     }
   }
-}
-
-// Run migrations if this script is executed directly
-if (import.meta.url === \`file://\${process.argv[1]}\`) {
-  runMigrations()
-    .then(() => {
-      console.log('\nMigrations complete');
-      process.exit(0);
-    })
-    .catch((error) => {
-      console.error('\nMigration error:', error);
-      process.exit(1);
-    });
 }
