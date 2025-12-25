@@ -370,6 +370,119 @@ When you have enough information, summarize what you've learned and offer to gen
           total: countResult[0]?.count || 0,
         };
       }),
+
+    // Get featured/curated collections
+    getFeaturedProducts: publicProcedure
+      .input(z.object({
+        collection: z.enum(["best-sellers", "new-arrivals", "traditional", "modern", "transitional", "rustic"]),
+        limit: z.number().default(50),
+      }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) return { products: [], collectionName: "" };
+
+        let collectionName = "";
+        let conditions: any[] = [];
+
+        switch (input.collection) {
+          case "best-sellers":
+            collectionName = "Best Sellers";
+            // Featured items or popular collections
+            conditions.push(
+              or(
+                eq(products.featured, "yes"),
+                like(products.collection, "%Devon%"),
+                like(products.collection, "%Nouveau%"),
+                like(products.collection, "%Aspen%")
+              )
+            );
+            break;
+          case "new-arrivals":
+            collectionName = "New Arrivals";
+            // Recent collections
+            conditions.push(
+              or(
+                like(products.collection, "%Nouveau%"),
+                like(products.collection, "%Lynwood%"),
+                like(products.collection, "%Mercer%")
+              )
+            );
+            break;
+          case "traditional":
+            collectionName = "Traditional Style";
+            conditions.push(
+              or(
+                like(products.collection, "%Tuscany%"),
+                like(products.collection, "%Somerset%"),
+                like(products.collection, "%Chateau%"),
+                like(products.collection, "%Victoria%")
+              )
+            );
+            break;
+          case "modern":
+            collectionName = "Modern & Contemporary";
+            conditions.push(
+              or(
+                like(products.collection, "%Nouveau%"),
+                like(products.collection, "%Lynwood%"),
+                like(products.collection, "%Kinney%"),
+                like(products.collection, "%Mercer%")
+              )
+            );
+            break;
+          case "transitional":
+            collectionName = "Transitional";
+            conditions.push(
+              or(
+                like(products.collection, "%Devon%"),
+                like(products.collection, "%Aspen%"),
+                like(products.collection, "%Grace%")
+              )
+            );
+            break;
+          case "rustic":
+            collectionName = "Rustic & Farmhouse";
+            conditions.push(
+              or(
+                like(products.collection, "%Aspen%"),
+                like(products.collection, "%Rustic%"),
+                like(products.finish, "%Antique%"),
+                like(products.finish, "%Pewter%")
+              )
+            );
+            break;
+        }
+
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+        const productsList = await db.select().from(products)
+          .where(whereClause)
+          .limit(input.limit);
+
+        return {
+          products: productsList,
+          collectionName,
+        };
+      }),
+
+    // Get unique collections for filtering
+    getCollections: publicProcedure
+      .query(async () => {
+        const db = await getDb();
+        if (!db) return { collections: [], finishes: [], categories: [] };
+
+        const [collectionsResult, finishesResult, categoriesResult] = await Promise.all([
+          db.selectDistinct({ collection: products.collection }).from(products).where(sql`${products.collection} IS NOT NULL`),
+          db.selectDistinct({ finish: products.finish }).from(products).where(sql`${products.finish} IS NOT NULL`),
+          db.selectDistinct({ category: products.category }).from(products).where(sql`${products.category} IS NOT NULL`),
+        ]);
+
+        return {
+          collections: collectionsResult.map(r => r.collection).filter(Boolean).sort(),
+          finishes: finishesResult.map(r => r.finish).filter(Boolean).sort(),
+          categories: categoriesResult.map(r => r.category).filter(Boolean).sort(),
+        };
+      }),
   }),
 
   // Shopping cart

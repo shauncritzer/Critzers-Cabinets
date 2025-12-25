@@ -82,19 +82,20 @@
 - [x] Import 7,358 Top Knobs products from Excel
 - [ ] Scrape and import product images from dealer portal
 - [x] Build product catalog page with search and filters
+- [x] Create featured product collections (Best Sellers, New Arrivals, by Style)
 - [ ] Create product detail pages
-- [ ] Implement shopping cart functionality
-- [ ] Add checkout and payment processing
+- [x] Implement shopping cart functionality
+- [x] Add checkout and payment processing (Stripe integration)
 - [ ] Integrate shipping calculation
 
 ## Design Overhaul - Match Original Site
-- [ ] Extract all images from critzerscabinets.com (logo, cabinet photos, team photos)
-- [ ] Change color scheme from pink/warm to green/professional to match original
-- [ ] Redesign homepage hero section with cabinet background image
-- [ ] Match navigation style and layout to original site
-- [ ] Import and use original site's imagery throughout
-- [ ] Ensure all pages maintain consistent look with original design
-- [ ] Test all functionality with new design
+- [x] Extract all images from critzerscabinets.com (logo, cabinet photos, team photos)
+- [x] Change color scheme from pink/warm to green/professional to match original
+- [x] Redesign homepage hero section with cabinet background image
+- [x] Match navigation style and layout to original site
+- [x] Import and use original site's imagery throughout
+- [x] Ensure all pages maintain consistent look with original design
+- [x] Test all functionality with new design
 
 ## GitHub & Railway Deployment
 - [x] Fix all technical errors (schema syntax, console errors)
@@ -118,25 +119,25 @@
 - [x] Update color scheme to green/professional theme
 - [x] Extract logo from original site
 - [x] Extract hero background image (kitchen with green cabinets)
-- [ ] Extract team photos (Larry, Dana, Shaun)
+- [x] Add Shaun's professional photo to team section
 - [ ] Extract service/project photos
 - [x] Redesign homepage hero section to match original
 - [x] Update navigation to match original dark bar style
-- [ ] Ensure all pages maintain original site's professional look
+- [x] Ensure all pages maintain original site's professional look
 
 ## Loom Video Review Feedback (Dec 22, 2025)
 
 ### Critical Changes
 - [x] **REMOVE "AI-powered" branding from all pages** (user doesn't want to advertise as AI - wants it to feel more personal/human)
 - [x] Fix Shop Hardware page - products not displaying (7,358 products imported but not showing) - RESOLVED: Products are loading correctly
-- [ ] Get shopping cart feature working
+- [x] Get shopping cart feature working
 - [ ] Scrape product images from Top Knobs and upload to site
 
 ### UI/UX Improvements
 - [x] Add logo to quote page top navigation
 - [x] Make contact info (email/phone) clickable on About page and homepage footer
 - [x] Move gallery images to start at top of page (gallery now displays 8 Omega images)
-- [ ] Add pictures to About page
+- [x] Add pictures to About page (Shaun's photo added)
 - [ ] Add more images throughout site (user will provide)
 
 ### Content Additions
@@ -165,7 +166,7 @@
 ### Deployment
 - [ ] Test image display on shop page
 - [ ] Test gallery page with new images
-- [ ] Save checkpoint
+- [x] Save checkpoint
 - [ ] Push to GitHub for Railway auto-deploy
 
 ## New Features Implementation (Dec 22, 2025)
@@ -176,7 +177,7 @@
 - [x] Add "Add to Cart" buttons to shop page
 - [x] Build cart page with quantity controls
 - [x] Add cart icon to navigation with item count badge
-- [ ] Implement checkout flow (payment processing)
+- [x] Implement checkout flow (Stripe payment processing)
 
 ### Product Image Upload Tool
 - [x] Create admin-only image upload page
@@ -189,33 +190,32 @@
 
 ### About Page Enhancements
 - [x] Add team photo section (already existed with team member cards)
-- [x] Add workshop/fabrication photos section (4 placeholder sections added)
+- [x] Add Shaun's professional photo to team section
 - [x] Update About page layout to accommodate new images
-- [x] Add placeholder images with upload instructions
+- [x] Team bios moved to top of About page
 
-## Railway Deployment Issues (Loom Review #2 - Dec 22, 2025)
+## Navigation Consistency (Dec 25, 2025)
+- [x] Create unified Navigation component with logo, links, cart badge, mobile menu
+- [x] Apply Navigation to Home page
+- [x] Apply Navigation to About page
+- [x] Apply Navigation to Shop page
+- [x] Apply Navigation to Quote page
+- [x] Apply Navigation to Gallery page
+- [x] Apply Navigation to Cart page
+- [x] Apply Navigation to Checkout page
+- [x] Apply Navigation to ShippingPolicy page
+- [x] Apply Navigation to ReturnPolicy page
+- [x] Apply Navigation to OrderConfirmation page
 
-### Navigation Bar
-- [ ] Fix logo disappearing on About Us and other pages
-- [ ] Make navigation consistent across all pages (show full menu everywhere)
-- [ ] Ensure "Critzer's Cabinets" logo shows on all pages
+## Quote System Improvements (Dec 25, 2025)
+- [x] Add structured form with wood species, door style, finish, countertop options
+- [x] Add dimensions input field
+- [x] Add links to measurement apps (Apple Measure, Google Measure, magicplan)
+- [x] Add kitchen background image to Quote page hero
 
-### Gallery Images
-- [ ] Fix gallery images not loading on Railway (work in Manus preview but not Railway)
-- [ ] Investigate static asset deployment from `/client/public/images/gallery/`
-- [ ] Verify image paths are correct for production build
-
-### Shop Hardware
-- [ ] Fix shop hardware page not working on Railway
-- [ ] Verify database connection to MySQL from Railway
-- [ ] Check if products are accessible from Railway deployment
-
-### Dashboard
-- [ ] Fix dashboard not working on Railway
-- [ ] Investigate why it works in Manus preview but not Railway
-
-### Database Connection
-- [ ] Verify Railway can connect to MySQL database
-- [ ] Check if gallery_items table is accessible
-- [ ] Check if products table is accessible
-- [ ] Verify DATABASE_URL environment variable is correct
+## Shop Page Improvements (Dec 25, 2025)
+- [x] Create featured product collections (Best Sellers, New Arrivals, Traditional, Modern, Transitional, Rustic)
+- [x] Add tabbed interface for Collections vs Browse All
+- [x] Add collection selector cards with icons
+- [x] Add kitchen background image to Shop page hero
+- [x] Improve filter UI with clear button

@@ -4,6 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle2, Package, Mail, Home, Loader2 } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 export default function OrderConfirmation() {
   const [location] = useLocation();
@@ -62,6 +63,8 @@ export default function OrderConfirmation() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Navigation />
+
       {/* Success Header */}
       <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-16">
         <div className="container text-center">

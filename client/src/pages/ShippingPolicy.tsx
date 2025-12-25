@@ -2,10 +2,13 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Truck, Package, Clock, MapPin, ArrowLeft } from "lucide-react";
+import Navigation from "@/components/Navigation";
 
 export default function ShippingPolicy() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
+      <Navigation />
+
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-12">
         <div className="container">
