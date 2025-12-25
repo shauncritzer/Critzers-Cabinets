@@ -58,10 +58,10 @@ export default function Checkout() {
   const createPaymentIntent = trpc.checkout.createPaymentIntent.useMutation();
 
   const items = cartData?.items || [];
-  const subtotal = parseFloat(totalsData?.subtotal || "0");
-  const shipping = parseFloat(totalsData?.shipping || "0");
-  const tax = parseFloat(totalsData?.tax || "0");
-  const total = parseFloat(totalsData?.total || "0");
+  const subtotal = parseFloat(String(totalsData?.subtotal || "0"));
+  const shipping = parseFloat(String(totalsData?.shipping || "0"));
+  const tax = parseFloat(String(totalsData?.tax || "0"));
+  const total = parseFloat(String(totalsData?.total || "0"));
 
   // Redirect to cart if empty
   useEffect(() => {
