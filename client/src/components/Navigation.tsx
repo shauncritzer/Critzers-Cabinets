@@ -33,11 +33,11 @@ export default function Navigation({ transparent = false }: NavigationProps) {
     setIsMobileMenuOpen(false);
   }, [location]);
 
+  // Public navigation links - Dashboard hidden from public nav (requires login)
   const navLinks = [
     { href: "/about", label: "About Us" },
     { href: "/shop", label: "Shop Hardware" },
     { href: "/gallery", label: "Gallery" },
-    { href: "/dashboard", label: "Dashboard" },
   ];
 
   const isActive = (href: string) => location === href;
@@ -152,7 +152,6 @@ export default function Navigation({ transparent = false }: NavigationProps) {
                   {link.label === "About Us" && "ℹ️ "}
                   {link.label === "Shop Hardware" && "🛒 "}
                   {link.label === "Gallery" && "🖼️ "}
-                  {link.label === "Dashboard" && "📊 "}
                   {link.label}
                 </Link>
               ))}

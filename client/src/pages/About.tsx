@@ -44,10 +44,14 @@ export default function About() {
             </div>
 
             <div className="grid gap-8 md:grid-cols-3">
-              {/* Larry Critzer */}
+              {/* Larry Critzer - WITH REAL PHOTO */}
               <Card className="overflow-hidden">
-                <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <div className="text-6xl">👨‍💼</div>
+                <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/team/larry-critzer.png" 
+                    alt="Larry Critzer"
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
                 <CardContent className="pt-6 space-y-2">
                   <h3 className="font-bold text-xl">Larry Critzer</h3>
@@ -60,10 +64,14 @@ export default function About() {
                 </CardContent>
               </Card>
 
-              {/* Dana Quick */}
+              {/* Dana Quick - WITH REAL PHOTO */}
               <Card className="overflow-hidden">
-                <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center">
-                  <div className="text-6xl">👩‍💼</div>
+                <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src="/images/team/dana-quick.png" 
+                    alt="Dana Quick"
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
                 <CardContent className="pt-6 space-y-2">
                   <h3 className="font-bold text-xl">Dana Quick</h3>
@@ -100,24 +108,83 @@ export default function About() {
         </div>
       </section>
 
-      {/* Company Story */}
-      <section className="container py-20">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <div className="space-y-4">
-            <h2 className="text-3xl font-bold">Who We Are</h2>
-            <div className="prose prose-lg max-w-none text-muted-foreground">
-              <p>
-                Critzer's Cabinet Creations, Inc. is family-owned and operated and has been in business since 1986. 
-                We try hard to earn and keep our customers' respect and trust by offering courteous service at an 
-                honest value. With every Critzer "creation" comes the pride of workmanship and dedication to providing 
-                unparalleled customer service and satisfaction.
+      {/* Cabinetry Showcase Section */}
+      <section className="py-16">
+        <div className="container">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-bold">Craftsmanship You Can Trust</h2>
+              <p className="text-muted-foreground">
+                Every kitchen we design reflects our commitment to quality and attention to detail. 
+                From traditional to contemporary styles, we work with you to create spaces that 
+                are both beautiful and functional.
               </p>
-              <p>
+              <Link href="/gallery">
+                <Button variant="outline" className="gap-2">
+                  View Our Gallery <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-xl">
+              <img 
+                src="/images/gallery/omega-traditional-cherry.jpg" 
+                alt="Traditional cherry kitchen cabinets"
+                className="w-full h-80 object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Company Story with Image */}
+      <section className="bg-secondary/10 py-20">
+        <div className="container">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="rounded-lg overflow-hidden shadow-xl order-2 md:order-1">
+                <img 
+                  src="/images/gallery/omega-modern-gray.jpg" 
+                  alt="Modern gray kitchen design"
+                  className="w-full h-96 object-cover"
+                />
+              </div>
+              <div className="space-y-6 order-1 md:order-2">
+                <h2 className="text-3xl font-bold">Who We Are</h2>
+                <div className="prose prose-lg max-w-none text-muted-foreground space-y-4">
+                  <p>
+                    Critzer's Cabinet Creations, Inc. is family-owned and operated and has been in business since 1986. 
+                    We try hard to earn and keep our customers' respect and trust by offering courteous service at an 
+                    honest value.
+                  </p>
+                  <p>
+                    With every Critzer "creation" comes the pride of workmanship and dedication to providing 
+                    unparalleled customer service and satisfaction.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Services with Cabinetry Image */}
+      <section className="container py-20">
+        <div className="max-w-6xl mx-auto space-y-12">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="space-y-6">
+              <h2 className="text-3xl font-bold">What We Offer</h2>
+              <p className="text-muted-foreground">
                 As authorized dealers for <strong>Omega Cabinetry</strong> and <strong>Wolf Cabinetry</strong>, we offer 
                 semi-custom and stock cabinet options for any room in your home or office. We also provide a wide selection 
-                of countertops including granite, marble, quartz, soapstone, and solid surface options. Whether you're 
-                building a new home or remodeling, we have solutions to fit every style and budget.
+                of countertops including granite, marble, quartz, soapstone, and solid surface options.
               </p>
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-xl">
+              <img 
+                src="/images/gallery/omega-transitional-white.jpg" 
+                alt="Transitional white kitchen"
+                className="w-full h-80 object-cover"
+              />
             </div>
           </div>
 
@@ -175,7 +242,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* Our Partners */}
+      {/* Our Partners with Images */}
       <section className="bg-secondary/10 py-20">
         <div className="container">
           <div className="max-w-6xl mx-auto space-y-12">
@@ -187,8 +254,15 @@ export default function About() {
             </div>
 
             <div className="grid gap-8 md:grid-cols-2">
-              <Card className="p-8">
-                <div className="text-center space-y-4">
+              <Card className="overflow-hidden">
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src="/images/gallery/omega-farmhouse-rustic.jpg" 
+                    alt="Omega Cabinetry example"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-8 text-center space-y-4">
                   <h3 className="text-2xl font-bold">Omega Cabinetry</h3>
                   <p className="text-muted-foreground">
                     We are an authorized dealer of Omega Cabinetry from Waterloo, Iowa. 
@@ -200,8 +274,15 @@ export default function About() {
                   </a>
                 </div>
               </Card>
-              <Card className="p-8">
-                <div className="text-center space-y-4">
+              <Card className="overflow-hidden">
+                <div className="h-48 overflow-hidden">
+                  <img 
+                    src="/images/gallery/omega-coastal-blue.jpg" 
+                    alt="Top Knobs hardware on cabinets"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div className="p-8 text-center space-y-4">
                   <h3 className="text-2xl font-bold">Top Knobs</h3>
                   <p className="text-muted-foreground">
                     As an authorized Top Knobs dealer, we offer their complete line of 

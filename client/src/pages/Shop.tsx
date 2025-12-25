@@ -106,6 +106,63 @@ export default function Shop() {
         </div>
       </section>
 
+      {/* Hardware Showcase Banner */}
+      <section className="bg-gradient-to-r from-slate-900 to-slate-800 py-12">
+        <div className="container">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4 text-white">
+              <h2 className="text-3xl font-bold">Premium Cabinet Hardware</h2>
+              <p className="text-slate-300">
+                Transform your cabinets with Top Knobs - America's leading decorative hardware brand. 
+                From sleek modern pulls to classic traditional knobs, find the perfect finishing touch 
+                for your kitchen, bathroom, or furniture.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  7,000+ Products
+                </Badge>
+                <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  Free Shipping $100+
+                </Badge>
+                <Badge variant="secondary" className="bg-white/10 text-white border-white/20">
+                  Authorized Dealer
+                </Badge>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/hardware/topknobs-showcase-1.png" 
+                  alt="Top Knobs hardware on white cabinets"
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/hardware/topknobs-showcase-2.png" 
+                  alt="Top Knobs hardware on green cabinets"
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/hardware/topknobs-showcase-3.jpg" 
+                  alt="Top Knobs Ellis collection"
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+              <div className="rounded-lg overflow-hidden shadow-lg">
+                <img 
+                  src="/images/hardware/topknobs-showcase-4.png" 
+                  alt="Top Knobs hardware on kitchen island"
+                  className="w-full h-40 object-cover"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Main Content */}
       <div className="container py-8">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as "collections" | "browse")} className="space-y-6">

@@ -219,3 +219,12 @@
 - [x] Add collection selector cards with icons
 - [x] Add kitchen background image to Shop page hero
 - [x] Improve filter UI with clear button
+
+
+## Updates (Dec 25, 2025 - Session 2)
+- [x] Add Larry Critzer's professional photo to About page
+- [x] Add Dana Quick's professional photo to About page
+- [x] Add cabinetry images throughout About page (4 gallery images integrated)
+- [x] Add hardware showcase banner to Shop page with Top Knobs images
+- [x] Remove Dashboard from public navigation (still accessible via direct URL for logged-in users)
+- [ ] Scrape and add product images to individual SKUs
