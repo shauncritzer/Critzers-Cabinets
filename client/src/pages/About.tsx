@@ -48,9 +48,9 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
                   <img 
-                    src="/images/team/larry-critzer.png" 
+                    src="/images/team/larry_critzer_professional.png" 
                     alt="Larry Critzer"
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-cover object-center"
                   />
                 </div>
                 <CardContent className="pt-6 space-y-2">

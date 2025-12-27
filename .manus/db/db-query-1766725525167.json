@@ -1,0 +1,130 @@
+{
+  "query": "SELECT sku, name, collection, finish FROM products ORDER BY sku LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT sku, name, collection, finish FROM products ORDER BY sku LIMIT 20;",
+  "rows": [
+    {
+      "sku": "M1",
+      "name": "Oxford Pull 3 3/4\" (c-c) - German Bronze",
+      "collection": "Britannia",
+      "finish": "GBZ"
+    },
+    {
+      "sku": "M10",
+      "name": "Empress Knob 1 3/8\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA"
+    },
+    {
+      "sku": "M1001",
+      "name": "Pennington Bar Pull 3\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1002",
+      "name": "Pennington Bar Pull 3 3/4\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1003",
+      "name": "Pennington Bar Pull 5 1/16\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1004",
+      "name": "Pennington Bar Pull 6 5/16\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1005",
+      "name": "Pennington Bar Pull 8 13/16\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1006",
+      "name": "Pennington Bar Pull 11 11/32\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1007",
+      "name": "Pennington Bar Pull 15\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1008",
+      "name": "Pennington Bar Pull 18 7/8\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1009",
+      "name": "Pennington Bar Pull 26 15/32\" (c-c) - Brushed Satin Nickel",
+      "collection": "Bar Pulls",
+      "finish": "BSN"
+    },
+    {
+      "sku": "M1015",
+      "name": "Pennington Bar Pull 3\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1016",
+      "name": "Pennington Bar Pull 3 3/4\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1017",
+      "name": "Pennington Bar Pull 5 1/16\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1018",
+      "name": "Pennington Bar Pull 6 5/16\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1019",
+      "name": "Pennington Bar Pull 8 13/16\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1020",
+      "name": "Pennington Bar Pull 11 11/32\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1021",
+      "name": "Pennington Bar Pull 15\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1022",
+      "name": "Pennington Bar Pull 18 7/8\" (c-c) - Flat Black",
+      "collection": "Bar Pulls",
+      "finish": "BLK"
+    },
+    {
+      "sku": "M1029",
+      "name": "Pennington Bar Pull 3\" (c-c) - Oil Rubbed Bronze",
+      "collection": "Bar Pulls",
+      "finish": "ORB"
+    }
+  ],
+  "messages": [],
+  "stdout": "sku\tname\tcollection\tfinish\nM1\tOxford Pull 3 3/4\" (c-c) - German Bronze\tBritannia\tGBZ\nM10\tEmpress Knob 1 3/8\" - Pewter Antique\tBritannia\tPTA\nM1001\tPennington Bar Pull 3\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1002\tPennington Bar Pull 3 3/4\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1003\tPennington Bar Pull 5 1/16\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1004\tPennington Bar Pull 6 5/16\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1005\tPennington Bar Pull 8 13/16\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1006\tPennington Bar Pull 11 11/32\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1007\tPennington Bar Pull 15\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1008\tPennington Bar Pull 18 7/8\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1009\tPennington Bar Pull 26 15/32\" (c-c) - Brushed Satin Nickel\tBar Pulls\tBSN\nM1015\tPennington Bar Pull 3\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1016\tPennington Bar Pull 3 3/4\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1017\tPennington Bar Pull 5 1/16\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1018\tPennington Bar Pull 6 5/16\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1019\tPennington Bar Pull 8 13/16\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1020\tPennington Bar Pull 11 11/32\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1021\tPennington Bar Pull 15\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1022\tPennington Bar Pull 18 7/8\" (c-c) - Flat Black\tBar Pulls\tBLK\nM1029\tPennington Bar Pull 3\" (c-c) - Oil Rubbed Bronze\tBar Pulls\tORB\n",
+  "stderr": "",
+  "execution_time_ms": 56
+}

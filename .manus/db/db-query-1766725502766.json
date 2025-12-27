@@ -1,0 +1,170 @@
+{
+  "query": "SELECT id, sku, name, collection, finish, image_url FROM products LIMIT 20;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, sku, name, collection, finish, image_url FROM products LIMIT 20;",
+  "rows": [
+    {
+      "id": "1",
+      "sku": "M1",
+      "name": "Oxford Pull 3 3/4\" (c-c) - German Bronze",
+      "collection": "Britannia",
+      "finish": "GBZ",
+      "image_url": "NULL"
+    },
+    {
+      "id": "2",
+      "sku": "M2",
+      "name": "Oxford Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "PTL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "3",
+      "sku": "M3",
+      "name": "Oxford Pull 3 3/4\" (c-c) - Dark Antique Brass",
+      "collection": "Britannia",
+      "finish": "DAB",
+      "image_url": "NULL"
+    },
+    {
+      "id": "4",
+      "sku": "M4V",
+      "name": "Tudor Pull 2 1/2\" w/Vertical Backplate - German Bronze **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "GBZ",
+      "image_url": "NULL"
+    },
+    {
+      "id": "5",
+      "sku": "M5H",
+      "name": "Tudor Pull 2 1/8\" w/Horizontal Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "PTL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "6",
+      "sku": "M5V",
+      "name": "Tudor Pull 2 1/2\" w/Vertical Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "PTL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "7",
+      "sku": "M6",
+      "name": "Devon Knob 1 1/4\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "image_url": "NULL"
+    },
+    {
+      "id": "8",
+      "sku": "M7",
+      "name": "Devon Knob 1 1/4\" - Old English Copper",
+      "collection": "Britannia",
+      "finish": "OEC",
+      "image_url": "NULL"
+    },
+    {
+      "id": "9",
+      "sku": "M8",
+      "name": "Devon Knob 1 1/4\" - Rust **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "RST",
+      "image_url": "NULL"
+    },
+    {
+      "id": "10",
+      "sku": "M10",
+      "name": "Empress Knob 1 3/8\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "image_url": "NULL"
+    },
+    {
+      "id": "11",
+      "sku": "M14",
+      "name": "Ascot Knob 1 1/4\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "image_url": "NULL"
+    },
+    {
+      "id": "12",
+      "sku": "M15",
+      "name": "Ascot Knob 1 1/4\" - Old English Copper",
+      "collection": "Britannia",
+      "finish": "OEC",
+      "image_url": "NULL"
+    },
+    {
+      "id": "13",
+      "sku": "M16",
+      "name": "Ascot Knob 1 1/4\" - German Bronze",
+      "collection": "Britannia",
+      "finish": "GBZ",
+      "image_url": "NULL"
+    },
+    {
+      "id": "14",
+      "sku": "M17",
+      "name": "Eton Pull 3 3/4\" (c-c) - German Bronze",
+      "collection": "Britannia",
+      "finish": "GBZ",
+      "image_url": "NULL"
+    },
+    {
+      "id": "15",
+      "sku": "M18AP",
+      "name": "Eton Pull 3 3/4\" (c-c) - Antique Pewter",
+      "collection": "Britannia",
+      "finish": "PTL",
+      "image_url": "NULL"
+    },
+    {
+      "id": "16",
+      "sku": "M18",
+      "name": "Eton Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "image_url": "NULL"
+    },
+    {
+      "id": "17",
+      "sku": "M19",
+      "name": "Eton Pull 3 3/4\" (c-c) - Dark Antique Brass **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "DAB",
+      "image_url": "NULL"
+    },
+    {
+      "id": "18",
+      "sku": "M20",
+      "name": "Eton Pull 3 3/4\" (c-c) - Rust **DISCONTINUED - LIMITED AVAILABILITY**",
+      "collection": "Britannia",
+      "finish": "RST",
+      "image_url": "NULL"
+    },
+    {
+      "id": "19",
+      "sku": "M22",
+      "name": "London Knob 1 1/4\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "image_url": "NULL"
+    },
+    {
+      "id": "20",
+      "sku": "M23",
+      "name": "London Knob 1 1/4\" - Old English Copper",
+      "collection": "Britannia",
+      "finish": "OEC",
+      "image_url": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tcollection\tfinish\timage_url\n1\tM1\tOxford Pull 3 3/4\" (c-c) - German Bronze\tBritannia\tGBZ\tNULL\n2\tM2\tOxford Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tPTL\tNULL\n3\tM3\tOxford Pull 3 3/4\" (c-c) - Dark Antique Brass\tBritannia\tDAB\tNULL\n4\tM4V\tTudor Pull 2 1/2\" w/Vertical Backplate - German Bronze **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tGBZ\tNULL\n5\tM5H\tTudor Pull 2 1/8\" w/Horizontal Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tPTL\tNULL\n6\tM5V\tTudor Pull 2 1/2\" w/Vertical Backplate - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tPTL\tNULL\n7\tM6\tDevon Knob 1 1/4\" - Pewter Antique\tBritannia\tPTA\tNULL\n8\tM7\tDevon Knob 1 1/4\" - Old English Copper\tBritannia\tOEC\tNULL\n9\tM8\tDevon Knob 1 1/4\" - Rust **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tRST\tNULL\n10\tM10\tEmpress Knob 1 3/8\" - Pewter Antique\tBritannia\tPTA\tNULL\n11\tM14\tAscot Knob 1 1/4\" - Pewter Antique\tBritannia\tPTA\tNULL\n12\tM15\tAscot Knob 1 1/4\" - Old English Copper\tBritannia\tOEC\tNULL\n13\tM16\tAscot Knob 1 1/4\" - German Bronze\tBritannia\tGBZ\tNULL\n14\tM17\tEton Pull 3 3/4\" (c-c) - German Bronze\tBritannia\tGBZ\tNULL\n15\tM18AP\tEton Pull 3 3/4\" (c-c) - Antique Pewter\tBritannia\tPTL\tNULL\n16\tM18\tEton Pull 3 3/4\" (c-c) - Pewter Light **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tPTA\tNULL\n17\tM19\tEton Pull 3 3/4\" (c-c) - Dark Antique Brass **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tDAB\tNULL\n18\tM20\tEton Pull 3 3/4\" (c-c) - Rust **DISCONTINUED - LIMITED AVAILABILITY**\tBritannia\tRST\tNULL\n19\tM22\tLondon Knob 1 1/4\" - Pewter Antique\tBritannia\tPTA\tNULL\n20\tM23\tLondon Knob 1 1/4\" - Old English Copper\tBritannia\tOEC\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 90
+}

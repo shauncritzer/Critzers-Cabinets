@@ -1,0 +1,26 @@
+{
+  "query": "SELECT id, sku, name, collection, finish, SUBSTRING(image_url, 1, 50) as img_preview FROM products WHERE sku IN ('M1', 'M6', 'TK700', 'TK701') LIMIT 10;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, sku, name, collection, finish, SUBSTRING(image_url, 1, 50) as img_preview FROM products WHERE sku IN ('M1', 'M6', 'TK700', 'TK701') LIMIT 10;",
+  "rows": [
+    {
+      "id": "1",
+      "sku": "M1",
+      "name": "Oxford Pull 3 3/4\" (c-c) - German Bronze",
+      "collection": "Britannia",
+      "finish": "GBZ",
+      "img_preview": "NULL"
+    },
+    {
+      "id": "7",
+      "sku": "M6",
+      "name": "Devon Knob 1 1/4\" - Pewter Antique",
+      "collection": "Britannia",
+      "finish": "PTA",
+      "img_preview": "NULL"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\tsku\tname\tcollection\tfinish\timg_preview\n1\tM1\tOxford Pull 3 3/4\" (c-c) - German Bronze\tBritannia\tGBZ\tNULL\n7\tM6\tDevon Knob 1 1/4\" - Pewter Antique\tBritannia\tPTA\tNULL\n",
+  "stderr": "",
+  "execution_time_ms": 88
+}

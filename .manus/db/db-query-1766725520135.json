@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total, COUNT(image_url) as with_images FROM products;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT COUNT(*) as total, COUNT(image_url) as with_images FROM products;",
+  "rows": [
+    {
+      "total": "7358",
+      "with_images": "0"
+    }
+  ],
+  "messages": [],
+  "stdout": "total\twith_images\n7358\t0\n",
+  "stderr": "",
+  "execution_time_ms": 168
+}

@@ -228,3 +228,18 @@
 - [x] Add hardware showcase banner to Shop page with Top Knobs images
 - [x] Remove Dashboard from public navigation (still accessible via direct URL for logged-in users)
 - [ ] Scrape and add product images to individual SKUs
+
+## Image Scraping Task (Dec 26, 2025)
+- [ ] Scrape all product images from Top Knobs dealer portal
+- [ ] Match images to SKUs using product name from Description field
+- [ ] Upload images to S3 storage
+- [ ] Update product records with image URLs
+
+
+## New Tasks (Dec 26, 2025 - Evening)
+- [x] Stop full 7,358 SKU scrape
+- [x] Research and identify top 100-200 best-selling hardware products
+- [x] Scrape images for top sellers only (95 images found)
+- [x] Generate improved professional photo of Larry at design island (clean, designing, youthful, happy)
+- [x] Update About page with new Larry photo
+- [x] Update database with top seller product images (191 products updated)
