@@ -987,6 +987,50 @@ When you have enough information, summarize what you've learned and offer to gen
         }
       }),
 
+    updateProductImages: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Read the scraped image data
+        const fs = await import('fs');
+        const path = await import('path');
+        const imageDataPath = path.join(process.cwd(), 'product_images.json');
+        
+        if (!fs.existsSync(imageDataPath)) {
+          return {
+            success: false,
+            message: 'Image data file not found',
+          };
+        }
+
+        const imageData = JSON.parse(fs.readFileSync(imageDataPath, 'utf8'));
+        let updated = 0;
+        let errors = 0;
+
+        for (const item of imageData) {
+          if (item.image_url) {
+            try {
+              await db.update(products)
+                .set({ imageUrl: item.image_url })
+                .where(eq(products.sku, item.sku));
+              updated++;
+            } catch (error) {
+              console.error(`Error updating ${item.sku}:`, error);
+              errors++;
+            }
+          }
+        }
+
+        return {
+          success: true,
+          updated,
+          errors,
+          total: imageData.length,
+          message: `Updated ${updated} products with images`,
+        };
+      }),
+
     clearProducts: publicProcedure
       .mutation(async () => {
         const db = await getDb();

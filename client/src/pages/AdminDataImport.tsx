@@ -8,6 +8,7 @@ export default function AdminDataImport() {
   const [results, setResults] = useState<{
     products?: number;
     gallery?: number;
+    images?: { updated: number; total: number };
     error?: string;
   }>({});
   const [showClearConfirm, setShowClearConfirm] = useState(false);
@@ -15,6 +16,7 @@ export default function AdminDataImport() {
   const importProductsMutation = trpc.admin.importProducts.useMutation();
   const importGalleryMutation = trpc.admin.importGallery.useMutation();
   const clearProductsMutation = trpc.admin.clearProducts.useMutation();
+  const updateImagesMutation = trpc.admin.updateProductImages.useMutation();
 
   const handleClearProducts = async () => {
     setImporting(true);
@@ -49,6 +51,19 @@ export default function AdminDataImport() {
     try {
       const result = await importGalleryMutation.mutateAsync();
       setResults((prev) => ({ ...prev, gallery: result.count }));
+    } catch (error: any) {
+      setResults((prev) => ({ ...prev, error: error.message }));
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  const handleUpdateImages = async () => {
+    setImporting(true);
+    setResults({});
+    try {
+      const result = await updateImagesMutation.mutateAsync();
+      setResults((prev) => ({ ...prev, images: { updated: result.updated || 0, total: result.total || 0 } }));
     } catch (error: any) {
       setResults((prev) => ({ ...prev, error: error.message }));
     } finally {
@@ -143,6 +158,26 @@ export default function AdminDataImport() {
         </Card>
 
         <Card className="p-6 mb-6">
+          <h2 className="text-xl font-semibold mb-4">Update Product Images</h2>
+          <p className="text-gray-600 mb-4">
+            Update 191 top-selling products with real images from Top Knobs dealer portal.
+          </p>
+          <Button
+            onClick={handleUpdateImages}
+            disabled={importing}
+            size="lg"
+            className="bg-green-600 hover:bg-green-700"
+          >
+            {importing ? "Updating..." : "Update Product Images"}
+          </Button>
+          {results.images && (
+            <p className="mt-4 text-green-600 font-semibold">
+              ✓ Updated {results.images.updated} out of {results.images.total} products with images!
+            </p>
+          )}
+        </Card>
+
+        <Card className="p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Import Gallery Images</h2>
           <p className="text-gray-600 mb-4">
             Import 8 Omega Cabinetry gallery items into the Railway database.
@@ -171,6 +206,7 @@ export default function AdminDataImport() {
           <h3 className="font-semibold mb-2">Instructions:</h3>
           <ol className="list-decimal list-inside space-y-2 text-sm">
             <li>Click "Import Products" to load all 7,358 Top Knobs products</li>
+            <li>Click "Update Product Images" to add real images to 191 top sellers</li>
             <li>Click "Import Gallery" to load the 8 Omega Cabinetry images</li>
             <li>Wait for confirmation messages</li>
             <li>Refresh the Shop Hardware and Gallery pages to verify</li>
