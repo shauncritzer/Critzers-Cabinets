@@ -246,6 +246,6 @@
 
 
 ## Bug Fixes & New Features (Dec 26, 2025 - Late Evening)
-- [x] Fix product images not displaying on live Railway site (added admin endpoint to update production database)
+- [x] Fix product images not displaying on live Railway site (embedded 191 image URLs in code for deployment)
 - [ ] Implement quote lead notification system (email alerts when quotes submitted) - NEXT
 - [ ] Add lead capture with contact information from quote form - NEXT
