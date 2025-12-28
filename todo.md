@@ -249,3 +249,10 @@
 - [x] Fix product images not displaying on live Railway site (embedded 191 image URLs in code for deployment)
 - [ ] Implement quote lead notification system (email alerts when quotes submitted) - NEXT
 - [ ] Add lead capture with contact information from quote form - NEXT
+
+
+## Debugging (Dec 27, 2025 - Early Morning)
+- [x] Check Railway deployment status and verify latest code is deployed
+- [x] Test admin update button on live site and check for errors (shows success but images not appearing)
+- [x] Debug why product images still not showing after update (code works locally, issue is Railway-specific)
+- [ ] Implement working solution for production database

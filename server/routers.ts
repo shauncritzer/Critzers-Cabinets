@@ -987,6 +987,13 @@ When you have enough information, summarize what you've learned and offer to gen
         }
       }),
 
+    debugImageUrls: publicProcedure
+      .query(async () => {
+        const { checkImageUrls } = await import('./debug-images');
+        const results = await checkImageUrls();
+        return { results };
+      }),
+
     updateProductImages: publicProcedure
       .mutation(async () => {
         const db = await getDb();
