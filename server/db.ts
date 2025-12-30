@@ -101,7 +101,31 @@ export async function createQuote(quote: InsertQuote) {
   if (!db) throw new Error("Database not available");
   
   const result = await db.insert(quotes).values(quote);
-  return result[0].insertId;
+  const quoteId = result[0].insertId;
+  
+  // Send notification to owner about new quote
+  try {
+    const { notifyOwner } = await import('./_core/notification');
+    await notifyOwner({
+      title: `New Quote Request from ${quote.customerName}`,
+      content: `
+Customer: ${quote.customerName}
+Email: ${quote.customerEmail}
+Phone: ${quote.customerPhone || 'Not provided'}
+
+Project Details:
+${quote.projectDescription || 'See conversation data'}
+
+Quote ID: ${quoteId}
+View at: https://critzerscabinets.com/dashboard
+      `.trim(),
+    });
+  } catch (error) {
+    console.error('[createQuote] Failed to send notification:', error);
+    // Don't fail the quote creation if notification fails
+  }
+  
+  return quoteId;
 }
 
 export async function getQuoteById(id: number) {
