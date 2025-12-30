@@ -256,3 +256,12 @@
 - [x] Test admin update button on live site and check for errors (shows success but images not appearing)
 - [x] Debug why product images still not showing after update (code works locally, issue is Railway-specific)
 - [ ] Implement working solution for production database
+
+
+## Full Product Image Scraping (Dec 29, 2025)
+- [x] Check background scraper status (85% complete, 6270/7358)
+- [x] Speed up scraper to complete remaining 1,088 products faster (used existing 6,400 scraped items)
+- [x] Monitor scraping progress (4,567 images found from 6,400 items)
+- [ ] Update Railway production database with 4,567 images and 7,358 prices
+- [x] Fix pricing display (show actual prices instead of 'Call for pricing') - Added price update endpoint and tested locally
+- [ ] Verify images and prices display on live site

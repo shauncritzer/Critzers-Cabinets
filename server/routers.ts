@@ -994,6 +994,38 @@ When you have enough information, summarize what you've learned and offer to gen
         return { results };
       }),
 
+    updateProductPrices: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Import the embedded price data
+        const { PRODUCT_PRICE_MAP } = await import('./productPriceData');
+        
+        let updated = 0;
+        let errors = 0;
+
+        for (const [sku, retailPrice] of Object.entries(PRODUCT_PRICE_MAP)) {
+          try {
+            await db.update(products)
+              .set({ retailPrice })
+              .where(eq(products.sku, sku));
+            updated++;
+          } catch (error) {
+            console.error(`Error updating price for ${sku}:`, error);
+            errors++;
+          }
+        }
+
+        return {
+          success: true,
+          updated,
+          errors,
+          total: Object.keys(PRODUCT_PRICE_MAP).length,
+          message: `Updated ${updated} products with prices`,
+        };
+      }),
+
     updateProductImages: publicProcedure
       .mutation(async () => {
         const db = await getDb();
