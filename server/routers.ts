@@ -4,7 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router, protectedProcedure } from "./_core/trpc";
 import { z } from "zod";
 import { invokeLLM } from "./_core/llm";
-import { like, or, and, eq, sql } from "drizzle-orm";
+import { like, or, and, eq, sql, isNull, not } from "drizzle-orm";
 import { products, cartItems, gallery, orders, orderItems } from "../drizzle/schema";
 import { getDb } from "./db";
 import { createPaymentIntent, calculateShipping, calculateTax } from "./stripe";
@@ -337,6 +337,14 @@ When you have enough information, summarize what you've learned and offer to gen
 
         const conditions = [];
         
+        // Filter out discontinued products
+        conditions.push(
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
+          )
+        );
+        
         if (input.search) {
           conditions.push(
             or(
@@ -452,6 +460,14 @@ When you have enough information, summarize what you've learned and offer to gen
             );
             break;
         }
+
+        // Add filter to exclude discontinued products
+        conditions.push(
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
+          )
+        );
 
         const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -1311,6 +1327,40 @@ When you have enough information, summarize what you've learned and offer to gen
           ...order,
           items,
         };
+      }),
+
+    fixGalleryDuplicates: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        try {
+          // Delete gallery items with IDs 1-8 (duplicates)
+          // Keeping items 9-16 which are the newer entries
+          const duplicateIds = [1, 2, 3, 4, 5, 6, 7, 8];
+          
+          let deleted = 0;
+          for (const id of duplicateIds) {
+            const result = await db.delete(gallery)
+              .where(eq(gallery.id, id));
+            deleted++;
+          }
+
+          // Get remaining items
+          const remaining = await db.select()
+            .from(gallery)
+            .orderBy(gallery.id);
+
+          return {
+            success: true,
+            deleted,
+            remaining: remaining.length,
+            message: `Deleted ${deleted} duplicate gallery items. ${remaining.length} items remaining.`,
+          };
+        } catch (error) {
+          console.error('Error fixing gallery duplicates:', error);
+          throw new Error('Failed to fix gallery duplicates');
+        }
       }),
 
     updateOrderStatus: publicProcedure

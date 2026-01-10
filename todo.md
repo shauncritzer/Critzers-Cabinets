@@ -269,8 +269,80 @@
 
 ## Final Push and Additional Features (Dec 29, 2025)
 - [x] Push checkpoint ee198705 to GitHub (3 commits pushed successfully)
-- [ ] Verify Railway deployment completes successfully (deployment in progress)
+- [x] Verify Railway deployment completes successfully (pushed to GitHub, Railway deploying)
 - [x] Implement quote lead notification system (email alerts) - Added to createQuote function
 - [ ] Resume background scraper for remaining ~2,800 product images (manual trigger only, takes 3-4 hours)
-- [ ] Test images, prices, and lead notifications on live site
+- [ ] Test images, prices, and lead notifications on live site (after Railway deployment completes)
 - [ ] Consider requesting official image feed from Top Knobs dealer rep (best long-term solution)
+
+
+## Loom Video Feedback - Round 2 (Dec 30, 2025)
+
+### CRITICAL: Email Notifications
+- [ ] Replace Manus notifications with email notifications
+- [ ] Send quote notifications to info@critzerscabinets.com
+- [ ] Configure email sender name/address (determine what "From" shows as)
+- [ ] Test email delivery for quote submissions
+
+### Product Display Issues
+- [ ] Hide or filter out all discontinued products (marked with "DISCONTINUED - LIMITED AVAILABILITY")
+- [ ] Improve product image quality (current images are "zoomed back and unfocused")
+- [ ] Fix finish name display (showing "copper" when it's actually "antique pewter")
+- [ ] Create finish name mapping table for accurate display
+
+### UX Improvements
+- [ ] Add quantity selector to each product card (1-99 with +/- buttons)
+- [ ] Group products by style with finish selector (like Top Knobs site)
+- [ ] Implement finish carousel/slider on product cards
+- [ ] Show all finishes for one product in unified view (not separate cards per finish)
+
+### Data Structure Changes
+- [ ] Analyze current product data structure (separate SKU per finish)
+- [ ] Design new structure to group products by base style
+- [ ] Create finish variants system
+- [ ] Map finish abbreviations to full finish names (BSN, PC, BLK, PB, etc.)
+
+### Image Quality Improvements
+- [ ] Research higher-resolution image sources from Top Knobs
+- [ ] Try scraping from product detail pages instead of search results
+- [ ] Consider requesting official product image feed from Top Knobs
+- [ ] Upload high-quality images for top sellers manually if needed
+
+
+## Bug Fix - Gallery Duplication (Dec 30, 2025)
+- [ ] Fix gallery page showing duplicate images (each item appears twice)
+- [ ] Check if database has duplicate entries or if it's a rendering issue
+- [ ] Remove duplicates and verify gallery displays correctly
+
+
+## Current Priority Tasks (Jan 8, 2026)
+- [ ] Implement email notifications for quotes → info@critzerscabinets.com (replace Manus notifications)
+- [ ] Add quantity selector to product cards in shop
+- [ ] Hide/filter discontinued products from shop catalog
+- [ ] Improve AI quote system UX and data collection
+- [ ] Review and restore any missing navigation tabs or features
+- [ ] Fix gallery duplication issue (deploy fixGalleryDuplicates endpoint)
+- [ ] Test email notification system with real quote submission
+- [ ] Verify all site features are working before deployment
+
+
+## Phase 1 Progress (Jan 8, 2026)
+- [x] Implement email notifications for quotes → info@critzerscabinets.com (replaced Manus notifications)
+- [x] Add quantity selector to product cards in shop
+- [x] Hide/filter discontinued products from shop catalog
+- [ ] Test email notification system with SendGrid API key
+
+
+## Phase 2 - Restore Missing Features from Old Site (Jan 8, 2026)
+- [x] Add hero image carousel to homepage (auto-rotating images)
+- [x] Add 30-second commercial video section
+- [x] Create Products navigation page
+- [x] Create Services navigation page
+- [x] Create Contact navigation page
+- [x] Add physical address (661 Berkmar Court) to footer
+- [x] Add social media links (Facebook, Twitter/X)
+- [x] Add payment method icons (Visa, MC, Amex, Discover, Cash, Check)
+- [x] Add "Since 1986" / "Family-owned and operated" messaging
+- [x] Add "FREE Design Consultation" call-out
+- [x] Add factory warranty mention for countertops (included in Services page)
+- [x] Update navigation to include Products, Services, Contact

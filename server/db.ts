@@ -103,25 +103,18 @@ export async function createQuote(quote: InsertQuote) {
   const result = await db.insert(quotes).values(quote);
   const quoteId = result[0].insertId;
   
-  // Send notification to owner about new quote
+  // Send email notification to owner about new quote
   try {
-    const { notifyOwner } = await import('./_core/notification');
-    await notifyOwner({
-      title: `New Quote Request from ${quote.customerName}`,
-      content: `
-Customer: ${quote.customerName}
-Email: ${quote.customerEmail}
-Phone: ${quote.customerPhone || 'Not provided'}
-
-Project Details:
-${quote.projectDescription || 'See conversation data'}
-
-Quote ID: ${quoteId}
-View at: https://critzerscabinets.com/dashboard
-      `.trim(),
+    const { sendQuoteNotification } = await import('./emailService');
+    await sendQuoteNotification({
+      customerName: quote.customerName,
+      customerEmail: quote.customerEmail,
+      customerPhone: quote.customerPhone || undefined,
+      projectDescription: quote.projectDescription || undefined,
+      quoteId,
     });
   } catch (error) {
-    console.error('[createQuote] Failed to send notification:', error);
+    console.error('[createQuote] Failed to send email notification:', error);
     // Don't fail the quote creation if notification fails
   }
   

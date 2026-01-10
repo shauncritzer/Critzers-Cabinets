@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Link } from "wouter";
 import Navigation from "@/components/Navigation";
+import HeroCarousel from "@/components/HeroCarousel";
+import { Facebook, Twitter } from "lucide-react";
 
 export default function Home() {
   const { isAuthenticated } = useAuth();
@@ -12,38 +14,19 @@ export default function Home() {
       {/* Shared Navigation */}
       <Navigation transparent />
       
-      {/* Hero Section with Background Image */}
-      <div 
-        className="relative bg-cover bg-center min-h-[600px] flex flex-col"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('/images/hero-bg.webp')",
-          backgroundPosition: "center",
-          backgroundSize: "cover"
-        }}
-      >
-
-        {/* Hero Content */}
-        <div className="flex-1 flex items-center justify-center">
-          <div className="container text-center">
-            <div className="max-w-3xl mx-auto space-y-6">
-              <h1 className="text-5xl md:text-6xl font-bold text-white drop-shadow-lg">
-                Critzer's Cabinet Creations
-              </h1>
-              <p className="text-xl md:text-2xl text-white/95 drop-shadow-md">
-                Serving Charlottesville and Surrounding Areas Since 1986
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Hero Carousel */}
+      <HeroCarousel />
 
       {/* Welcome Section */}
       <section className="py-16 bg-background">
         <div className="container">
           <div className="max-w-4xl mx-auto text-center space-y-6">
+            <div className="inline-block bg-primary/10 text-primary px-6 py-2 rounded-full font-semibold mb-4">
+              🏆 Family-Owned & Operated Since 1986
+            </div>
             <h2 className="text-4xl font-bold text-foreground">Welcome to Critzer's Cabinet Creations</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              For 40 years, Critzer's Cabinet Creations has been Charlottesville's trusted kitchen and bath design center.
+              For <strong>40 years</strong>, Critzer's Cabinet Creations has been Charlottesville's trusted kitchen and bath design center.
               As authorized dealers for Omega Cabinetry, Wolf Cabinetry, and Top Knobs hardware, we combine expert design
               services with quality products to transform your space.
             </p>
@@ -51,6 +34,10 @@ export default function Home() {
               From professional design consultations to instant online hardware shopping, we bring four decades of experience
               into the digital age. Get your custom cabinet design quote in minutes, not days.
             </p>
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-6 my-8">
+              <p className="text-xl font-bold text-emerald-800 mb-2">✨ FREE Design Consultation</p>
+              <p className="text-emerald-700">Schedule your complimentary consultation with our expert designers today!</p>
+            </div>
             <div className="flex gap-4 justify-center pt-4">
               <Link href="/quote">
                 <Button size="lg" className="bg-primary hover:bg-primary/90">
@@ -63,6 +50,27 @@ export default function Home() {
                 </Button>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Commercial Video Section */}
+      <section className="py-16 bg-muted/30">
+        <div className="container">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-bold text-center mb-8">See Our Craftsmanship in Action</h2>
+            <div className="relative aspect-video rounded-lg overflow-hidden shadow-2xl">
+              <iframe
+                className="w-full h-full"
+                src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
+                title="Critzer's Cabinet Creations Commercial"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+            <p className="text-center text-muted-foreground mt-4 text-sm">
+              Watch our 30-second commercial showcasing 40 years of quality craftsmanship
+            </p>
           </div>
         </div>
       </section>
@@ -200,7 +208,48 @@ export default function Home() {
               </div>
             </div>
           </div>
-          <div className="mt-8 pt-8 border-t border-white/10 text-center text-sm text-secondary-foreground/60">
+          {/* Social Media & Payment Methods */}
+          <div className="mt-8 pt-8 border-t border-white/10">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-6">
+              {/* Social Media */}
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-secondary-foreground/80">Follow Us:</span>
+                <a 
+                  href="https://www.facebook.com/critzerscabinets" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label="Facebook"
+                >
+                  <Facebook className="w-5 h-5" />
+                </a>
+                <a 
+                  href="https://twitter.com/critzerscabinets" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                  aria-label="Twitter/X"
+                >
+                  <Twitter className="w-5 h-5" />
+                </a>
+              </div>
+
+              {/* Payment Methods */}
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-secondary-foreground/80">We Accept:</span>
+                <div className="flex gap-2">
+                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">VISA</div>
+                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">MC</div>
+                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">AMEX</div>
+                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">DISC</div>
+                  <div className="px-3 py-1 bg-white/10 border border-white/30 rounded text-xs font-bold">CASH</div>
+                  <div className="px-3 py-1 bg-white/10 border border-white/30 rounded text-xs font-bold">CHECK</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-6 text-center text-sm text-secondary-foreground/60">
             <p>© 2025 Critzer's Cabinet Creations, Inc. All Rights Reserved.</p>
           </div>
         </div>

@@ -76,8 +76,8 @@ export default function Shop() {
     },
   });
 
-  const handleAddToCart = (productId: number) => {
-    addToCart.mutate({ productId, quantity: 1, sessionId });
+  const handleAddToCart = (productId: number, quantity: number = 1) => {
+    addToCart.mutate({ productId, quantity, sessionId });
   };
 
   const cartCount = cartData?.count || 0;
@@ -375,7 +375,7 @@ function ProductGrid({
 }: { 
   products: any[]; 
   isLoading: boolean;
-  onAddToCart: (id: number) => void;
+  onAddToCart: (id: number, quantity?: number) => void;
   addToCartPending: boolean;
 }) {
   if (isLoading) {
@@ -448,7 +448,7 @@ function ProductGrid({
               </Badge>
             )}
             
-            <div className="flex items-center justify-between pt-2">
+            <div className="space-y-2 pt-2">
               <div>
                 {product.retailPrice && parseFloat(product.retailPrice) > 0 ? (
                   <p className="text-lg font-bold text-primary">
@@ -460,13 +460,27 @@ function ProductGrid({
                   </p>
                 )}
               </div>
-              <Button
-                size="sm"
-                onClick={() => onAddToCart(product.id)}
-                disabled={addToCartPending}
-              >
-                {addToCartPending ? "Adding..." : "Add to Cart"}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  min="1"
+                  defaultValue="1"
+                  className="w-16 h-9 text-center"
+                  id={`qty-${product.id}`}
+                />
+                <Button
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => {
+                    const qtyInput = document.getElementById(`qty-${product.id}`) as HTMLInputElement;
+                    const quantity = parseInt(qtyInput?.value || '1');
+                    onAddToCart(product.id, quantity);
+                  }}
+                  disabled={addToCartPending}
+                >
+                  {addToCartPending ? "Adding..." : "Add to Cart"}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
