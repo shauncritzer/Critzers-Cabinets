@@ -15,17 +15,17 @@ const slides: CarouselSlide[] = [
     subtitle: "Serving Charlottesville Since 1986"
   },
   {
-    image: "/images/kitchen-1.webp",
+    image: "/images/gallery/7nAUkEFBXEaf.jpg",
     title: "Custom Kitchen Design",
     subtitle: "Transform Your Space with Expert Craftsmanship"
   },
   {
-    image: "/images/kitchen-2.webp",
+    image: "/images/gallery/RHHoKWmplcBC.jpg",
     title: "Quality Cabinetry",
     subtitle: "Authorized Omega & Wolf Dealer"
   },
   {
-    image: "/images/kitchen-3.webp",
+    image: "/images/gallery/bt6Vi4lpCf4B.jpg",
     title: "Premium Hardware",
     subtitle: "Top Knobs Collection Available Online"
   }

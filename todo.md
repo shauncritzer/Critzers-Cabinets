@@ -352,3 +352,17 @@
 - [x] Add meta description tag (50-160 characters)
 - [x] Add meta keywords tag
 - [x] Verify SEO improvements
+
+
+## Homepage & Quote System Updates (Jan 10, 2026 - Evening)
+- [ ] Add SendGrid API key to Railway environment variables (manual setup required)
+- [x] Replace carousel grey background slides with actual images from old site
+- [x] Remove trophy emoji (🏆) from "Family-Owned & Operated Since 1986"
+- [x] Remove star emoji (✨) from "FREE Design Consultation"
+- [x] Redesign quote system - replace open LLM chat with structured form
+- [x] Add specific quote form fields (room type, dimensions, cabinet style, wood species, finish, countertop, hardware)
+- [x] Build pricing calculator logic for instant estimates
+- [x] Research and implement pricing formula based on form inputs
+- [x] Test quote system with pricing calculator
+- [ ] Deploy all changes to Railway via GitHub
+- [ ] Consider scraping Ferguson or Top Knobs for additional product images

@@ -22,7 +22,7 @@ export default function Home() {
         <div className="container">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-block bg-primary/10 text-primary px-6 py-2 rounded-full font-semibold mb-4">
-              🏆 Family-Owned & Operated Since 1986
+              Family-Owned & Operated Since 1986
             </div>
             <h2 className="text-4xl font-bold text-foreground">Welcome to Critzer's Cabinet Creations</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
@@ -35,7 +35,7 @@ export default function Home() {
               into the digital age. Get your custom cabinet design quote in minutes, not days.
             </p>
             <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-6 my-8">
-              <p className="text-xl font-bold text-emerald-800 mb-2">✨ FREE Design Consultation</p>
+              <p className="text-xl font-bold text-emerald-800 mb-2">FREE Design Consultation</p>
               <p className="text-emerald-700">Schedule your complimentary consultation with our expert designers today!</p>
             </div>
             <div className="flex gap-4 justify-center pt-4">
