@@ -1335,27 +1335,46 @@ When you have enough information, summarize what you've learned and offer to gen
         if (!db) throw new Error('Database connection failed');
 
         try {
-          // Delete gallery items with IDs 1-8 (duplicates)
-          // Keeping items 9-16 which are the newer entries
-          const duplicateIds = [1, 2, 3, 4, 5, 6, 7, 8];
-          
+          // Get all gallery items
+          const allItems = await db.select()
+            .from(gallery)
+            .orderBy(gallery.id);
+
+          // Group by afterImageUrl to find duplicates
+          const urlMap = new Map<string, typeof allItems>();
+          for (const item of allItems) {
+            const url = item.afterImageUrl || '';
+            if (!urlMap.has(url)) {
+              urlMap.set(url, []);
+            }
+            urlMap.get(url)!.push(item);
+          }
+
+          // Delete duplicates, keeping only the first occurrence
           let deleted = 0;
-          for (const id of duplicateIds) {
-            const result = await db.delete(gallery)
-              .where(eq(gallery.id, id));
-            deleted++;
+          const entries = Array.from(urlMap.entries());
+          for (const [url, items] of entries) {
+            if (items.length > 1) {
+              // Keep the first item, delete the rest
+              for (let i = 1; i < items.length; i++) {
+                await db.delete(gallery)
+                  .where(eq(gallery.id, items[i].id));
+                deleted++;
+              }
+            }
           }
 
           // Get remaining items
           const remaining = await db.select()
             .from(gallery)
-            .orderBy(gallery.id);
+            .orderBy(gallery.displayOrder);
 
           return {
             success: true,
             deleted,
             remaining: remaining.length,
-            message: `Deleted ${deleted} duplicate gallery items. ${remaining.length} items remaining.`,
+            items: remaining,
+            message: `Deleted ${deleted} duplicate gallery items. ${remaining.length} unique items remaining.`,
           };
         } catch (error) {
           console.error('Error fixing gallery duplicates:', error);

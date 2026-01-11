@@ -358,7 +358,7 @@ export default function ReturnPolicy() {
                 </Button>
               </div>
               <p className="text-xs text-muted-foreground mt-4">
-                Hours: Monday-Friday 9:00 AM - 5:00 PM EST
+                Hours: Monday-Friday 10:00 AM - 3:00 PM EST
               </p>
             </CardContent>
           </Card>

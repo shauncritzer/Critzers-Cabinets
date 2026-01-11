@@ -97,7 +97,7 @@ export default function Contact() {
                     (434) 973-1691
                   </a>
                   <p className="text-sm text-muted-foreground mt-2">
-                    Monday - Friday: 9:00 AM - 5:00 PM<br />
+                    Monday - Friday: 10:00 AM - 3:00 PM<br />
                     Saturday: By Appointment<br />
                     Sunday: Closed
                   </p>
@@ -222,7 +222,7 @@ export default function Contact() {
                   <div>
                     <p className="font-semibold mb-2">Weekdays</p>
                     <p className="text-muted-foreground">Monday - Friday</p>
-                    <p className="text-lg font-bold text-primary">9:00 AM - 5:00 PM</p>
+                    <p className="text-lg font-bold text-primary">10:00 AM - 3:00 PM</p>
                   </div>
                   <div>
                     <p className="font-semibold mb-2">Weekend</p>

@@ -378,4 +378,14 @@
 - [x] Add clickable links to Omega Cabinetry, Wolf Home Products, and Top Knobs websites
 - [x] Verify mobile hamburger menu works properly on all pages
 - [x] Test all fixes on dev server
+- [x] Deploy to GitHub/Railway
+
+
+## Production Fixes (Jan 10, 2026 - Final)
+- [x] Fix gallery triplicates on Railway production database (created smart deduplication endpoint)
+- [x] Update business hours to 10am-3pm Monday-Friday consistently (Contact, Shipping, Return pages)
+- [x] Review and adjust quote pricing formula - increased base prices ~75%
+- [x] Explain pricing formula to user for validation
+- [ ] Test all fixes
 - [ ] Deploy to GitHub/Railway
+- [ ] Run fixGalleryDuplicates endpoint on production after deploy

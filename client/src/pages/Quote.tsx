@@ -48,11 +48,11 @@ export default function Quote() {
 
     // Base price per linear foot based on door style
     const doorStylePrices: Record<string, number> = {
-      "shaker": 200,
-      "raised-panel": 250,
-      "flat-panel": 180,
-      "beadboard": 220,
-      "glass-front": 280,
+      "shaker": 350,
+      "raised-panel": 450,
+      "flat-panel": 320,
+      "beadboard": 380,
+      "glass-front": 500,
     };
 
     // Wood species multiplier
@@ -67,11 +67,11 @@ export default function Quote() {
 
     // Countertop additions (per linear foot)
     const countertopPrices: Record<string, number> = {
-      "laminate": 30,
-      "granite": 60,
-      "quartz": 70,
-      "marble": 80,
-      "butcher-block": 50,
+      "laminate": 50,
+      "granite": 100,
+      "quartz": 120,
+      "marble": 140,
+      "butcher-block": 80,
     };
 
     const doorStylePrice = doorStylePrices[projectData.doorStyle] || 200;
@@ -80,8 +80,8 @@ export default function Quote() {
 
     basePrice = (doorStylePrice * woodMultiplier * linearFeet) + (countertopPrice * linearFeet);
 
-    // Add 10% for hardware
-    basePrice = basePrice * 1.1;
+    // Add 15% for hardware and installation
+    basePrice = basePrice * 1.15;
 
     setEstimatedPrice(Math.round(basePrice));
   };

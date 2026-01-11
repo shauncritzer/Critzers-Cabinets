@@ -139,7 +139,7 @@ export default function ShippingPolicy() {
                   Charlottesville, VA 22901
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">
-                  Monday-Friday: 9:00 AM - 5:00 PM<br />
+                  Monday-Friday: 10:00 AM - 3:00 PM<br />
                   Saturday: By appointment
                 </p>
               </div>
