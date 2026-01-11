@@ -30,8 +30,11 @@ export default function Products() {
           
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <Card className="overflow-hidden">
-              <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center">
-                <div className="text-4xl font-bold text-amber-800">OMEGA</div>
+              <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center relative overflow-hidden">
+                <img src="/images/gallery/7nAUkEFBXEaf.jpg" alt="Omega Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-4xl font-bold text-white">OMEGA</div>
+                </div>
               </div>
               <CardHeader>
                 <CardTitle>Omega Cabinetry</CardTitle>
@@ -49,8 +52,11 @@ export default function Products() {
             </Card>
 
             <Card className="overflow-hidden">
-              <div className="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
-                <div className="text-4xl font-bold text-white">WOLF</div>
+              <div className="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center relative overflow-hidden">
+                <img src="/images/gallery/RHHoKWmplcBC.jpg" alt="Wolf Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                  <div className="text-4xl font-bold text-white">WOLF</div>
+                </div>
               </div>
               <CardHeader>
                 <CardTitle>Wolf Cabinetry</CardTitle>

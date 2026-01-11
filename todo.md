@@ -364,5 +364,18 @@
 - [x] Build pricing calculator logic for instant estimates
 - [x] Research and implement pricing formula based on form inputs
 - [x] Test quote system with pricing calculator
-- [ ] Deploy all changes to Railway via GitHub
+- [x] Deploy all changes to Railway via GitHub
 - [ ] Consider scraping Ferguson or Top Knobs for additional product images
+
+
+## Bug Fixes & Content Updates (Jan 10, 2026 - Late Evening)
+- [x] Fix gallery showing 3x duplicates of each image (was 2x, now 3x)
+- [x] Add real cabinet/project images to About page (not just AI avatars)
+- [x] Add relevant cabinetry images to Products page
+- [x] Add service-related images to Services page
+- [x] Update contact phone number to (434)973-1691 throughout entire site
+- [x] Revise homepage dealer copy - mention multiple cabinet lines with Omega/Wolf as primary (not just "Omega and Wolf dealer")
+- [x] Add clickable links to Omega Cabinetry, Wolf Home Products, and Top Knobs websites
+- [x] Verify mobile hamburger menu works properly on all pages
+- [x] Test all fixes on dev server
+- [ ] Deploy to GitHub/Railway

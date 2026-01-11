@@ -214,7 +214,7 @@ export async function getAllGalleryItems() {
   const db = await getDb();
   if (!db) return [];
   
-  return db.select().from(gallery).orderBy(gallery.displayOrder, desc(gallery.createdAt));
+  return db.select().from(gallery).orderBy(gallery.displayOrder);
 }
 
 export async function getFeaturedGalleryItems() {

@@ -10,8 +10,12 @@ export default function Services() {
       <Navigation />
       
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-16">
-        <div className="container">
+      <section className="relative bg-gradient-to-r from-primary/10 to-primary/5 py-16">
+        <div 
+          className="absolute inset-0 bg-cover bg-center opacity-10"
+          style={{ backgroundImage: "url('/images/gallery/KL9ldeZDUcbT.jpg')" }}
+        />
+        <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-4">
             <h1 className="text-5xl font-bold">Our Services</h1>
             <p className="text-xl text-muted-foreground">

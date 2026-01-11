@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, title, afterImageUrl FROM gallery ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, title, afterImageUrl FROM gallery ORDER BY id;",
+  "rows": [
+    {
+      "id": "30001",
+      "title": "Modern White Kitchen Transformation",
+      "afterImageUrl": "/images/gallery/3HrP0H3BuW7m.jpg"
+    },
+    {
+      "id": "30002",
+      "title": "Elegant Gray Kitchen Design",
+      "afterImageUrl": "/images/gallery/53H0NAM0eSvE.webp"
+    },
+    {
+      "id": "30003",
+      "title": "Custom Kitchen Island",
+      "afterImageUrl": "/images/gallery/7nAUkEFBXEaf.jpg"
+    },
+    {
+      "id": "30004",
+      "title": "Traditional Wood Kitchen",
+      "afterImageUrl": "/images/gallery/FbkkkCWXInZS.jpg"
+    },
+    {
+      "id": "30005",
+      "title": "Contemporary Open Kitchen",
+      "afterImageUrl": "/images/gallery/KL9ldeZDUcbT.jpg"
+    },
+    {
+      "id": "30006",
+      "title": "Luxury Kitchen Remodel",
+      "afterImageUrl": "/images/gallery/RHHoKWmplcBC.jpg"
+    },
+    {
+      "id": "30007",
+      "title": "Farmhouse Style Kitchen",
+      "afterImageUrl": "/images/gallery/bt6Vi4lpCf4B.jpg"
+    },
+    {
+      "id": "30008",
+      "title": "Transitional Kitchen Design",
+      "afterImageUrl": "/images/gallery/ubBFg9QkproG.jpg"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tafterImageUrl\n30001\tModern White Kitchen Transformation\t/images/gallery/3HrP0H3BuW7m.jpg\n30002\tElegant Gray Kitchen Design\t/images/gallery/53H0NAM0eSvE.webp\n30003\tCustom Kitchen Island\t/images/gallery/7nAUkEFBXEaf.jpg\n30004\tTraditional Wood Kitchen\t/images/gallery/FbkkkCWXInZS.jpg\n30005\tContemporary Open Kitchen\t/images/gallery/KL9ldeZDUcbT.jpg\n30006\tLuxury Kitchen Remodel\t/images/gallery/RHHoKWmplcBC.jpg\n30007\tFarmhouse Style Kitchen\t/images/gallery/bt6Vi4lpCf4B.jpg\n30008\tTransitional Kitchen Design\t/images/gallery/ubBFg9QkproG.jpg\n",
+  "stderr": "",
+  "execution_time_ms": 1484
+}

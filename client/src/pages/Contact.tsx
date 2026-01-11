@@ -93,8 +93,8 @@ export default function Contact() {
                   <CardDescription>Speak with our team directly</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <a href="tel:+14342960000" className="text-lg font-semibold hover:text-primary">
-                    (434) 296-0000
+                  <a href="tel:+14349731691" className="text-lg font-semibold hover:text-primary">
+                    (434) 973-1691
                   </a>
                   <p className="text-sm text-muted-foreground mt-2">
                     Monday - Friday: 9:00 AM - 5:00 PM<br />

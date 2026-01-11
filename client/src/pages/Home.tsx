@@ -27,8 +27,7 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-foreground">Welcome to Critzer's Cabinet Creations</h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
               For <strong>40 years</strong>, Critzer's Cabinet Creations has been Charlottesville's trusted kitchen and bath design center.
-              As authorized dealers for Omega Cabinetry, Wolf Cabinetry, and Top Knobs hardware, we combine expert design
-              services with quality products to transform your space.
+              We offer a wide selection of quality cabinet lines, with <a href="https://www.omegacabinetry.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Omega Cabinetry</a> and <a href="https://www.wolfhomeproducts.com/kitchen-cabinetry/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Wolf Home Products</a> as our preferred brands. We're also an authorized dealer for <a href="https://www.topknobs.com/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Top Knobs</a> decorative hardware.
             </p>
             <p className="text-lg text-muted-foreground leading-relaxed">
               From professional design consultations to instant online hardware shopping, we bring four decades of experience

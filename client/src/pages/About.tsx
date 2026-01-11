@@ -127,7 +127,7 @@ export default function About() {
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img 
-                src="/images/gallery/omega-traditional-cherry.jpg" 
+                src="/images/gallery/FbkkkCWXInZS.jpg" 
                 alt="Traditional cherry kitchen cabinets"
                 className="w-full h-80 object-cover"
               />
@@ -143,7 +143,7 @@ export default function About() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="rounded-lg overflow-hidden shadow-xl order-2 md:order-1">
                 <img 
-                  src="/images/gallery/omega-modern-gray.jpg" 
+                  src="/images/gallery/53H0NAM0eSvE.webp" 
                   alt="Modern gray kitchen design"
                   className="w-full h-96 object-cover"
                 />
@@ -181,7 +181,7 @@ export default function About() {
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img 
-                src="/images/gallery/omega-transitional-white.jpg" 
+                src="/images/gallery/ubBFg9QkproG.jpg" 
                 alt="Transitional white kitchen"
                 className="w-full h-80 object-cover"
               />
