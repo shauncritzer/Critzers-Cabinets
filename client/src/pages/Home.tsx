@@ -59,14 +59,17 @@ export default function Home() {
         <div className="container">
           <div className="max-w-4xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-8">See Our Craftsmanship in Action</h2>
-            <div className="relative aspect-video rounded-lg overflow-hidden shadow-2xl">
-              <iframe
+            <div className="aspect-video bg-gray-900 rounded-lg overflow-hidden">
+              <video
                 className="w-full h-full"
-                src="https://www.youtube.com/embed/YOUR_VIDEO_ID"
-                title="Critzer's Cabinet Creations Commercial"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
+                controls
+                autoPlay
+                muted
+                loop
+              >
+                <source src="https://files.manuscdn.com/user_upload_by_module/session_file/96788853/rrbxjupqbtreOPuY.mp4" type="video/mp4" />
+                Your browser does not support the video tag.
+              </video>
             </div>
             <p className="text-center text-muted-foreground mt-4 text-sm">
               Watch our 30-second commercial showcasing 40 years of quality craftsmanship
