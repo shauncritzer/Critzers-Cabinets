@@ -389,3 +389,10 @@
 - [x] Test all fixes
 - [x] Deploy to GitHub/Railway
 - [ ] Run fixGalleryDuplicates endpoint on production after deploy (instructions below)
+
+
+## Fix Gallery Duplicates Button (Jan 12, 2026)
+- [x] Add fixGalleryDuplicates procedure to gallery router (currently in wrong location)
+- [x] Remove duplicate procedure from line 1332
+- [ ] Test admin-utilities page works (tRPC types not regenerating locally)
+- [ ] Deploy to production and test there

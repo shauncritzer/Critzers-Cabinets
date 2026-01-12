@@ -277,6 +277,61 @@ When you have enough information, summarize what you've learned and offer to gen
         await deleteGalleryItem(input.id);
         return { success: true };
       }),
+
+    fixGalleryDuplicates: publicProcedure
+      .mutation(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        try {
+          // Get all gallery items
+          const allItems = await db.select()
+            .from(gallery)
+            .orderBy(gallery.id);
+
+          // Group by afterImageUrl to find duplicates
+          const urlMap = new Map<string, typeof allItems>();
+          for (const item of allItems) {
+            const url = item.afterImageUrl || '';
+            if (!urlMap.has(url)) {
+              urlMap.set(url, []);
+            }
+            urlMap.get(url)!.push(item);
+          }
+
+          // Delete duplicates, keeping the first occurrence
+          let deletedCount = 0;
+          const entries = Array.from(urlMap.entries());
+          for (const [url, items] of entries) {
+            if (items.length > 1) {
+              // Keep first item, delete the rest
+              for (let i = 1; i < items.length; i++) {
+                await db.delete(gallery).where(eq(gallery.id, items[i].id));
+                deletedCount++;
+              }
+            }
+          }
+
+          const remainingCount = allItems.length - deletedCount;
+
+          return {
+            success: true,
+            message: deletedCount > 0 
+              ? `Successfully removed ${deletedCount} duplicate${deletedCount > 1 ? 's' : ''}`
+              : 'No duplicates found',
+            deleted: deletedCount,
+            remaining: remainingCount,
+          };
+        } catch (error) {
+          console.error('Error fixing gallery duplicates:', error);
+          return {
+            success: false,
+            message: 'Failed to fix duplicates',
+            deleted: 0,
+            remaining: 0,
+          };
+        }
+      }),
   }),
   
   // Pricing formulas
@@ -1327,59 +1382,6 @@ When you have enough information, summarize what you've learned and offer to gen
           ...order,
           items,
         };
-      }),
-
-    fixGalleryDuplicates: publicProcedure
-      .mutation(async () => {
-        const db = await getDb();
-        if (!db) throw new Error('Database connection failed');
-
-        try {
-          // Get all gallery items
-          const allItems = await db.select()
-            .from(gallery)
-            .orderBy(gallery.id);
-
-          // Group by afterImageUrl to find duplicates
-          const urlMap = new Map<string, typeof allItems>();
-          for (const item of allItems) {
-            const url = item.afterImageUrl || '';
-            if (!urlMap.has(url)) {
-              urlMap.set(url, []);
-            }
-            urlMap.get(url)!.push(item);
-          }
-
-          // Delete duplicates, keeping only the first occurrence
-          let deleted = 0;
-          const entries = Array.from(urlMap.entries());
-          for (const [url, items] of entries) {
-            if (items.length > 1) {
-              // Keep the first item, delete the rest
-              for (let i = 1; i < items.length; i++) {
-                await db.delete(gallery)
-                  .where(eq(gallery.id, items[i].id));
-                deleted++;
-              }
-            }
-          }
-
-          // Get remaining items
-          const remaining = await db.select()
-            .from(gallery)
-            .orderBy(gallery.displayOrder);
-
-          return {
-            success: true,
-            deleted,
-            remaining: remaining.length,
-            items: remaining,
-            message: `Deleted ${deleted} duplicate gallery items. ${remaining.length} unique items remaining.`,
-          };
-        } catch (error) {
-          console.error('Error fixing gallery duplicates:', error);
-          throw new Error('Failed to fix gallery duplicates');
-        }
       }),
 
     updateOrderStatus: publicProcedure
