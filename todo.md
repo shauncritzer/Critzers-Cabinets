@@ -396,3 +396,9 @@
 - [x] Remove duplicate procedure from line 1332
 - [ ] Test admin-utilities page works (tRPC types not regenerating locally)
 - [ ] Deploy to production and test there
+
+
+## Gallery & Video Fixes (Jan 12, 2026 - Afternoon)
+- [ ] Gallery still showing triplicates on production (Railway hasn't deployed fix yet)
+- [x] Homepage commercial video has no sound - removed muted attribute
+- [ ] Wait for Railway to deploy latest code with gallery query fix

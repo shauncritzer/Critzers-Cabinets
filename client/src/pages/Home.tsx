@@ -63,7 +63,6 @@ export default function Home() {
                 className="w-full h-full"
                 controls
                 autoPlay
-                muted
                 loop
               >
                 <source src="https://files.manuscdn.com/user_upload_by_module/session_file/96788853/rrbxjupqbtreOPuY.mp4" type="video/mp4" />
