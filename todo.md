@@ -388,5 +388,4 @@
 - [x] Explain pricing formula to user for validation
 - [x] Test all fixes
 - [x] Deploy to GitHub/Railway
-- [x] Create admin button for fixing gallery duplicates
-- [ ] Test admin button on production after deploy
+- [ ] Run fixGalleryDuplicates endpoint on production after deploy (instructions below)

@@ -12,8 +12,9 @@ import Contact from "./pages/Contact";
 import Shop from "./pages/Shop";
 import Quote from "./pages/Quote";
 import Dashboard from "./pages/Dashboard";
-import Admin from "./pages/Admin";
-import Gallery from "./pages/Gallery";
+import Admin from "@/pages/Admin";
+import AdminUtilities from "@/pages/AdminUtilities";
+import Gallery from "@/pages/Gallery";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderConfirmation from "./pages/OrderConfirmation";
@@ -37,6 +38,7 @@ function Router() {
       <Route path={"/quote"} component={Quote} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/admin"} component={Admin} />
+      <Route path={"/admin-utilities"} component={AdminUtilities} />
       <Route path={"/gallery"} component={Gallery} />
       <Route path={"/cart"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />

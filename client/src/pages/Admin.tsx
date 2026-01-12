@@ -18,86 +18,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Loader2, Users, FileText, TrendingUp, DollarSign, Wrench } from "lucide-react";
+import { Loader2, Users, FileText, TrendingUp, DollarSign } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
-import { useState } from "react";
-import { CheckCircle, AlertCircle } from "lucide-react";
-
-function GalleryFixButton() {
-  const [isFixing, setIsFixing] = useState(false);
-  const [result, setResult] = useState<any>(null);
-
-  const fixGallery = trpc.gallery.fixGalleryDuplicates.useMutation({
-    onSuccess: (data) => {
-      setIsFixing(false);
-      setResult(data);
-      toast.success(data.message || "Gallery duplicates fixed!");
-    },
-    onError: (error) => {
-      setIsFixing(false);
-      toast.error("Failed to fix gallery: " + error.message);
-    },
-  });
-
-  const handleFixGallery = () => {
-    if (confirm("This will remove duplicate gallery items. Continue?")) {
-      setIsFixing(true);
-      setResult(null);
-      fixGallery.mutate();
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <h3 className="font-semibold mb-2">Fix Gallery Duplicates</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          Remove duplicate images from the gallery page. This will keep only one copy of each image.
-        </p>
-        <Button 
-          onClick={handleFixGallery} 
-          disabled={isFixing}
-          className="w-full"
-        >
-          {isFixing ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Fixing Gallery...
-            </>
-          ) : (
-            "Fix Gallery Duplicates"
-          )}
-        </Button>
-      </div>
-
-      {result && (
-        <div className={`p-4 rounded-lg border ${
-          result.success 
-            ? "bg-green-50 border-green-200 text-green-900" 
-            : "bg-red-50 border-red-200 text-red-900"
-        }`}>
-          <div className="flex items-start gap-2">
-            {result.success ? (
-              <CheckCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-            ) : (
-              <AlertCircle className="h-5 w-5 mt-0.5 flex-shrink-0" />
-            )}
-            <div className="space-y-2">
-              <p className="font-semibold">{result.message}</p>
-              {result.deleted > 0 && (
-                <div className="text-sm space-y-1">
-                  <p>✓ Deleted {result.deleted} duplicate items</p>
-                  <p>✓ {result.remaining} unique items remaining</p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function Admin() {
   const { user, loading, isAuthenticated } = useAuth();
@@ -192,22 +115,6 @@ export default function Admin() {
               Manage quotes, leads, and projects
             </p>
           </div>
-
-          {/* Admin Utilities */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Wrench className="h-5 w-5" />
-                Admin Utilities
-              </CardTitle>
-              <CardDescription>
-                Quick tools for managing your website
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <GalleryFixButton />
-            </CardContent>
-          </Card>
 
           {/* Stats Cards */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
