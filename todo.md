@@ -386,6 +386,7 @@
 - [x] Update business hours to 10am-3pm Monday-Friday consistently (Contact, Shipping, Return pages)
 - [x] Review and adjust quote pricing formula - increased base prices ~75%
 - [x] Explain pricing formula to user for validation
-- [ ] Test all fixes
-- [ ] Deploy to GitHub/Railway
-- [ ] Run fixGalleryDuplicates endpoint on production after deploy
+- [x] Test all fixes
+- [x] Deploy to GitHub/Railway
+- [x] Create admin button for fixing gallery duplicates
+- [ ] Test admin button on production after deploy
