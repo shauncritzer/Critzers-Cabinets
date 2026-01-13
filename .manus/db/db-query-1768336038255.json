@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO gallery (title, description, afterImageUrl, cabinetType, style, roomType) \nVALUES ('Luxury Modern Kitchen', 'Contemporary kitchen design with premium finishes and smart storage solutions', '/images/gallery/luxury-modern-kitchen.webp', 'Kitchen', 'Modern', 'Kitchen');",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute INSERT INTO gallery (title, description, afterImageUrl, cabinetType, style, roomType) \nVALUES ('Luxury Modern Kitchen', 'Contemporary kitchen design with premium finishes and smart storage solutions', '/images/gallery/luxury-modern-kitchen.webp', 'Kitchen', 'Modern', 'Kitchen');",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 66
+}

@@ -1,0 +1,50 @@
+{
+  "query": "SELECT id, title, afterImageUrl FROM gallery ORDER BY id;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, title, afterImageUrl FROM gallery ORDER BY id;",
+  "rows": [
+    {
+      "id": "60001",
+      "title": "Modern White Kitchen",
+      "afterImageUrl": "/images/gallery/ubBFg9QkproG.jpg"
+    },
+    {
+      "id": "60002",
+      "title": "Traditional Cherry Cabinets",
+      "afterImageUrl": "/images/gallery/vKvxCuPYdMYA.jpg"
+    },
+    {
+      "id": "60003",
+      "title": "Rustic Farmhouse Kitchen",
+      "afterImageUrl": "/images/gallery/xQoLPWJCwjQw.jpg"
+    },
+    {
+      "id": "60004",
+      "title": "Contemporary Gray Kitchen",
+      "afterImageUrl": "/images/gallery/GzKSMfPMjwGN.jpg"
+    },
+    {
+      "id": "60005",
+      "title": "Classic Oak Cabinetry",
+      "afterImageUrl": "/images/gallery/HKBaGWUmCGGe.jpg"
+    },
+    {
+      "id": "60006",
+      "title": "Shaker Style Kitchen",
+      "afterImageUrl": "/images/gallery/ZKxkXEqHaGGe.jpg"
+    },
+    {
+      "id": "60007",
+      "title": "Custom Bathroom Vanity",
+      "afterImageUrl": "/images/gallery/aKxkXEqHaGGe.jpg"
+    },
+    {
+      "id": "60008",
+      "title": "Transitional Kitchen Design",
+      "afterImageUrl": "/images/gallery/bKxkXEqHaGGe.jpg"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tafterImageUrl\n60001\tModern White Kitchen\t/images/gallery/ubBFg9QkproG.jpg\n60002\tTraditional Cherry Cabinets\t/images/gallery/vKvxCuPYdMYA.jpg\n60003\tRustic Farmhouse Kitchen\t/images/gallery/xQoLPWJCwjQw.jpg\n60004\tContemporary Gray Kitchen\t/images/gallery/GzKSMfPMjwGN.jpg\n60005\tClassic Oak Cabinetry\t/images/gallery/HKBaGWUmCGGe.jpg\n60006\tShaker Style Kitchen\t/images/gallery/ZKxkXEqHaGGe.jpg\n60007\tCustom Bathroom Vanity\t/images/gallery/aKxkXEqHaGGe.jpg\n60008\tTransitional Kitchen Design\t/images/gallery/bKxkXEqHaGGe.jpg\n",
+  "stderr": "",
+  "execution_time_ms": 179
+}

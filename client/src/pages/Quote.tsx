@@ -308,6 +308,14 @@ export default function Quote() {
                       value={projectData.dimensions}
                       onChange={(e) => setProjectData({ ...projectData, dimensions: e.target.value })}
                     />
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+                      <p className="text-xs font-semibold text-blue-900 mb-2">📱 Need help measuring? Download these free apps:</p>
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <a href="https://apps.apple.com/us/app/magicplan/id427424432" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">MagicPlan (iOS/Android)</a>
+                        <a href="https://apps.apple.com/us/app/roomscan-pro-lidar/id571436618" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">RoomScan Pro (iOS)</a>
+                        <a href="https://play.google.com/store/apps/details?id=com.google.tango.measure" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">Google Measure (Android)</a>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Additional Notes */}

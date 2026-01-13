@@ -434,3 +434,29 @@
 - [ ] Generate Solid Surface countertop image
 - [ ] Test all fixes
 - [ ] Deploy to production
+
+
+## Immediate Fixes (Jan 13, 2026)
+- [ ] Add Top Knobs branded hero image to Products page (similar to Omega/Wolf sections)
+- [ ] Fix gallery to display all 9 images (currently only 1 showing, expand from 8 to 9 items)
+- [ ] Add measurement app download links back to Quote page
+- [ ] Design and implement file upload system for customer measurements
+- [ ] Research and recommend optimal CAD software to replace 2020 Design
+
+## AI Quote System Enhancement Vision
+- [ ] Integrate measurement app uploads (RoomScan Pro, MagicPlan, Apple Measure, Google Measure)
+- [ ] Build file upload system accepting photos, PDFs, measurement data
+- [ ] Create cabinet catalog browser with Omega/Wolf products
+- [ ] Implement smart pricing engine with GPM multiplier
+- [ ] Add AI chat assistant for 24/7 customer support
+- [ ] Generate instant quotes within 5-10% accuracy
+
+## Updates (Jan 13, 2026)
+- [x] Fix gallery triplicates issue (database had 8 items, now displaying correctly)
+- [x] Fix Contact page map with correct coordinates for 661 Berkmar Ct
+- [x] Add payment card logos to footer (Visa, Mastercard, Amex, Discover)
+- [x] Replace Laminate with Solid Surface (Corian) on Products page
+- [x] Add Top Knobs branded hero image to Products page
+- [x] Expand gallery from 8 to 9 items (3x3 grid)
+- [x] Add measurement app download links to Quote page (MagicPlan, RoomScan Pro, Google Measure)
+- [x] Create comprehensive AI Quote System roadmap with CAD software recommendation

@@ -160,10 +160,13 @@ export default function Products() {
           </p>
           
           <Card className="max-w-3xl mx-auto overflow-hidden">
-            <div className="h-64 bg-gradient-to-br from-amber-50 to-slate-100 flex items-center justify-center">
-              <div className="text-center space-y-4">
-                <div className="text-5xl font-bold text-slate-800">TOP KNOBS</div>
-                <p className="text-lg text-slate-600">Decorative Hardware Collection</p>
+            <div className="h-64 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center relative overflow-hidden">
+              <img src="/images/topknobs-showcase.jpg" alt="Top Knobs Hardware" className="absolute inset-0 w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                <div className="text-center space-y-4">
+                  <div className="text-5xl font-bold text-white">TOP KNOBS</div>
+                  <p className="text-lg text-white/90">Decorative Hardware Collection</p>
+                </div>
               </div>
             </div>
             <CardHeader>
