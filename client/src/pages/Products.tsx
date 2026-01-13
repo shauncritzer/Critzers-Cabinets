@@ -129,14 +129,14 @@ export default function Products() {
 
             <Card className="text-center overflow-hidden">
               <div className="h-40 overflow-hidden">
-                <img src="/countertop-laminate.jpg" alt="Laminate Countertop" className="w-full h-full object-cover" />
+                <img src="/countertop-corian.jpg" alt="Corian Solid Surface Countertop" className="w-full h-full object-cover" />
               </div>
               <CardHeader>
-                <CardTitle>Laminate</CardTitle>
+                <CardTitle>Solid Surface (Corian)</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Budget-friendly option with modern patterns and colors. Easy to maintain.
+                  Non-porous engineered surface. Seamless joints, repairable, and available in many colors.
                 </p>
               </CardContent>
             </Card>

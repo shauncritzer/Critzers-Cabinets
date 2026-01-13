@@ -1,0 +1,58 @@
+{
+  "query": "SELECT id, title, afterImageUrl, displayOrder FROM gallery ORDER BY displayOrder;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT id, title, afterImageUrl, displayOrder FROM gallery ORDER BY displayOrder;",
+  "rows": [
+    {
+      "id": "60001",
+      "title": "Modern White Kitchen",
+      "afterImageUrl": "/images/gallery/ubBFg9QkproG.jpg",
+      "displayOrder": "1"
+    },
+    {
+      "id": "60002",
+      "title": "Traditional Cherry Cabinets",
+      "afterImageUrl": "/images/gallery/vKvxCuPYdMYA.jpg",
+      "displayOrder": "2"
+    },
+    {
+      "id": "60003",
+      "title": "Rustic Farmhouse Kitchen",
+      "afterImageUrl": "/images/gallery/xQoLPWJCwjQw.jpg",
+      "displayOrder": "3"
+    },
+    {
+      "id": "60004",
+      "title": "Contemporary Gray Kitchen",
+      "afterImageUrl": "/images/gallery/GzKSMfPMjwGN.jpg",
+      "displayOrder": "4"
+    },
+    {
+      "id": "60005",
+      "title": "Classic Oak Cabinetry",
+      "afterImageUrl": "/images/gallery/HKBaGWUmCGGe.jpg",
+      "displayOrder": "5"
+    },
+    {
+      "id": "60006",
+      "title": "Shaker Style Kitchen",
+      "afterImageUrl": "/images/gallery/ZKxkXEqHaGGe.jpg",
+      "displayOrder": "6"
+    },
+    {
+      "id": "60007",
+      "title": "Custom Bathroom Vanity",
+      "afterImageUrl": "/images/gallery/aKxkXEqHaGGe.jpg",
+      "displayOrder": "7"
+    },
+    {
+      "id": "60008",
+      "title": "Transitional Kitchen Design",
+      "afterImageUrl": "/images/gallery/bKxkXEqHaGGe.jpg",
+      "displayOrder": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "id\ttitle\tafterImageUrl\tdisplayOrder\n60001\tModern White Kitchen\t/images/gallery/ubBFg9QkproG.jpg\t1\n60002\tTraditional Cherry Cabinets\t/images/gallery/vKvxCuPYdMYA.jpg\t2\n60003\tRustic Farmhouse Kitchen\t/images/gallery/xQoLPWJCwjQw.jpg\t3\n60004\tContemporary Gray Kitchen\t/images/gallery/GzKSMfPMjwGN.jpg\t4\n60005\tClassic Oak Cabinetry\t/images/gallery/HKBaGWUmCGGe.jpg\t5\n60006\tShaker Style Kitchen\t/images/gallery/ZKxkXEqHaGGe.jpg\t6\n60007\tCustom Bathroom Vanity\t/images/gallery/aKxkXEqHaGGe.jpg\t7\n60008\tTransitional Kitchen Design\t/images/gallery/bKxkXEqHaGGe.jpg\t8\n",
+  "stderr": "",
+  "execution_time_ms": 61
+}

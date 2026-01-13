@@ -250,7 +250,7 @@ export default function Contact() {
             <h2 className="text-3xl font-bold text-center mb-8">Find Us</h2>
             <div className="aspect-video bg-muted rounded-lg overflow-hidden">
               <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3141.234567890123!2d-78.5!3d38.05!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDAzJzAwLjAiTiA3OMKwMzAnMDAuMCJX!5e0!3m2!1sen!2sus!4v1234567890123!5m2!1sen!2sus"
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3140.3704168616528!2d-78.4795012!3d38.085040899999996!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b387ff5df6de6f%3A0xa3cd799aa2103bca!2s661%20Berkmar%20Ct%2C%20Charlottesville%2C%20VA%2022901!5e0!3m2!1sen!2sus!4v1736789029000!5m2!1sen!2sus"
                 width="100%"
                 height="100%"
                 style={{ border: 0 }}

@@ -238,14 +238,7 @@ export default function Home() {
               {/* Payment Methods */}
               <div className="flex items-center gap-4">
                 <span className="text-sm text-secondary-foreground/80">We Accept:</span>
-                <div className="flex gap-2">
-                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">VISA</div>
-                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">MC</div>
-                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">AMEX</div>
-                  <div className="px-3 py-1 bg-white rounded text-xs font-bold text-slate-800">DISC</div>
-                  <div className="px-3 py-1 bg-white/10 border border-white/30 rounded text-xs font-bold">CASH</div>
-                  <div className="px-3 py-1 bg-white/10 border border-white/30 rounded text-xs font-bold">CHECK</div>
-                </div>
+                <img src="/images/payment-cards.jpg" alt="Payment Methods: Visa, Mastercard, American Express, Discover" className="h-8 object-contain" />
               </div>
             </div>
           </div>

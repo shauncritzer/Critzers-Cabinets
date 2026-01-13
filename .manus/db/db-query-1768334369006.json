@@ -1,0 +1,14 @@
+{
+  "query": "SELECT COUNT(*) as total_rows, COUNT(DISTINCT afterImageUrl) as unique_images FROM gallery;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway02.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 3q3JgbnADWj9PiL.acec3d81057a --database 6bAtAme57yHmTrGpGGUweN --execute SELECT COUNT(*) as total_rows, COUNT(DISTINCT afterImageUrl) as unique_images FROM gallery;",
+  "rows": [
+    {
+      "total_rows": "8",
+      "unique_images": "8"
+    }
+  ],
+  "messages": [],
+  "stdout": "total_rows\tunique_images\n8\t8\n",
+  "stderr": "",
+  "execution_time_ms": 185
+}

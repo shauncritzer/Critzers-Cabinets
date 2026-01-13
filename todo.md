@@ -422,5 +422,15 @@
 - [x] Update About.tsx with new Omega and Top Knobs images
 - [x] Update Services.tsx replacing icons with quality photos
 - [x] Update Products.tsx with countertop material images
-- [ ] Verify gallery triplicates fixed on production
-- [ ] Test all pages and deploy
+- [ ] Verify gallery triplicates fixed on production (Railway deployment in progress)
+- [x] Test all pages and deploy
+
+
+## Critical Fixes (Jan 13, 2026 - Afternoon)
+- [ ] FIX GALLERY TRIPLICATES ONCE AND FOR ALL - verify query code deployed to production
+- [ ] Update Contact page map pin to correct location: 661 Berkmar Ct, Charlottesville, VA 22901
+- [ ] Add actual payment card logos (Visa, Mastercard, Amex, Discover) to footer instead of text
+- [ ] Replace Laminate countertop with Solid Surface (Corian) on Products page
+- [ ] Generate Solid Surface countertop image
+- [ ] Test all fixes
+- [ ] Deploy to production
