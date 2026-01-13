@@ -31,8 +31,8 @@ export default function Services() {
           <div className="grid md:grid-cols-3 gap-8">
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Ruler className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-design.jpg" alt="Professional Design" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Professional Design</CardTitle>
                 <CardDescription>Expert kitchen & bath design services</CardDescription>
@@ -50,8 +50,8 @@ export default function Services() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Package className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-cabinetry.jpg" alt="Custom Cabinetry" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Custom Cabinetry</CardTitle>
                 <CardDescription>Quality cabinets built to your specifications</CardDescription>
@@ -69,8 +69,8 @@ export default function Services() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Palette className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-countertop.jpg" alt="Countertop Fabrication" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Countertop Fabrication</CardTitle>
                 <CardDescription>Custom countertops in premium materials</CardDescription>
@@ -88,8 +88,8 @@ export default function Services() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Hammer className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-installation.jpg" alt="Professional Installation" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Professional Installation</CardTitle>
                 <CardDescription>Expert installation by experienced craftsmen</CardDescription>
@@ -107,8 +107,8 @@ export default function Services() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Truck className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-delivery.jpg" alt="Delivery & Logistics" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Delivery & Logistics</CardTitle>
                 <CardDescription>Careful handling and timely delivery</CardDescription>
@@ -126,8 +126,8 @@ export default function Services() {
 
             <Card>
               <CardHeader>
-                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-4">
-                  <Wrench className="w-6 h-6 text-primary" />
+                <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
+                  <img src="/service-hardware.jpg" alt="Hardware Selection" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Hardware Selection</CardTitle>
                 <CardDescription>Perfect finishing touches for your project</CardDescription>

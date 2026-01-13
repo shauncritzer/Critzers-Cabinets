@@ -85,7 +85,10 @@ export default function Products() {
           </p>
           
           <div className="grid md:grid-cols-4 gap-6">
-            <Card className="text-center">
+            <Card className="text-center overflow-hidden">
+              <div className="h-40 overflow-hidden">
+                <img src="/countertop-granite.jpg" alt="Granite Countertop" className="w-full h-full object-cover" />
+              </div>
               <CardHeader>
                 <CardTitle>Granite</CardTitle>
               </CardHeader>
@@ -96,7 +99,10 @@ export default function Products() {
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center overflow-hidden">
+              <div className="h-40 overflow-hidden">
+                <img src="/countertop-marble.jpg" alt="Marble Countertop" className="w-full h-full object-cover" />
+              </div>
               <CardHeader>
                 <CardTitle>Marble</CardTitle>
               </CardHeader>
@@ -107,7 +113,10 @@ export default function Products() {
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center overflow-hidden">
+              <div className="h-40 overflow-hidden">
+                <img src="/countertop-quartz.jpg" alt="Quartz Countertop" className="w-full h-full object-cover" />
+              </div>
               <CardHeader>
                 <CardTitle>Quartz</CardTitle>
               </CardHeader>
@@ -118,7 +127,10 @@ export default function Products() {
               </CardContent>
             </Card>
 
-            <Card className="text-center">
+            <Card className="text-center overflow-hidden">
+              <div className="h-40 overflow-hidden">
+                <img src="/countertop-laminate.jpg" alt="Laminate Countertop" className="w-full h-full object-cover" />
+              </div>
               <CardHeader>
                 <CardTitle>Laminate</CardTitle>
               </CardHeader>

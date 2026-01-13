@@ -257,7 +257,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src="/images/gallery/omega-farmhouse-rustic.jpg" 
+                    src="/omega-cabinetry-showcase.jpg" 
                     alt="Omega Cabinetry example"
                     className="w-full h-full object-cover"
                   />
@@ -277,7 +277,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="h-48 overflow-hidden">
                   <img 
-                    src="/images/gallery/omega-coastal-blue.jpg" 
+                    src="/topknobs-hardware-display.jpg" 
                     alt="Top Knobs hardware on cabinets"
                     className="w-full h-full object-cover"
                   />

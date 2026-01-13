@@ -402,3 +402,25 @@
 - [ ] Gallery still showing triplicates on production (Railway hasn't deployed fix yet)
 - [x] Homepage commercial video has no sound - removed muted attribute
 - [ ] Wait for Railway to deploy latest code with gallery query fix
+
+
+## Image Generation & Fixes (Jan 13, 2026)
+- [x] Generate quality image for About page - Omega Cabinetry section
+- [x] Generate quality image for About page - Top Knobs hardware section
+- [x] Generate 6 service images for Services page:
+  - [x] Professional Design (kitchen/bath design consultation)
+  - [x] Custom Cabinetry (cabinet craftsmanship)
+  - [x] Countertop Fabrication (granite/marble/quartz)
+  - [x] Professional Installation (installation work)
+  - [x] Delivery & Logistics (delivery truck/coordination)
+  - [x] Hardware Selection (cabinet hardware display)
+- [x] Generate 4 countertop material images for Products page:
+  - [x] Granite countertop sample
+  - [x] Marble countertop sample
+  - [x] Quartz countertop sample
+  - [x] Laminate countertop sample
+- [x] Update About.tsx with new Omega and Top Knobs images
+- [x] Update Services.tsx replacing icons with quality photos
+- [x] Update Products.tsx with countertop material images
+- [ ] Verify gallery triplicates fixed on production
+- [ ] Test all pages and deploy
