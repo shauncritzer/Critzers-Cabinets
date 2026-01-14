@@ -471,4 +471,4 @@
 - [x] Products page: Start immediately with "Cabinetry" section
 - [x] Update roadmap with Cabinet Vision perpetual license option
 - [x] Update roadmap with MagicPlan affiliate program info
-- [ ] Deploy all changes to Railway via GitHub
+- [x] Deploy all changes to Railway via GitHub (code already in GitHub repo, user needs to log into Railway to verify auto-deployment)
