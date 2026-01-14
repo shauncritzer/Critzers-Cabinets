@@ -486,3 +486,13 @@
 - [x] Hardcode 9 image paths directly in Gallery.tsx
 - [x] Test gallery displays 9 unique images (verified in dev environment)
 - [x] Push to GitHub and verify Railway deployment (pushed commit 409b782)
+
+
+## Top Knobs Catalog Implementation (Jan 14, 2026)
+- [x] Research Ferguson's Top Knobs catalog presentation
+- [x] Replace Shop page with Ferguson-style collection browser
+- [x] Add 8 collection cards with images
+- [x] Add 4 style category cards
+- [x] Add CTA to contact for ordering
+- [x] Test in dev environment (verified all sections loading correctly)
+- [ ] Push to GitHub and deploy to Railway
