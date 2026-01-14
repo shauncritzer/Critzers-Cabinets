@@ -10,29 +10,7 @@ export default function About() {
       {/* Shared Navigation */}
       <Navigation />
 
-      {/* Hero Section with Kitchen Background */}
-      <section className="relative bg-gradient-to-b from-secondary/30 to-background py-20">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{ backgroundImage: "url('/images/gallery/omega-classic-white-kitchen.jpg')" }}
-        />
-        <div className="container relative z-10">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-block rounded-lg bg-primary/10 px-3 py-1 text-sm text-primary font-medium">
-              Serving Charlottesville Since 1986
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl lg:text-6xl">
-              About Critzer's Cabinet Creations
-            </h1>
-            <p className="text-lg text-muted-foreground">
-              A family-owned business bringing four decades of expertise, 
-              dedication, and unparalleled customer service to every project.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Team Section - MOVED TO TOP */}
+      {/* Team Section - NOW AT TOP */}
       <section className="bg-secondary/20 py-20">
         <div className="container">
           <div className="max-w-5xl mx-auto space-y-12">
@@ -253,21 +231,19 @@ export default function About() {
               </p>
             </div>
 
-            <div className="grid gap-8 md:grid-cols-2">
+            <div className="grid gap-8 md:grid-cols-3">
               <Card className="overflow-hidden">
-                <div className="h-48 overflow-hidden">
+                <div className="h-48 bg-white flex items-center justify-center p-8">
                   <img 
-                    src="/omega-cabinetry-showcase.jpg" 
-                    alt="Omega Cabinetry example"
-                    className="w-full h-full object-cover"
+                    src="/images/omega-logo.png" 
+                    alt="Omega Cabinetry"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="p-8 text-center space-y-4">
                   <h3 className="text-2xl font-bold">Omega Cabinetry</h3>
                   <p className="text-muted-foreground">
-                    We are an authorized dealer of Omega Cabinetry from Waterloo, Iowa. 
-                    Omega offers semi-custom and stock cabinet options with exceptional quality 
-                    and endless customization possibilities for every room in your home.
+                    Authorized dealer offering semi-custom and stock cabinet options with exceptional quality.
                   </p>
                   <a href="https://www.omegacabinetry.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-block">
                     Visit Omega Cabinetry →
@@ -275,19 +251,35 @@ export default function About() {
                 </div>
               </Card>
               <Card className="overflow-hidden">
-                <div className="h-48 overflow-hidden">
+                <div className="h-48 bg-white flex items-center justify-center p-8">
                   <img 
-                    src="/topknobs-hardware-display.jpg" 
-                    alt="Top Knobs hardware on cabinets"
-                    className="w-full h-full object-cover"
+                    src="/images/wolf-logo.png" 
+                    alt="Wolf Cabinetry"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="p-8 text-center space-y-4">
+                  <h3 className="text-2xl font-bold">Wolf Cabinetry</h3>
+                  <p className="text-muted-foreground">
+                    Authorized dealer providing premium cabinetry solutions for every room in your home.
+                  </p>
+                  <a href="https://www.wolfhomeproducts.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline inline-block">
+                    Visit Wolf Cabinetry →
+                  </a>
+                </div>
+              </Card>
+              <Card className="overflow-hidden">
+                <div className="h-48 bg-white flex items-center justify-center p-8">
+                  <img 
+                    src="/images/topknobs-logo.png" 
+                    alt="Top Knobs Hardware"
+                    className="w-full h-full object-contain"
                   />
                 </div>
                 <div className="p-8 text-center space-y-4">
                   <h3 className="text-2xl font-bold">Top Knobs</h3>
                   <p className="text-muted-foreground">
-                    As an authorized Top Knobs dealer, we offer their complete line of 
-                    premium cabinet hardware including knobs, pulls, hinges, and accessories. 
-                    Browse our online store for over 7,000 products.
+                    Complete line of premium cabinet hardware with over 7,000 products available online.
                   </p>
                   <Link href="/shop" className="text-primary hover:underline inline-block">
                     Shop Hardware →
@@ -318,14 +310,14 @@ export default function About() {
                   <Phone className="h-5 w-5 text-primary" />
                   <span>(434) 973-1691</span>
                 </a>
-                <a href="mailto:critzerscabinets@gmail.com" className="flex items-center gap-3 hover:text-primary transition-colors">
+                <a href="mailto:info@critzerscabinets.com" className="flex items-center gap-3 hover:text-primary transition-colors">
                   <Mail className="h-5 w-5 text-primary" />
-                  <span>critzerscabinets@gmail.com</span>
+                  <span>info@critzerscabinets.com</span>
                 </a>
               </div>
 
               <p className="text-sm text-muted-foreground">
-                <strong>Hours:</strong> Monday - Friday: 10AM - 3PM | Saturday & Sunday: Closed
+                <strong>Hours:</strong> Monday - Friday: 10AM - 3PM | Saturday: By Appointment Only | Sunday: Closed
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

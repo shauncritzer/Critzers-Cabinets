@@ -8,19 +8,7 @@ export default function Products() {
     <div className="min-h-screen flex flex-col">
       <Navigation />
       
-      {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary/10 to-primary/5 py-16">
-        <div className="container">
-          <div className="max-w-3xl mx-auto text-center space-y-4">
-            <h1 className="text-5xl font-bold">Our Products</h1>
-            <p className="text-xl text-muted-foreground">
-              Quality cabinetry, countertops, and hardware from trusted manufacturers
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Cabinetry Section */}
+      {/* Cabinetry Section - Starts immediately */}
       <section className="py-16 bg-background">
         <div className="container">
           <h2 className="text-4xl font-bold text-center mb-4">Cabinetry</h2>

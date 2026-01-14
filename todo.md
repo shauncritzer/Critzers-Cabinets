@@ -460,3 +460,15 @@
 - [x] Expand gallery from 8 to 9 items (3x3 grid)
 - [x] Add measurement app download links to Quote page (MagicPlan, RoomScan Pro, Google Measure)
 - [x] Create comprehensive AI Quote System roadmap with CAD software recommendation
+
+## About & Products Page UX Improvements (Jan 14, 2026)
+- [x] About page: Move "Meet Our Team" section to very top
+- [x] About page: Move "About Critzer's" text section below team
+- [x] About page: Add Wolf logo to "Our Partners" (make it 3 logos: Omega, Wolf, Top Knobs)
+- [x] About page: Fix email critzerscabinets@gmail.com → info@critzerscabinets.com
+- [x] About page: Change Saturday hours to "By Appointment Only"
+- [x] Products page: Remove large "Our Products" hero section
+- [x] Products page: Start immediately with "Cabinetry" section
+- [x] Update roadmap with Cabinet Vision perpetual license option
+- [x] Update roadmap with MagicPlan affiliate program info
+- [ ] Deploy all changes to Railway via GitHub
