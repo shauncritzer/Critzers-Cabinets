@@ -472,3 +472,10 @@
 - [x] Update roadmap with Cabinet Vision perpetual license option
 - [x] Update roadmap with MagicPlan affiliate program info
 - [x] Deploy all changes to Railway via GitHub (code already in GitHub repo, user needs to log into Railway to verify auto-deployment)
+
+
+## Railway Deployment Issues (Jan 14, 2026)
+- [x] Fix About page: Omega and Top Knobs logos not loading on Railway (added omega-logo.png and topknobs-logo.png)
+- [x] Fix Gallery page: Still showing triplicates on Railway (updated database to use existing images)
+- [ ] Verify all images are accessible on Railway deployment
+- [ ] Push fixes to GitHub and verify Railway auto-deployment
