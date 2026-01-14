@@ -479,3 +479,10 @@
 - [x] Fix Gallery page: Still showing triplicates on Railway (updated database to use existing images)
 - [x] Verify all images are accessible on Railway deployment
 - [x] Push fixes to GitHub and verify Railway auto-deployment (pushed commit bea75e7)
+
+
+## Gallery Rebuild - Simple Static Approach (Jan 14, 2026)
+- [x] Remove database dependency from Gallery page
+- [x] Hardcode 9 image paths directly in Gallery.tsx
+- [x] Test gallery displays 9 unique images (verified in dev environment)
+- [ ] Push to GitHub and verify Railway deployment
