@@ -477,5 +477,5 @@
 ## Railway Deployment Issues (Jan 14, 2026)
 - [x] Fix About page: Omega and Top Knobs logos not loading on Railway (added omega-logo.png and topknobs-logo.png)
 - [x] Fix Gallery page: Still showing triplicates on Railway (updated database to use existing images)
-- [ ] Verify all images are accessible on Railway deployment
-- [ ] Push fixes to GitHub and verify Railway auto-deployment
+- [x] Verify all images are accessible on Railway deployment
+- [x] Push fixes to GitHub and verify Railway auto-deployment (pushed commit bea75e7)
