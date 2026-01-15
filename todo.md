@@ -528,3 +528,12 @@
 - [ ] Implement Stripe checkout integration
 - [ ] Add order confirmation page
 - [ ] Send email notifications for orders
+
+
+## Video & Quote Form Updates (Jan 14, 2026 Evening)
+- [x] Replace old commercial video with new one (1000102400.mp4)
+- [x] Add 6 educational questions to quote form (current condition, timeline, budget, style, features, referral)
+- [x] Add helpful explanations for each question with lightbulb icons
+- [x] Configure SendGrid API key for email notifications
+- [x] Test SendGrid email system (test email sent successfully to info@critzerscabinets.com)
+- [x] Verify quote notifications will be sent to info@critzerscabinets.com
