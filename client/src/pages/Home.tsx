@@ -65,7 +65,7 @@ export default function Home() {
                 autoPlay
                 loop
               >
-                <source src="https://files.manuscdn.com/user_upload_by_module/session_file/96788853/rrbxjupqbtreOPuY.mp4" type="video/mp4" />
+                <source src="/videos/heygen-intro.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>

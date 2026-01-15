@@ -495,4 +495,36 @@
 - [x] Add 4 style category cards
 - [x] Add CTA to contact for ordering
 - [x] Test in dev environment (verified all sections loading correctly)
-- [ ] Push to GitHub and deploy to Railway
+- [x] Push to GitHub and deploy to Railway (checkpoint 5b40a5d2)
+
+
+## Home Page Video Update & E-Commerce Build (Jan 14, 2026)
+- [x] Replace old HeyGen video with new one on home page
+- [x] Extract Top Knobs price list (7,358 products found)
+- [ ] Filter ~238 available products (exclude discontinued, match Ferguson inventory)
+- [ ] Build product database schema with Stripe integration
+- [ ] Import filtered products into database
+- [ ] Build product listing page with filters (collection, finish, price, type)
+- [ ] Build product detail pages with add-to-cart
+- [ ] Build shopping cart functionality
+- [ ] Integrate Stripe dynamic checkout
+- [ ] Test e-commerce flow end-to-end
+- [ ] Deploy to Railway
+
+
+## E-Commerce Implementation - Phase 1 (Jan 14, 2026)
+- [x] Import 50 Top Knobs products into database (test batch)
+- [x] Create tRPC procedures for product fetching (getAllProducts, getProductById, getProductBySku, getFilters)
+- [x] Build Shop page with product grid and filters
+- [x] Add search functionality by name, SKU, description
+- [x] Add filter dropdowns (Category, Collection, Finish)
+- [x] Create ProductDetail page with full specifications
+- [x] Add quantity selector on product detail page
+- [x] Display product pricing, SKU, dimensions, finish, weight
+- [x] Show "In Stock" badges and featured product indicators
+- [x] Add "View Details" buttons linking to product pages
+- [ ] Implement shopping cart functionality (add to cart, view cart, update quantities)
+- [ ] Create Cart page to view/edit cart items
+- [ ] Implement Stripe checkout integration
+- [ ] Add order confirmation page
+- [ ] Send email notifications for orders

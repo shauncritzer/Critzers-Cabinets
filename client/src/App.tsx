@@ -24,6 +24,7 @@ import AdminOrders from "@/pages/AdminOrders";
 import ShippingPolicy from "@/pages/ShippingPolicy";
 import ReturnPolicy from "@/pages/ReturnPolicy";
 import Login from "@/pages/Login";
+import ProductDetail from "@/pages/ProductDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -35,6 +36,7 @@ function Router() {
       <Route path={"/services"} component={Services} />
       <Route path={"/contact"} component={Contact} />
       <Route path={"/shop"} component={Shop} />
+      <Route path={"/shop/product/:id"} component={ProductDetail} />
       <Route path={"/quote"} component={Quote} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/admin"} component={Admin} />

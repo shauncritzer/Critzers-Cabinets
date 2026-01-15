@@ -219,6 +219,107 @@ When you have enough information, summarize what you've learned and offer to gen
       }),
   }),
   
+  // Shop/Products management
+  shop: router({ 
+    getAllProducts: publicProcedure
+      .input(z.object({
+        category: z.string().optional(),
+        collection: z.string().optional(),
+        finish: z.string().optional(),
+        minPrice: z.number().optional(),
+        maxPrice: z.number().optional(),
+        search: z.string().optional(),
+        featured: z.boolean().optional(),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database not available');
+        const conditions = [];
+        
+        if (input?.category) {
+          conditions.push(eq(products.category, input.category));
+        }
+        if (input?.collection) {
+          conditions.push(eq(products.collection, input.collection));
+        }
+        if (input?.finish) {
+          conditions.push(eq(products.finish, input.finish));
+        }
+        if (input?.minPrice !== undefined) {
+          conditions.push(sql`${products.retailPrice} >= ${input.minPrice}`);
+        }
+        if (input?.maxPrice !== undefined) {
+          conditions.push(sql`${products.retailPrice} <= ${input.maxPrice}`);
+        }
+        if (input?.search) {
+          conditions.push(
+            or(
+              like(products.name, `%${input.search}%`),
+              like(products.description, `%${input.search}%`),
+              like(products.sku, `%${input.search}%`)
+            )
+          );
+        }
+        if (input?.featured) {
+          conditions.push(eq(products.featured, 'yes'));
+        }
+        
+        const query = conditions.length > 0 
+          ? db.select().from(products).where(and(...conditions))
+          : db.select().from(products);
+        
+        return await query;
+      }),
+    
+    getProductById: publicProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database not available');
+        const result = await db.select().from(products).where(eq(products.id, input.id));
+        return result[0] || null;
+      }),
+    
+    getProductBySku: publicProcedure
+      .input(z.object({ sku: z.string() }))
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database not available');
+        const result = await db.select().from(products).where(eq(products.sku, input.sku));
+        return result[0] || null;
+      }),
+    
+    getFilters: publicProcedure
+      .query(async () => {
+        const db = await getDb();
+        if (!db) throw new Error('Database not available');
+        
+        // Get unique collections
+        const collections = await db.select({ collection: products.collection })
+          .from(products)
+          .where(not(isNull(products.collection)))
+          .groupBy(products.collection);
+        
+        // Get unique finishes
+        const finishes = await db.select({ finish: products.finish })
+          .from(products)
+          .where(not(isNull(products.finish)))
+          .groupBy(products.finish);
+        
+        // Get unique categories
+        const categories = await db.select({ category: products.category })
+          .from(products)
+          .where(not(isNull(products.category)))
+          .groupBy(products.category);
+        
+        return {
+          collections: collections.map((c: any) => c.collection).filter(Boolean),
+          finishes: finishes.map((f: any) => f.finish).filter(Boolean),
+          categories: categories.map((c: any) => c.category).filter(Boolean),
+        };
+      }),
+  }),
+  
   // Gallery management
   gallery: router({
     getAll: publicProcedure
@@ -376,7 +477,10 @@ When you have enough information, summarize what you've learned and offer to gen
       }),
   }),
   
-  // Shop/Hardware Store
+  // Shop/Hardware Store (DUPLICATE - REMOVED)
+  // The duplicate shop router has been removed. Using the first definition above.
+  
+  /* REMOVED DUPLICATE SHOP ROUTER
   shop: router({
     getProducts: publicProcedure
       .input(z.object({
@@ -555,6 +659,7 @@ When you have enough information, summarize what you've learned and offer to gen
         };
       }),
   }),
+  */ // END REMOVED DUPLICATE SHOP ROUTER
 
   // Shopping cart
   cart: router({
