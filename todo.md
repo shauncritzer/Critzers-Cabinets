@@ -548,3 +548,11 @@
 - [ ] Test SendGrid email notifications
 - [ ] Re-import 50 products into Railway database
 - [ ] Re-enable Shop Hardware page
+
+
+## Critical Bugs - Jan 16, 2026
+- [ ] Fix quote submission error ("Failed to submit quote. Please try again")
+- [ ] Fix RoomScan Pro link (currently shows "page not found")
+- [ ] Fix Google Measure link (currently shows "item not found")
+- [ ] Verify database schema migrations ran on Railway
+- [ ] Test quote submission end-to-end with email delivery

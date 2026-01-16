@@ -70,6 +70,24 @@ export async function runMigrations(): Promise<void> {
     await safeAddColumn(connection, 'orders', 'tracking_number', 'varchar(255)');
     await safeAddColumn(connection, 'orders', 'notes', 'text');
 
+    console.log('\nChecking quotes table columns...');
+
+    // Add educational question fields
+    await safeAddColumn(connection, 'quotes', 'currentCondition', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'timeline', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'budgetRange', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'stylePreference', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'specialFeatures', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'referralSource', 'varchar(100)');
+
+    // Add project detail fields
+    await safeAddColumn(connection, 'quotes', 'doorStyle', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'woodSpecies', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'countertopType', 'varchar(100)');
+    await safeAddColumn(connection, 'quotes', 'linearFeet', 'varchar(50)');
+    await safeAddColumn(connection, 'quotes', 'dimensions', 'varchar(255)');
+    await safeAddColumn(connection, 'quotes', 'estimatedPrice', 'int');
+
     console.log('\n✅ All migrations completed successfully!');
   } catch (error: any) {
     console.error('\n❌ Migration failed:', error.message || error);
