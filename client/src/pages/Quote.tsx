@@ -22,6 +22,13 @@ export default function Quote() {
     dimensions: "",
     linearFeet: "",
     additionalNotes: "",
+    // Educational questions
+    currentCondition: "",
+    timeline: "",
+    budgetRange: "",
+    stylePreference: "",
+    specialFeatures: "",
+    referralSource: "",
   });
   const [contactInfo, setContactInfo] = useState({
     name: "",
@@ -315,6 +322,128 @@ export default function Quote() {
                         <a href="https://apps.apple.com/us/app/roomscan-pro-lidar/id571436618" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">RoomScan Pro (iOS)</a>
                         <a href="https://play.google.com/store/apps/details?id=com.google.tango.measure" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">Google Measure (Android)</a>
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Educational Questions */}
+                  <div className="space-y-4 border-t pt-6">
+                    <h3 className="font-semibold text-lg">Help Us Understand Your Project Better</h3>
+                    
+                    {/* Current Condition */}
+                    <div className="space-y-2">
+                      <Label htmlFor="currentCondition">What's the current condition? 💡</Label>
+                      <p className="text-sm text-muted-foreground">This helps us understand the scope of work needed.</p>
+                      <Select value={projectData.currentCondition} onValueChange={(value) => setProjectData({ ...projectData, currentCondition: value })}>
+                        <SelectTrigger id="currentCondition">
+                          <SelectValue placeholder="Select condition" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="new-construction">New Construction</SelectItem>
+                          <SelectItem value="full-remodel">Full Remodel</SelectItem>
+                          <SelectItem value="cabinet-replacement">Cabinet Replacement Only</SelectItem>
+                          <SelectItem value="refacing">Cabinet Refacing</SelectItem>
+                          <SelectItem value="repair">Repair/Restoration</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Timeline */}
+                    <div className="space-y-2">
+                      <Label htmlFor="timeline">When would you like to start? 💡</Label>
+                      <p className="text-sm text-muted-foreground">Helps us schedule and plan materials.</p>
+                      <Select value={projectData.timeline} onValueChange={(value) => setProjectData({ ...projectData, timeline: value })}>
+                        <SelectTrigger id="timeline">
+                          <SelectValue placeholder="Select timeline" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="asap">As Soon As Possible</SelectItem>
+                          <SelectItem value="1-3-months">1-3 Months</SelectItem>
+                          <SelectItem value="3-6-months">3-6 Months</SelectItem>
+                          <SelectItem value="6-12-months">6-12 Months</SelectItem>
+                          <SelectItem value="12plus-months">12+ Months (Planning Stage)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Budget Range */}
+                    <div className="space-y-2">
+                      <Label htmlFor="budgetRange">What's your budget range? 💡</Label>
+                      <p className="text-sm text-muted-foreground">Helps us recommend options that fit your investment level.</p>
+                      <Select value={projectData.budgetRange} onValueChange={(value) => setProjectData({ ...projectData, budgetRange: value })}>
+                        <SelectTrigger id="budgetRange">
+                          <SelectValue placeholder="Select budget range" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="under-10k">Under $10,000</SelectItem>
+                          <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
+                          <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
+                          <SelectItem value="50k-75k">$50,000 - $75,000</SelectItem>
+                          <SelectItem value="75k-plus">$75,000+</SelectItem>
+                          <SelectItem value="flexible">Flexible/Not Sure</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Style Preference */}
+                    <div className="space-y-2">
+                      <Label htmlFor="stylePreference">What style do you prefer? 💡</Label>
+                      <p className="text-sm text-muted-foreground">Helps us visualize your dream space.</p>
+                      <Select value={projectData.stylePreference} onValueChange={(value) => setProjectData({ ...projectData, stylePreference: value })}>
+                        <SelectTrigger id="stylePreference">
+                          <SelectValue placeholder="Select style" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="traditional">Traditional</SelectItem>
+                          <SelectItem value="modern">Modern/Contemporary</SelectItem>
+                          <SelectItem value="farmhouse">Farmhouse/Rustic</SelectItem>
+                          <SelectItem value="transitional">Transitional</SelectItem>
+                          <SelectItem value="craftsman">Craftsman</SelectItem>
+                          <SelectItem value="industrial">Industrial</SelectItem>
+                          <SelectItem value="coastal">Coastal</SelectItem>
+                          <SelectItem value="not-sure">Not Sure Yet</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Special Features */}
+                    <div className="space-y-2">
+                      <Label htmlFor="specialFeatures">Any special features needed? 💡</Label>
+                      <p className="text-sm text-muted-foreground">Custom solutions we should consider.</p>
+                      <Select value={projectData.specialFeatures} onValueChange={(value) => setProjectData({ ...projectData, specialFeatures: value })}>
+                        <SelectTrigger id="specialFeatures">
+                          <SelectValue placeholder="Select special features" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">None</SelectItem>
+                          <SelectItem value="accessibility">Accessibility Features</SelectItem>
+                          <SelectItem value="custom-storage">Custom Storage Solutions</SelectItem>
+                          <SelectItem value="island">Kitchen Island</SelectItem>
+                          <SelectItem value="pantry">Walk-in Pantry</SelectItem>
+                          <SelectItem value="appliance-garage">Appliance Garage</SelectItem>
+                          <SelectItem value="wine-storage">Wine Storage</SelectItem>
+                          <SelectItem value="multiple">Multiple Features</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    {/* Referral Source */}
+                    <div className="space-y-2">
+                      <Label htmlFor="referralSource">How did you hear about us? 💡</Label>
+                      <p className="text-sm text-muted-foreground">Helps us know what's working!</p>
+                      <Select value={projectData.referralSource} onValueChange={(value) => setProjectData({ ...projectData, referralSource: value })}>
+                        <SelectTrigger id="referralSource">
+                          <SelectValue placeholder="Select source" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="google">Google Search</SelectItem>
+                          <SelectItem value="social-media">Social Media</SelectItem>
+                          <SelectItem value="referral">Friend/Family Referral</SelectItem>
+                          <SelectItem value="contractor">Contractor Referral</SelectItem>
+                          <SelectItem value="previous-customer">Previous Customer</SelectItem>
+                          <SelectItem value="drive-by">Saw Your Work</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
 

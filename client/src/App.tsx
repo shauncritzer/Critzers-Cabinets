@@ -10,6 +10,7 @@ import Products from "./pages/Products";
 import Services from "./pages/Services";
 import Contact from "./pages/Contact";
 import Shop from "./pages/Shop";
+import ShopComingSoon from "./pages/ShopComingSoon";
 import Quote from "./pages/Quote";
 import Dashboard from "./pages/Dashboard";
 import Admin from "@/pages/Admin";
@@ -35,7 +36,7 @@ function Router() {
       <Route path={"/products"} component={Products} />
       <Route path={"/services"} component={Services} />
       <Route path={"/contact"} component={Contact} />
-      <Route path={"/shop"} component={Shop} />
+      <Route path={"/shop"} component={ShopComingSoon} />
       <Route path={"/shop/product/:id"} component={ProductDetail} />
       <Route path={"/quote"} component={Quote} />
       <Route path={"/dashboard"} component={Dashboard} />

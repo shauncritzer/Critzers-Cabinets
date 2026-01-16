@@ -537,3 +537,14 @@
 - [x] Configure SendGrid API key for email notifications
 - [x] Test SendGrid email system (test email sent successfully to info@critzerscabinets.com)
 - [x] Verify quote notifications will be sent to info@critzerscabinets.com
+
+
+## Fix Quote Page & Shop Page - Jan 16, 2026
+- [ ] Verify Quote.tsx has educational questions in code
+- [ ] Temporarily disable Shop Hardware page (show "Coming Soon")
+- [ ] Commit and push changes directly to GitHub (not checkpoint system)
+- [ ] Verify Railway deploys from GitHub
+- [ ] Test live Quote page with educational questions
+- [ ] Test SendGrid email notifications
+- [ ] Re-import 50 products into Railway database
+- [ ] Re-enable Shop Hardware page
