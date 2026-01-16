@@ -77,11 +77,51 @@ export async function sendQuoteNotification(quote: {
   customerPhone?: string;
   projectDescription?: string;
   quoteId: number;
+  // Project details
+  roomType?: string;
+  doorStyle?: string;
+  woodSpecies?: string;
+  finish?: string;
+  countertopType?: string;
+  linearFeet?: string;
+  dimensions?: string;
+  // Educational questions
+  currentCondition?: string;
+  timeline?: string;
+  budgetRange?: string;
+  stylePreference?: string;
+  specialFeatures?: string;
+  referralSource?: string;
+  estimatedPrice?: number;
 }): Promise<boolean> {
   const TO_EMAIL = process.env.QUOTE_NOTIFICATION_EMAIL || 'info@critzerscabinets.com';
 
   const subject = `New Quote Request from ${quote.customerName}`;
   
+  const formatLabel = (key: string): string => {
+    return key.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  };
+
+  const projectDetails = [
+    quote.roomType && `Room Type: ${formatLabel(quote.roomType)}`,
+    quote.doorStyle && `Door Style: ${formatLabel(quote.doorStyle)}`,
+    quote.woodSpecies && `Wood Species: ${formatLabel(quote.woodSpecies)}`,
+    quote.finish && `Finish: ${formatLabel(quote.finish)}`,
+    quote.countertopType && `Countertop: ${formatLabel(quote.countertopType)}`,
+    quote.linearFeet && `Linear Feet: ${quote.linearFeet}`,
+    quote.dimensions && `Dimensions: ${quote.dimensions}`,
+    quote.estimatedPrice && `Estimated Price: $${quote.estimatedPrice.toLocaleString()}`,
+  ].filter(Boolean).join('\n- ');
+
+  const additionalInfo = [
+    quote.currentCondition && `Current Condition: ${formatLabel(quote.currentCondition)}`,
+    quote.timeline && `Timeline: ${formatLabel(quote.timeline)}`,
+    quote.budgetRange && `Budget Range: ${formatLabel(quote.budgetRange)}`,
+    quote.stylePreference && `Style Preference: ${formatLabel(quote.stylePreference)}`,
+    quote.specialFeatures && `Special Features: ${formatLabel(quote.specialFeatures)}`,
+    quote.referralSource && `How They Found Us: ${formatLabel(quote.referralSource)}`,
+  ].filter(Boolean).join('\n- ');
+
   const text = `
 New Quote Request Received
 
@@ -91,7 +131,11 @@ Customer Information:
 - Phone: ${quote.customerPhone || 'Not provided'}
 
 Project Details:
-${quote.projectDescription || 'No description provided'}
+${projectDetails || 'No details provided'}
+
+${additionalInfo ? `Additional Information:\n- ${additionalInfo}` : ''}
+
+${quote.projectDescription ? `Additional Notes:\n${quote.projectDescription}` : ''}
 
 Quote ID: ${quote.quoteId}
 
@@ -131,7 +175,13 @@ This is an automated notification from your website quote system.
       </div>
       
       <h2>Project Details</h2>
-      <p>${quote.projectDescription || 'No description provided'}</p>
+      ${projectDetails ? projectDetails.split('\n- ').map(detail => `<div class="info-row">${detail.replace(/^(.+?):\s*/, '<span class="label">$1:</span> ')}</div>`).join('') : '<p>No details provided</p>'}
+      
+      ${additionalInfo ? `<h2>Additional Information</h2>
+      ${additionalInfo.split('\n- ').map(detail => `<div class="info-row">${detail.replace(/^(.+?):\s*/, '<span class="label">$1:</span> ')}</div>`).join('')}` : ''}
+      
+      ${quote.projectDescription ? `<h2>Additional Notes</h2>
+      <p>${quote.projectDescription}</p>` : ''}
       
       <div class="info-row">
         <span class="label">Quote ID:</span> ${quote.quoteId}

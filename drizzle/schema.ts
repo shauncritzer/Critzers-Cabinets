@@ -160,6 +160,22 @@ export const quotes = mysqlTable("quotes", {
   crmLeadId: varchar("crmLeadId", { length: 255 }),
   sentToCrm: int("sentToCrm").default(0).notNull(), // Boolean: 0 or 1
   
+  // Educational Questions (for better lead qualification)
+  currentCondition: varchar("currentCondition", { length: 100 }), // new-construction, full-remodel, etc.
+  timeline: varchar("timeline", { length: 100 }), // asap, 1-3-months, etc.
+  budgetRange: varchar("budgetRange", { length: 100 }), // under-10k, 10k-25k, etc.
+  stylePreference: varchar("stylePreference", { length: 100 }), // traditional, modern, etc.
+  specialFeatures: varchar("specialFeatures", { length: 100 }), // accessibility, custom-storage, etc.
+  referralSource: varchar("referralSource", { length: 100 }), // google, social-media, referral, etc.
+  
+  // Additional project details from form
+  doorStyle: varchar("doorStyle", { length: 100 }),
+  woodSpecies: varchar("woodSpecies", { length: 100 }),
+  countertopType: varchar("countertopType", { length: 100 }),
+  linearFeet: varchar("linearFeet", { length: 50 }),
+  dimensions: varchar("dimensions", { length: 255 }),
+  estimatedPrice: int("estimatedPrice"),
+  
   // Conversation data (JSON)
   conversationData: text("conversationData"), // Stores full AI chat history
   
