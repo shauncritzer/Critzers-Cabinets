@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,25 +6,66 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, ShoppingCart, Minus, Plus, Package, Ruler, Tag } from "lucide-react";
-// Toast functionality to be added later
+import { ArrowLeft, ShoppingCart, Minus, Plus, Package, Ruler, Tag, Check, Truck, Phone, Shield } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/shop/product/:id");
   const productId = params?.id ? parseInt(params.id) : 0;
   const [quantity, setQuantity] = useState(1);
-  // const { toast } = useToast();
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  // Session ID for cart
+  const [sessionId, setSessionId] = useState<string>("");
+  useEffect(() => {
+    let sid = localStorage.getItem("cart_session_id");
+    if (!sid) {
+      sid = `guest_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      localStorage.setItem("cart_session_id", sid);
+    }
+    setSessionId(sid);
+  }, []);
 
   const { data: product, isLoading } = trpc.shop.getProductById.useQuery({ id: productId });
+
+  // Fetch related products from same collection
+  const { data: relatedData } = trpc.shop.getAllProducts.useQuery(
+    {
+      collection: product?.collection || undefined,
+      pageSize: 5,
+      page: 1,
+    },
+    { enabled: !!product?.collection }
+  );
+
+  // Add to cart mutation
+  const addToCart = trpc.cart.addToCart.useMutation({
+    onSuccess: (data) => {
+      setAddedToCart(true);
+      toast.success(`Added ${quantity} × ${product?.name} to cart!`, {
+        action: {
+          label: 'View Cart',
+          onClick: () => window.location.href = '/cart',
+        },
+      });
+      setTimeout(() => setAddedToCart(false), 3000);
+    },
+    onError: () => {
+      toast.error('Failed to add to cart. Please try again.');
+    },
+  });
 
   const handleQuantityChange = (delta: number) => {
     setQuantity(Math.max(1, quantity + delta));
   };
 
   const handleAddToCart = () => {
-    // TODO: Implement cart functionality
-    alert(`Added ${quantity} × ${product?.name} to your cart`);
+    if (!product) return;
+    addToCart.mutate({ productId: product.id, quantity, sessionId });
   };
+
+  // Related products excluding current
+  const relatedProducts = (relatedData?.products || []).filter(p => p.id !== productId).slice(0, 4);
 
   if (isLoading) {
     return (
@@ -78,7 +119,23 @@ export default function ProductDetail() {
             Shop
           </Link>
           <span>/</span>
-          <span className="text-foreground">{product.name}</span>
+          {product.productType && (
+            <>
+              <Link href={`/shop?type=${product.productType}`} className="hover:text-foreground transition-colors">
+                {product.productType}s
+              </Link>
+              <span>/</span>
+            </>
+          )}
+          {product.collection && (
+            <>
+              <Link href={`/shop?collection=${product.collection}`} className="hover:text-foreground transition-colors">
+                {product.collection}
+              </Link>
+              <span>/</span>
+            </>
+          )}
+          <span className="text-foreground">{product.sku}</span>
         </div>
 
         {/* Product Details */}
@@ -99,7 +156,7 @@ export default function ProductDetail() {
             </Card>
             {product.featured === 'yes' && (
               <Badge className="w-full justify-center py-2">
-                ⭐ Featured Product
+                Featured Product
               </Badge>
             )}
           </div>
@@ -114,9 +171,21 @@ export default function ProductDetail() {
                 </Badge>
               </div>
               
-              {product.collection && (
-                <p className="text-lg text-muted-foreground">{product.collection} Collection</p>
-              )}
+              <div className="flex items-center gap-2 text-muted-foreground">
+                {product.brand && <span className="font-medium">{product.brand}</span>}
+                {product.collection && (
+                  <>
+                    <span>·</span>
+                    <span>{product.collection} Collection</span>
+                  </>
+                )}
+                {product.productType && (
+                  <>
+                    <span>·</span>
+                    <span>{product.productType}</span>
+                  </>
+                )}
+              </div>
             </div>
 
             <Separator />
@@ -143,8 +212,9 @@ export default function ProductDetail() {
 
             <Separator />
 
-            {/* Product Details */}
+            {/* Product Specifications */}
             <div className="space-y-4">
+              <h3 className="font-semibold text-lg">Specifications</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex items-center gap-2 text-sm">
                   <Tag className="h-4 w-4 text-muted-foreground" />
@@ -154,36 +224,94 @@ export default function ProductDetail() {
                   </div>
                 </div>
                 
-                {product.category && (
+                {product.productType && (
                   <div className="flex items-center gap-2 text-sm">
                     <Package className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="text-muted-foreground">Category</p>
-                      <p className="font-medium capitalize">{product.category}</p>
+                      <p className="text-muted-foreground">Type</p>
+                      <p className="font-medium">{product.productType}</p>
                     </div>
+                  </div>
+                )}
+
+                {product.finish && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <div className="h-4 w-4 rounded-full bg-muted border" />
+                    <div>
+                      <p className="text-muted-foreground">Finish</p>
+                      <p className="font-medium">{product.finish}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.material && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Shield className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-muted-foreground">Material</p>
+                      <p className="font-medium">{product.material}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.centerToCenter && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Ruler className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-muted-foreground">Center to Center</p>
+                      <p className="font-medium">{product.centerToCenter}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.length && (
+                  <div className="flex items-center gap-2 text-sm">
+                    <Ruler className="h-4 w-4 text-muted-foreground" />
+                    <div>
+                      <p className="text-muted-foreground">Length</p>
+                      <p className="font-medium">{product.length}</p>
+                    </div>
+                  </div>
+                )}
+
+                {product.width && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Width</p>
+                    <p className="font-medium">{product.width}</p>
+                  </div>
+                )}
+
+                {product.projection && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Projection</p>
+                    <p className="font-medium">{product.projection}</p>
+                  </div>
+                )}
+
+                {product.baseDiameter && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Base Diameter</p>
+                    <p className="font-medium">{product.baseDiameter}</p>
+                  </div>
+                )}
+
+                {product.weight && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">Weight</p>
+                    <p className="font-medium">{product.weight} lbs</p>
+                  </div>
+                )}
+
+                {product.upc && (
+                  <div className="text-sm">
+                    <p className="text-muted-foreground">UPC</p>
+                    <p className="font-medium">{product.upc}</p>
                   </div>
                 )}
               </div>
 
-              {product.dimensions && (
-                <div className="flex items-start gap-2 text-sm">
-                  <Ruler className="h-4 w-4 text-muted-foreground mt-0.5" />
-                  <div>
-                    <p className="text-muted-foreground">Dimensions</p>
-                    <p className="font-medium">{product.dimensions}</p>
-                  </div>
-                </div>
-              )}
-
-              {product.finish && (
-                <div className="text-sm">
-                  <p className="text-muted-foreground mb-1">Finish</p>
-                  <Badge variant="outline">{product.finish}</Badge>
-                </div>
-              )}
-
               {product.description && product.description !== product.name && (
-                <div className="text-sm">
+                <div className="text-sm mt-4">
                   <p className="text-muted-foreground mb-1">Description</p>
                   <p>{product.description}</p>
                 </div>
@@ -214,6 +342,9 @@ export default function ProductDetail() {
                     <Plus className="h-4 w-4" />
                   </Button>
                 </div>
+                <span className="text-sm text-muted-foreground">
+                  Subtotal: <span className="font-medium text-foreground">${(Number(product.retailPrice) * quantity).toFixed(2)}</span>
+                </span>
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
@@ -221,10 +352,21 @@ export default function ProductDetail() {
                   size="lg"
                   className="flex-1"
                   onClick={handleAddToCart}
-                  disabled={product.inStock !== 'yes'}
+                  disabled={product.inStock !== 'yes' || addToCart.isPending}
                 >
-                  <ShoppingCart className="mr-2 h-5 w-5" />
-                  Add to Cart
+                  {addToCart.isPending ? (
+                    <>Adding...</>
+                  ) : addedToCart ? (
+                    <>
+                      <Check className="mr-2 h-5 w-5" />
+                      Added to Cart!
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="mr-2 h-5 w-5" />
+                      Add to Cart — ${(Number(product.retailPrice) * quantity).toFixed(2)}
+                    </>
+                  )}
                 </Button>
                 <Link href="/shop">
                   <Button size="lg" variant="outline" className="w-full sm:w-auto">
@@ -241,25 +383,72 @@ export default function ProductDetail() {
               )}
             </div>
 
-            {/* Additional Info */}
+            {/* Trust Badges */}
             <Card className="bg-muted/50">
-              <CardContent className="p-4 space-y-2 text-sm">
+              <CardContent className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">✓</span>
+                  <Check className="h-4 w-4 text-green-600" />
                   <span>Authorized Top Knobs Dealer</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">✓</span>
+                  <Truck className="h-4 w-4 text-blue-600" />
+                  <span>Free shipping on orders $75+</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Shield className="h-4 w-4 text-purple-600" />
                   <span>Expert Installation Available</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium">✓</span>
-                  <span>Questions? Call (434) 973-1691</span>
+                  <Phone className="h-4 w-4 text-orange-600" />
+                  <span>Questions? (434) 973-1691</span>
                 </div>
               </CardContent>
             </Card>
           </div>
         </div>
+
+        {/* Related Products */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-16">
+            <Separator className="mb-8" />
+            <h2 className="text-2xl font-bold mb-6">
+              More from {product.collection} Collection
+            </h2>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {relatedProducts.map((related) => (
+                <Card key={related.id} className="group hover:shadow-lg transition-all overflow-hidden border hover:border-primary/50">
+                  <Link href={`/shop/product/${related.id}`}>
+                    <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-4">
+                      <img 
+                        src={related.imageUrl || "/images/topknobs/placeholder-knobs.jpg"} 
+                        alt={related.name}
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.src = "/images/topknobs/placeholder-knobs.jpg";
+                        }}
+                      />
+                    </div>
+                  </Link>
+                  <CardContent className="p-3 space-y-1">
+                    <Link href={`/shop/product/${related.id}`}>
+                      <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
+                        {related.name}
+                      </h3>
+                    </Link>
+                    <p className="text-xs text-muted-foreground">SKU: {related.sku}</p>
+                    {related.finish && (
+                      <Badge variant="outline" className="text-xs">{related.finish}</Badge>
+                    )}
+                    <p className="text-lg font-bold text-primary">
+                      ${Number(related.retailPrice).toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
