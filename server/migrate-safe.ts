@@ -88,6 +88,19 @@ export async function runMigrations(): Promise<void> {
     await safeAddColumn(connection, 'quotes', 'dimensions', 'varchar(255)');
     await safeAddColumn(connection, 'quotes', 'estimatedPrice', 'int');
 
+    console.log('\nChecking products table columns...');
+
+    // Add enhanced product fields for e-commerce
+    await safeAddColumn(connection, 'products', 'brand', 'varchar(100) DEFAULT "Top Knobs"');
+    await safeAddColumn(connection, 'products', 'finish_code', 'varchar(20)');
+    await safeAddColumn(connection, 'products', 'product_type', 'varchar(100)');
+    await safeAddColumn(connection, 'products', 'length', 'varchar(50)');
+    await safeAddColumn(connection, 'products', 'width', 'varchar(50)');
+    await safeAddColumn(connection, 'products', 'projection', 'varchar(50)');
+    await safeAddColumn(connection, 'products', 'center_to_center', 'varchar(50)');
+    await safeAddColumn(connection, 'products', 'base_diameter', 'varchar(50)');
+    await safeAddColumn(connection, 'products', 'material', 'varchar(100)');
+
     console.log('\n✅ All migrations completed successfully!');
   } catch (error: any) {
     console.error('\n❌ Migration failed:', error.message || error);

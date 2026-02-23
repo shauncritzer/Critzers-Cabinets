@@ -116,8 +116,25 @@ export default function Quote() {
     createQuote.mutate({
       customerName: contactInfo.name,
       customerEmail: contactInfo.email,
-      customerPhone: contactInfo.phone,
+      customerPhone: contactInfo.phone || undefined,
       conversationData,
+      // Pass all structured form fields directly for DB storage and email notification
+      roomType: projectData.roomType || undefined,
+      doorStyle: projectData.doorStyle || undefined,
+      woodSpecies: projectData.woodSpecies || undefined,
+      finish: projectData.finish || undefined,
+      countertopType: projectData.countertopType || undefined,
+      linearFeet: projectData.linearFeet || undefined,
+      dimensions: projectData.dimensions || undefined,
+      estimatedPrice: estimatedPrice || undefined,
+      projectDescription: projectData.additionalNotes || undefined,
+      // Educational qualification questions
+      currentCondition: projectData.currentCondition || undefined,
+      timeline: projectData.timeline || undefined,
+      budgetRange: projectData.budgetRange || undefined,
+      stylePreference: projectData.stylePreference || undefined,
+      specialFeatures: projectData.specialFeatures || undefined,
+      referralSource: projectData.referralSource || undefined,
     });
   };
 

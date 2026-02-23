@@ -55,6 +55,21 @@ export const appRouter = router({
         roomType: z.string().optional(),
         projectDescription: z.string().optional(),
         conversationData: z.string().optional(),
+        // Project detail fields from the structured quote form
+        doorStyle: z.string().optional(),
+        woodSpecies: z.string().optional(),
+        finish: z.string().optional(),
+        countertopType: z.string().optional(),
+        linearFeet: z.string().optional(),
+        dimensions: z.string().optional(),
+        estimatedPrice: z.number().optional(),
+        // Educational qualification questions
+        currentCondition: z.string().optional(),
+        timeline: z.string().optional(),
+        budgetRange: z.string().optional(),
+        stylePreference: z.string().optional(),
+        specialFeatures: z.string().optional(),
+        referralSource: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const quoteId = await createQuote({
@@ -226,15 +241,28 @@ When you have enough information, summarize what you've learned and offer to gen
         category: z.string().optional(),
         collection: z.string().optional(),
         finish: z.string().optional(),
+        productType: z.string().optional(),
+        brand: z.string().optional(),
         minPrice: z.number().optional(),
         maxPrice: z.number().optional(),
         search: z.string().optional(),
         featured: z.boolean().optional(),
+        sortBy: z.enum(['price-asc', 'price-desc', 'name-asc', 'name-desc', 'newest']).optional(),
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(24),
       }).optional())
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error('Database not available');
         const conditions = [];
+        
+        // Filter out discontinued products by default
+        conditions.push(
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
+          )
+        );
         
         if (input?.category) {
           conditions.push(eq(products.category, input.category));
@@ -245,18 +273,25 @@ When you have enough information, summarize what you've learned and offer to gen
         if (input?.finish) {
           conditions.push(eq(products.finish, input.finish));
         }
+        if (input?.productType) {
+          conditions.push(eq(products.productType, input.productType));
+        }
+        if (input?.brand) {
+          conditions.push(eq(products.brand, input.brand));
+        }
         if (input?.minPrice !== undefined) {
-          conditions.push(sql`${products.retailPrice} >= ${input.minPrice}`);
+          conditions.push(sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) >= ${input.minPrice}`);
         }
         if (input?.maxPrice !== undefined) {
-          conditions.push(sql`${products.retailPrice} <= ${input.maxPrice}`);
+          conditions.push(sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) <= ${input.maxPrice}`);
         }
         if (input?.search) {
           conditions.push(
             or(
               like(products.name, `%${input.search}%`),
               like(products.description, `%${input.search}%`),
-              like(products.sku, `%${input.search}%`)
+              like(products.sku, `%${input.search}%`),
+              like(products.collection, `%${input.search}%`)
             )
           );
         }
@@ -264,11 +299,55 @@ When you have enough information, summarize what you've learned and offer to gen
           conditions.push(eq(products.featured, 'yes'));
         }
         
-        const query = conditions.length > 0 
-          ? db.select().from(products).where(and(...conditions))
-          : db.select().from(products);
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
         
-        return await query;
+        // Get total count
+        const countResult = await db.select({ count: sql<number>`count(*)` })
+          .from(products)
+          .where(whereClause);
+        const totalCount = countResult[0]?.count || 0;
+        
+        // Build query with sorting
+        let orderClause;
+        switch (input?.sortBy) {
+          case 'price-asc':
+            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) ASC`;
+            break;
+          case 'price-desc':
+            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) DESC`;
+            break;
+          case 'name-asc':
+            orderClause = sql`${products.name} ASC`;
+            break;
+          case 'name-desc':
+            orderClause = sql`${products.name} DESC`;
+            break;
+          case 'newest':
+            orderClause = sql`${products.createdAt} DESC`;
+            break;
+          default:
+            orderClause = sql`${products.id} ASC`;
+        }
+        
+        const page = input?.page || 1;
+        const pageSize = input?.pageSize || 24;
+        const offset = (page - 1) * pageSize;
+        
+        const productsList = await db.select().from(products)
+          .where(whereClause)
+          .orderBy(orderClause)
+          .limit(pageSize)
+          .offset(offset);
+        
+        return {
+          products: productsList,
+          pagination: {
+            page,
+            pageSize,
+            totalCount,
+            totalPages: Math.ceil(totalCount / pageSize),
+          },
+        };
       }),
     
     getProductById: publicProcedure
@@ -294,28 +373,72 @@ When you have enough information, summarize what you've learned and offer to gen
         const db = await getDb();
         if (!db) throw new Error('Database not available');
         
-        // Get unique collections
-        const collections = await db.select({ collection: products.collection })
+        // Get unique collections with counts
+        const collections = await db.select({ 
+          collection: products.collection,
+          count: sql<number>`count(*)` 
+        })
           .from(products)
           .where(not(isNull(products.collection)))
-          .groupBy(products.collection);
+          .groupBy(products.collection)
+          .orderBy(sql`count(*) DESC`);
         
-        // Get unique finishes
-        const finishes = await db.select({ finish: products.finish })
+        // Get unique finishes with counts
+        const finishes = await db.select({ 
+          finish: products.finish,
+          count: sql<number>`count(*)` 
+        })
           .from(products)
           .where(not(isNull(products.finish)))
-          .groupBy(products.finish);
+          .groupBy(products.finish)
+          .orderBy(sql`count(*) DESC`);
         
-        // Get unique categories
-        const categories = await db.select({ category: products.category })
+        // Get unique categories with counts
+        const categories = await db.select({ 
+          category: products.category,
+          count: sql<number>`count(*)` 
+        })
           .from(products)
           .where(not(isNull(products.category)))
-          .groupBy(products.category);
+          .groupBy(products.category)
+          .orderBy(sql`count(*) DESC`);
+        
+        // Get unique product types with counts
+        const productTypes = await db.select({ 
+          productType: products.productType,
+          count: sql<number>`count(*)` 
+        })
+          .from(products)
+          .where(not(isNull(products.productType)))
+          .groupBy(products.productType)
+          .orderBy(sql`count(*) DESC`);
+        
+        // Get unique brands with counts
+        const brands = await db.select({ 
+          brand: products.brand,
+          count: sql<number>`count(*)` 
+        })
+          .from(products)
+          .where(not(isNull(products.brand)))
+          .groupBy(products.brand)
+          .orderBy(sql`count(*) DESC`);
+        
+        // Get price range
+        const priceRange = await db.select({
+          minPrice: sql<number>`MIN(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
+          maxPrice: sql<number>`MAX(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
+        }).from(products);
         
         return {
-          collections: collections.map((c: any) => c.collection).filter(Boolean),
-          finishes: finishes.map((f: any) => f.finish).filter(Boolean),
-          categories: categories.map((c: any) => c.category).filter(Boolean),
+          collections: collections.map((c: any) => ({ name: c.collection, count: c.count })).filter((c: any) => c.name),
+          finishes: finishes.map((f: any) => ({ name: f.finish, count: f.count })).filter((f: any) => f.name),
+          categories: categories.map((c: any) => ({ name: c.category, count: c.count })).filter((c: any) => c.name),
+          productTypes: productTypes.map((t: any) => ({ name: t.productType, count: t.count })).filter((t: any) => t.name),
+          brands: brands.map((b: any) => ({ name: b.brand, count: b.count })).filter((b: any) => b.name),
+          priceRange: {
+            min: priceRange[0]?.minPrice || 0,
+            max: priceRange[0]?.maxPrice || 1000,
+          },
         };
       }),
   }),
@@ -1271,63 +1394,161 @@ When you have enough information, summarize what you've learned and offer to gen
 
         const fileBuffer = await fs.readFile(filePath);
         const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const data: any[] = xlsx.utils.sheet_to_json(worksheet);
+        
+        // Finish code to full name mapping
+        const FINISH_MAP: Record<string, string> = {
+          'AC': 'Antique Copper', 'AG': 'Ash Gray', 'ALU': 'Aluminum',
+          'BA': 'Brass Antique', 'BI': 'Black Iron', 'BLK': 'Flat Black',
+          'BNI': 'Black Nickel', 'BR': 'Brass', 'BSN': 'Brushed Satin Nickel',
+          'CB': 'Coal Black', 'CI': 'Cast Iron', 'DAB': 'Dark Antique Brass',
+          'GBZ': 'German Bronze', 'HB': 'Honey Bronze', 'LB': 'Light Bronze',
+          'MB': 'Medium Bronze', 'MCB': 'Mahogany Bronze', 'OEC': 'Old English Copper',
+          'ORB': 'Oil Rubbed Bronze', 'ORB2': 'Oil Rubbed Bronze 2',
+          'PAB': 'Patina Antique Brass', 'PAR': 'Patina Rouge',
+          'PB': 'Polished Brass', 'PC': 'Polished Chrome',
+          'PN': 'Polished Nickel', 'PS': 'Brushed Stainless Steel',
+          'PSS': 'Polished Stainless Steel', 'PT': 'Pewter',
+          'PTA': 'Pewter Antique', 'PTL': 'Pewter Light',
+          'RST': 'Rust', 'SAB': 'Sable', 'SBL': 'Silicon Bronze Light',
+          'SS': 'Stainless Steel', 'TB': 'Tuscan Bronze', 'UM': 'Umbrio',
+          'WHT': 'White', 'BLK/HB': 'Flat Black and Honey Bronze',
+          'HB/BLK': 'Honey Bronze and Flat Black',
+          'BLK/PTA': 'Flat Black and Pewter Antique',
+          'PTA/BLK': 'Pewter Antique and Flat Black',
+        };
 
-        console.log(`Found ${data.length} rows in Excel file`);
-        if (data.length > 0) {
-          console.log('Available columns:', Object.keys(data[0]));
-        }
+        // Helper to determine product type from description
+        const getProductType = (desc: string): string => {
+          const d = desc.toLowerCase();
+          if (d.includes('knob')) return 'Knob';
+          if (d.includes('pull')) return 'Pull';
+          if (d.includes('handle')) return 'Handle';
+          if (d.includes('hook')) return 'Hook';
+          if (d.includes('backplate')) return 'Backplate';
+          if (d.includes('strike plate')) return 'Strike Plate';
+          if (d.includes('ring')) return 'Towel Ring';
+          if (d.includes('bar')) return 'Towel Bar';
+          if (d.includes('tissue')) return 'Tissue Holder';
+          return 'Hardware';
+        };
 
         let imported = 0;
         let skipped = 0;
         let discontinued = 0;
         let noPricing = 0;
 
-        for (const row of data) {
-          // Try multiple column name variations
-          const sku = row['Item Number'] || row['SKU'] || row['Item #'] || row['Part Number'] || '';
-          const name = row['Item Description'] || row['Description'] || row['Product Name'] || '';
-          const retailPrice = row['Retail Price'] || row['List Price'] || row['Price'] || null;
+        // Process Knobs_Pulls sheet (main sheet)
+        const mainSheet = workbook.Sheets[workbook.SheetNames[0]];
+        const mainData: any[] = xlsx.utils.sheet_to_json(mainSheet);
+        console.log(`Found ${mainData.length} rows in main sheet`);
 
-          // Skip if no SKU or name
-          if (!sku && !name) {
-            skipped++;
-            continue;
-          }
+        for (const row of mainData) {
+          const sku = row['Part Number'] || row['Item Number'] || row['SKU'] || '';
+          const description = row['Description'] || row['Item Description'] || '';
+          const finishCode = row['Finish'] || '';
+          const collection = row['Collection'] || '';
+          const listPrice = row['List Price - January 2026'] || row['Retail Price'] || row['List Price'] || null;
+          const length = row['Length'] || null;
+          const width = row['Width'] || null;
+          const projection = row['Projection'] || null;
+          const centerToCenter = row['Center to Center (c-c)'] || row['Center to Center'] || null;
+          const baseDiameter = row['Base Diameter'] || null;
+          const weight = row['Weight'] || null;
+          const material = row['Base Material'] || null;
+          const upc = row['UPC'] || null;
 
-          // FILTER OUT DISCONTINUED PRODUCTS
-          if (name && (
-            name.toUpperCase().includes('DISCONTINUED') ||
-            name.toUpperCase().includes('DEMO') ||
-            name.toUpperCase().includes('LIMITED AVAILABILITY')
-          )) {
+          if (!sku && !description) { skipped++; continue; }
+
+          // Filter out discontinued products
+          const descStr = String(description || '');
+          if (descStr.toUpperCase().includes('DISCONTINUED') ||
+              descStr.toUpperCase().includes('LIMITED AVAILABILITY')) {
             discontinued++;
             continue;
           }
 
-          // FILTER OUT PRODUCTS WITH NO VALID PRICING
-          const priceNum = retailPrice ? parseFloat(String(retailPrice).replace(/[$,]/g, '')) : 0;
-          if (!priceNum || priceNum <= 0) {
-            noPricing++;
-            continue;
-          }
+          // Filter out products with no valid pricing
+          const priceNum = listPrice ? parseFloat(String(listPrice).replace(/[$,]/g, '')) : 0;
+          if (!priceNum || priceNum <= 0) { noPricing++; continue; }
+
+          // Resolve finish name
+          const finishCodeClean = String(finishCode).trim();
+          const finishName = FINISH_MAP[finishCodeClean] || finishCodeClean;
+
+          // Determine product type
+          const productType = getProductType(descStr);
+
+          // Build dimensions string
+          const dims = [length, width, projection].filter(Boolean).join(' x ');
 
           try {
             await db.insert(products).values({
               sku: String(sku).trim(),
-              name: String(name).trim() || String(sku).trim(),
-              collection: row['Collection'] || row['Series'] || null,
-              finish: row['Finish'] || row['Color'] || null,
+              name: descStr.split(' - ')[0]?.trim() || String(sku).trim(),
+              description: descStr.trim(),
+              brand: 'Top Knobs',
+              collection: String(collection).trim() || null,
+              finish: finishName || null,
+              finishCode: finishCodeClean || null,
+              category: 'Hardware',
+              productType,
+              listPrice: String(priceNum.toFixed(2)),
               retailPrice: String(priceNum.toFixed(2)),
-              category: row['Category'] || 'Hardware',
-              inStock: 'yes', // Default to in stock, can be updated later
+              dimensions: dims || null,
+              length: length ? String(length).trim() : null,
+              width: width ? String(width).trim() : null,
+              projection: projection ? String(projection).trim() : null,
+              centerToCenter: centerToCenter ? String(centerToCenter).trim() : null,
+              baseDiameter: baseDiameter ? String(baseDiameter).trim() : null,
+              material: material ? String(material).trim() : null,
+              weight: weight ? String(weight) : null,
+              upc: upc ? String(upc) : null,
+              inStock: 'yes',
             });
             imported++;
           } catch (error) {
-            // Skip duplicates or errors
             skipped++;
+          }
+        }
+
+        // Process Hooks sheet
+        if (workbook.SheetNames.includes('Hooks January 2026')) {
+          const hooksSheet = workbook.Sheets['Hooks January 2026'];
+          const hooksData: any[] = xlsx.utils.sheet_to_json(hooksSheet);
+          for (const row of hooksData) {
+            const sku = row['Part Number'] || '';
+            const description = row['Description'] || '';
+            const finishCode = row['Finish'] || '';
+            const listPrice = row['List Price - January 2026'] || null;
+            if (!sku || !description) continue;
+            const descStr = String(description);
+            if (descStr.toUpperCase().includes('DISCONTINUED')) continue;
+            const priceNum = listPrice ? parseFloat(String(listPrice).replace(/[$,]/g, '')) : 0;
+            if (!priceNum || priceNum <= 0) continue;
+            const finishCodeClean = String(finishCode).trim();
+            const finishName = FINISH_MAP[finishCodeClean] || finishCodeClean;
+            try {
+              await db.insert(products).values({
+                sku: String(sku).trim(),
+                name: descStr.split(' - ')[0]?.trim() || String(sku).trim(),
+                description: descStr.trim(),
+                brand: 'Top Knobs',
+                finish: finishName || null,
+                finishCode: finishCodeClean || null,
+                category: 'Hardware',
+                productType: 'Hook',
+                listPrice: String(priceNum.toFixed(2)),
+                retailPrice: String(priceNum.toFixed(2)),
+                length: row['Length'] ? String(row['Length']).trim() : null,
+                width: row['Width'] ? String(row['Width']).trim() : null,
+                projection: row['Projection'] ? String(row['Projection']).trim() : null,
+                material: row['Base Material'] ? String(row['Base Material']).trim() : null,
+                weight: row['Weight'] ? String(row['Weight']) : null,
+                upc: row['UPC'] ? String(row['UPC']) : null,
+                inStock: 'yes',
+              });
+              imported++;
+            } catch (error) { skipped++; }
           }
         }
 
@@ -1336,14 +1557,14 @@ When you have enough information, summarize what you've learned and offer to gen
         console.log(`  - Skipped (discontinued): ${discontinued}`);
         console.log(`  - Skipped (no pricing): ${noPricing}`);
         console.log(`  - Skipped (other): ${skipped}`);
-        console.log(`  - Total processed: ${data.length}`);
+        console.log(`  - Total processed: ${mainData.length}`);
 
         return {
           count: imported,
           skipped: skipped + discontinued + noPricing,
           discontinued,
           noPricing,
-          total: data.length
+          total: mainData.length
         };
       }),
 
