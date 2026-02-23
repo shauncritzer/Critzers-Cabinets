@@ -194,7 +194,7 @@ export default function ProductDetail() {
             <div className="space-y-2">
               <div className="flex items-baseline gap-3">
                 <span className="text-4xl font-bold text-primary">
-                  ${Number(product.retailPrice).toFixed(2)}
+                  ${product.retailPrice != null ? Number(product.retailPrice).toFixed(2) : 'N/A'}
                 </span>
                 {product.listPrice && Number(product.listPrice) > Number(product.retailPrice) && (
                   <span className="text-xl text-muted-foreground line-through">
@@ -202,7 +202,7 @@ export default function ProductDetail() {
                   </span>
                 )}
               </div>
-              {product.listPrice && Number(product.listPrice) > Number(product.retailPrice) && (
+              {product.listPrice && product.retailPrice != null && Number(product.listPrice) > Number(product.retailPrice) && (
                 <p className="text-sm text-green-600 font-medium">
                   Save ${(Number(product.listPrice) - Number(product.retailPrice)).toFixed(2)} (
                   {Math.round(((Number(product.listPrice) - Number(product.retailPrice)) / Number(product.listPrice)) * 100)}% off)
@@ -343,7 +343,7 @@ export default function ProductDetail() {
                   </Button>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  Subtotal: <span className="font-medium text-foreground">${(Number(product.retailPrice) * quantity).toFixed(2)}</span>
+                  Subtotal: <span className="font-medium text-foreground">${product.retailPrice != null ? (Number(product.retailPrice) * quantity).toFixed(2) : 'N/A'}</span>
                 </span>
               </div>
 
@@ -364,7 +364,7 @@ export default function ProductDetail() {
                   ) : (
                     <>
                       <ShoppingCart className="mr-2 h-5 w-5" />
-                      Add to Cart — ${(Number(product.retailPrice) * quantity).toFixed(2)}
+                      Add to Cart — ${product.retailPrice != null ? (Number(product.retailPrice) * quantity).toFixed(2) : 'N/A'}
                     </>
                   )}
                 </Button>
@@ -441,7 +441,7 @@ export default function ProductDetail() {
                       <Badge variant="outline" className="text-xs">{related.finish}</Badge>
                     )}
                     <p className="text-lg font-bold text-primary">
-                      ${Number(related.retailPrice).toFixed(2)}
+                      ${related.retailPrice != null ? Number(related.retailPrice).toFixed(2) : 'N/A'}
                     </p>
                   </CardContent>
                 </Card>

@@ -238,7 +238,11 @@ export default function Shop() {
                 {filters?.priceRange && (
                   <div className="text-sm text-muted-foreground">
                     <p className="font-medium text-foreground mb-1">Price Range</p>
-                    <p>${filters.priceRange.min?.toFixed(2)} — ${filters.priceRange.max?.toFixed(2)}</p>
+                    <p>
+                      ${filters.priceRange.min != null ? Number(filters.priceRange.min).toFixed(2) : '0.00'}
+                      {' — '}
+                      ${filters.priceRange.max != null ? Number(filters.priceRange.max).toFixed(2) : '0.00'}
+                    </p>
                   </div>
                 )}
 
@@ -423,7 +427,7 @@ export default function Shop() {
                       
                       <div className="flex items-center justify-between pt-1">
                         <p className="text-lg font-bold text-primary">
-                          ${Number(product.retailPrice).toFixed(2)}
+                          ${product.retailPrice != null ? Number(product.retailPrice).toFixed(2) : 'N/A'}
                         </p>
                         <Badge variant={product.inStock === 'yes' ? 'default' : 'secondary'} className="text-xs">
                           {product.inStock === 'yes' ? 'In Stock' : 'Out of Stock'}
@@ -473,7 +477,7 @@ export default function Shop() {
                         </div>
                         <div className="flex flex-col items-end gap-2">
                           <p className="text-lg font-bold text-primary">
-                            ${Number(product.retailPrice).toFixed(2)}
+                            ${product.retailPrice != null ? Number(product.retailPrice).toFixed(2) : 'N/A'}
                           </p>
                           <Button
                             size="sm"

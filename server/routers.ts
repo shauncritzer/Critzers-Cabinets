@@ -436,8 +436,8 @@ When you have enough information, summarize what you've learned and offer to gen
           productTypes: productTypes.map((t: any) => ({ name: t.productType, count: t.count })).filter((t: any) => t.name),
           brands: brands.map((b: any) => ({ name: b.brand, count: b.count })).filter((b: any) => b.name),
           priceRange: {
-            min: priceRange[0]?.minPrice || 0,
-            max: priceRange[0]?.maxPrice || 1000,
+            min: priceRange[0]?.minPrice != null ? Number(priceRange[0].minPrice) : 0,
+            max: priceRange[0]?.maxPrice != null ? Number(priceRange[0].maxPrice) : 1000,
           },
         };
       }),
