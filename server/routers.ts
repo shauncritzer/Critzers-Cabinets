@@ -256,11 +256,14 @@ When you have enough information, summarize what you've learned and offer to gen
         if (!db) throw new Error('Database not available');
         const conditions = [];
         
-        // Filter out discontinued products by default
+        // Filter out discontinued products by default (check both name and description)
         conditions.push(
-          or(
-            isNull(products.description),
-            not(like(products.description, '%DISCONTINUED%'))
+          and(
+            not(like(products.name, '%DISCONTINUED%')),
+            or(
+              isNull(products.description),
+              not(like(products.description, '%DISCONTINUED%'))
+            )
           )
         );
         
@@ -373,13 +376,22 @@ When you have enough information, summarize what you've learned and offer to gen
         const db = await getDb();
         if (!db) throw new Error('Database not available');
         
+        // Base condition: exclude discontinued products from all filter counts
+        const notDiscontinued = and(
+          not(like(products.name, '%DISCONTINUED%')),
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
+          )
+        );
+        
         // Get unique collections with counts
         const collections = await db.select({ 
           collection: products.collection,
           count: sql<number>`count(*)` 
         })
           .from(products)
-          .where(not(isNull(products.collection)))
+          .where(and(not(isNull(products.collection)), notDiscontinued))
           .groupBy(products.collection)
           .orderBy(sql`count(*) DESC`);
         
@@ -389,7 +401,7 @@ When you have enough information, summarize what you've learned and offer to gen
           count: sql<number>`count(*)` 
         })
           .from(products)
-          .where(not(isNull(products.finish)))
+          .where(and(not(isNull(products.finish)), notDiscontinued))
           .groupBy(products.finish)
           .orderBy(sql`count(*) DESC`);
         
@@ -399,7 +411,7 @@ When you have enough information, summarize what you've learned and offer to gen
           count: sql<number>`count(*)` 
         })
           .from(products)
-          .where(not(isNull(products.category)))
+          .where(and(not(isNull(products.category)), notDiscontinued))
           .groupBy(products.category)
           .orderBy(sql`count(*) DESC`);
         
@@ -409,7 +421,7 @@ When you have enough information, summarize what you've learned and offer to gen
           count: sql<number>`count(*)` 
         })
           .from(products)
-          .where(not(isNull(products.productType)))
+          .where(and(not(isNull(products.productType)), notDiscontinued))
           .groupBy(products.productType)
           .orderBy(sql`count(*) DESC`);
         
@@ -419,7 +431,7 @@ When you have enough information, summarize what you've learned and offer to gen
           count: sql<number>`count(*)` 
         })
           .from(products)
-          .where(not(isNull(products.brand)))
+          .where(and(not(isNull(products.brand)), notDiscontinued))
           .groupBy(products.brand)
           .orderBy(sql`count(*) DESC`);
         
@@ -427,7 +439,7 @@ When you have enough information, summarize what you've learned and offer to gen
         const priceRange = await db.select({
           minPrice: sql<number>`MIN(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
           maxPrice: sql<number>`MAX(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
-        }).from(products);
+        }).from(products).where(notDiscontinued);
         
         return {
           collections: collections.map((c: any) => ({ name: c.collection, count: c.count })).filter((c: any) => c.name),
@@ -458,11 +470,14 @@ When you have enough information, summarize what you've learned and offer to gen
         if (!db) throw new Error('Database not available');
         const conditions = [];
         
-        // Filter out discontinued products
+        // Filter out discontinued products (check both name and description)
         conditions.push(
-          or(
-            isNull(products.description),
-            not(like(products.description, '%DISCONTINUED%'))
+          and(
+            not(like(products.name, '%DISCONTINUED%')),
+            or(
+              isNull(products.description),
+              not(like(products.description, '%DISCONTINUED%'))
+            )
           )
         );
         
@@ -539,23 +554,33 @@ When you have enough information, summarize what you've learned and offer to gen
         ];
         
         function getBaseName(productName: string): string {
+          let name = productName;
+          
+          // First, strip "w/ [Finish] Base" patterns
+          // e.g. 'Amber Crystal Knob 1 1/8" w/ Brushed Satin Nickel Base'
+          // Also handles 'w/ Oil Rubbed Bronze Base', 'w/ Polished Chrome Base', etc.
+          const wBaseMatch = name.match(/^(.+?)\s+w\/\s+.+?\s+Base\s*$/);
+          if (wBaseMatch) {
+            return wBaseMatch[1].trim();
+          }
+          
           // Try to strip " - FinishName" from the end
           for (const fn of FINISH_NAMES) {
             const suffix = ` - ${fn}`;
-            if (productName.endsWith(suffix)) {
-              return productName.slice(0, -suffix.length).trim();
+            if (name.endsWith(suffix)) {
+              return name.slice(0, -suffix.length).trim();
             }
           }
           // Also try splitting at the last " - "
-          const lastDash = productName.lastIndexOf(' - ');
+          const lastDash = name.lastIndexOf(' - ');
           if (lastDash > 0) {
-            const possibleFinish = productName.slice(lastDash + 3).trim();
+            const possibleFinish = name.slice(lastDash + 3).trim();
             // Check if the part after " - " looks like a finish (not a size)
             if (possibleFinish.length > 2 && !possibleFinish.match(/^\d/)) {
-              return productName.slice(0, lastDash).trim();
+              return name.slice(0, lastDash).trim();
             }
           }
-          return productName.trim();
+          return name.trim();
         }
         
         const groups = new Map<string, any[]>();
@@ -815,11 +840,14 @@ When you have enough information, summarize what you've learned and offer to gen
 
         const conditions = [];
         
-        // Filter out discontinued products
+        // Filter out discontinued products (check both name and description)
         conditions.push(
-          or(
-            isNull(products.description),
-            not(like(products.description, '%DISCONTINUED%'))
+          and(
+            not(like(products.name, '%DISCONTINUED%')),
+            or(
+              isNull(products.description),
+              not(like(products.description, '%DISCONTINUED%'))
+            )
           )
         );
         
@@ -939,11 +967,14 @@ When you have enough information, summarize what you've learned and offer to gen
             break;
         }
 
-        // Add filter to exclude discontinued products
+        // Add filter to exclude discontinued products (check both name and description)
         conditions.push(
-          or(
-            isNull(products.description),
-            not(like(products.description, '%DISCONTINUED%'))
+          and(
+            not(like(products.name, '%DISCONTINUED%')),
+            or(
+              isNull(products.description),
+              not(like(products.description, '%DISCONTINUED%'))
+            )
           )
         );
 

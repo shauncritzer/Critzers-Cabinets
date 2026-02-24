@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useRoute, Link } from "wouter";
+import { useRoute, Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import { toast } from "sonner";
 
 export default function ProductDetail() {
   const [, params] = useRoute("/shop/product/:id");
+  const [, setLocation] = useLocation();
   const productId = params?.id ? parseInt(params.id) : 0;
   const [quantity, setQuantity] = useState(1);
   const [addedToCart, setAddedToCart] = useState(false);
@@ -45,7 +46,7 @@ export default function ProductDetail() {
       toast.success(`Added ${quantity} × ${product?.name} to cart!`, {
         action: {
           label: 'View Cart',
-          onClick: () => window.location.href = '/cart',
+          onClick: () => setLocation('/cart'),
         },
       });
       setTimeout(() => setAddedToCart(false), 3000);

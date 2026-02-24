@@ -4,10 +4,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import Navigation from "@/components/Navigation";
 import { trpc } from "@/lib/trpc";
-import { Search, ShoppingCart, Filter, ChevronLeft, ChevronRight, X, SlidersHorizontal, Grid3X3, List, Plus } from "lucide-react";
+import { Search, ShoppingCart, Filter, ChevronLeft, ChevronRight, X, SlidersHorizontal, Grid3X3, List, Plus, Package } from "lucide-react";
 import { toast } from "sonner";
 
 // Finish code to swatch color mapping for visual finish swatches
@@ -142,32 +142,57 @@ interface ProductGroup {
   variants: ProductVariant[];
 }
 
+function ProductImagePlaceholder({ baseName }: { baseName: string }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-100 p-4">
+      <div className="text-center">
+        <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-slate-200 flex items-center justify-center">
+          <Package className="h-8 w-8 text-slate-400" />
+        </div>
+        <p className="text-xs font-medium text-slate-500 line-clamp-2 mb-1">{baseName}</p>
+        <p className="text-[10px] text-slate-400">Image Coming Soon</p>
+      </div>
+    </div>
+  );
+}
+
 function ProductCard({ group, onAddToCart, isAdding }: { 
   group: ProductGroup; 
   onAddToCart: (productId: number, e: React.MouseEvent) => void;
   isAdding: boolean;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [imgError, setImgError] = useState(false);
   const selected = group.variants[selectedIndex] || group.variants[0];
+  
+  // Reset image error state when selected variant changes
+  useEffect(() => {
+    setImgError(false);
+  }, [selectedIndex]);
   
   if (!selected) return null;
 
   const finishName = getFinishDisplayName(selected.finish);
   const hasMultipleFinishes = group.variants.length > 1;
+  const showPlaceholder = !selected.imageUrl || imgError;
 
   return (
     <Card className="group hover:shadow-lg transition-all overflow-hidden border hover:border-primary/30 flex flex-col">
       <Link href={`/shop/product/${selected.id}`}>
         <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-6 relative">
-          <img 
-            src={selected.imageUrl || "/images/topknobs-showcase.jpg"} 
-            alt={selected.name}
-            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.src = "/images/topknobs-showcase.jpg";
-            }}
-          />
+          {!showPlaceholder && (
+            <img 
+              key={`product-img-${selected.id}`}
+              src={selected.imageUrl!} 
+              alt={selected.name}
+              className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+              onError={() => setImgError(true)}
+            />
+          )}
+          {showPlaceholder && (
+            <ProductImagePlaceholder baseName={group.baseName} />
+          )}
           {/* Quick Add Button */}
           <Button
             size="sm"
@@ -266,6 +291,7 @@ function ProductCard({ group, onAddToCart, isAdding }: {
 }
 
 export default function Shop() {
+  const [, setLocation] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [selectedCollection, setSelectedCollection] = useState<string | undefined>();
@@ -331,7 +357,7 @@ export default function Shop() {
         description: 'Item has been added to your shopping cart.',
         action: {
           label: 'View Cart',
-          onClick: () => window.location.href = '/cart',
+          onClick: () => setLocation('/cart'),
         },
       });
     },
@@ -370,9 +396,13 @@ export default function Shop() {
           <div className="max-w-4xl mx-auto text-center space-y-3">
             <div className="flex justify-center mb-3">
               <img 
-                src="/images/topknobs-logo.png" 
+                src="/images/topknobs-logo-transparent.png" 
                 alt="Top Knobs" 
                 className="h-16 md:h-20 object-contain brightness-0 invert"
+                onError={(e) => {
+                  // Fallback: hide broken image, the text header below still shows
+                  e.currentTarget.style.display = 'none';
+                }}
               />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
