@@ -26,6 +26,7 @@ import ShippingPolicy from "@/pages/ShippingPolicy";
 import ReturnPolicy from "@/pages/ReturnPolicy";
 import Login from "@/pages/Login";
 import ProductDetail from "@/pages/ProductDetail";
+import CheckoutSuccess from "@/pages/CheckoutSuccess";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -45,6 +46,7 @@ function Router() {
       <Route path={"/gallery"} component={Gallery} />
       <Route path={"/cart"} component={Cart} />
       <Route path={"/checkout"} component={Checkout} />
+      <Route path={"/checkout/success"} component={CheckoutSuccess} />
       <Route path={"/order-confirmation"} component={OrderConfirmation} />
       <Route path={"/shipping-policy"} component={ShippingPolicy} />
       <Route path={"/return-policy"} component={ReturnPolicy} />

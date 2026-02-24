@@ -97,6 +97,103 @@ export async function createPaymentIntent(
 }
 
 /**
+ * Create a Stripe Checkout Session with dynamic line items
+ * Uses price_data so we don't need pre-created Stripe products
+ */
+export async function createCheckoutSession(
+  items: Array<{
+    name: string;
+    sku: string;
+    unitPrice: number; // in dollars
+    quantity: number;
+    imageUrl?: string | null;
+  }>,
+  successUrl: string,
+  cancelUrl: string,
+  metadata?: Record<string, string>
+): Promise<Stripe.Checkout.Session> {
+  const stripe = getStripe();
+
+  const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item) => {
+    const lineItem: Stripe.Checkout.SessionCreateParams.LineItem = {
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          description: `SKU: ${item.sku}`,
+          ...(item.imageUrl ? { images: [item.imageUrl] } : {}),
+        },
+        unit_amount: Math.round(item.unitPrice * 100), // Convert to cents
+      },
+      quantity: item.quantity,
+    };
+    return lineItem;
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    mode: 'payment',
+    line_items,
+    shipping_address_collection: {
+      allowed_countries: ['US'],
+    },
+    shipping_options: [
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: { amount: 0, currency: 'usd' },
+          display_name: 'Standard Shipping (5-7 business days)',
+          delivery_estimate: {
+            minimum: { unit: 'business_day', value: 5 },
+            maximum: { unit: 'business_day', value: 7 },
+          },
+        },
+      },
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: { amount: 1495, currency: 'usd' },
+          display_name: 'Expedited Shipping (2-3 business days)',
+          delivery_estimate: {
+            minimum: { unit: 'business_day', value: 2 },
+            maximum: { unit: 'business_day', value: 3 },
+          },
+        },
+      },
+      {
+        shipping_rate_data: {
+          type: 'fixed_amount',
+          fixed_amount: { amount: 2995, currency: 'usd' },
+          display_name: 'Express Shipping (Next day)',
+          delivery_estimate: {
+            minimum: { unit: 'business_day', value: 1 },
+            maximum: { unit: 'business_day', value: 1 },
+          },
+        },
+      },
+    ],
+    automatic_tax: { enabled: false },
+    success_url: successUrl,
+    cancel_url: cancelUrl,
+    metadata: metadata || {},
+  });
+
+  return session;
+}
+
+/**
+ * Retrieve a Checkout Session
+ */
+export async function getCheckoutSession(
+  sessionId: string
+): Promise<Stripe.Checkout.Session> {
+  const stripe = getStripe();
+  return await stripe.checkout.sessions.retrieve(sessionId, {
+    expand: ['line_items', 'shipping_details'],
+  });
+}
+
+/**
  * Retrieve a Payment Intent
  */
 export async function getPaymentIntent(

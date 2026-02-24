@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Link, useLocation } from "wouter";
 import Navigation from "@/components/Navigation";
 import { trpc } from "@/lib/trpc";
-import { Search, ShoppingCart, Filter, ChevronLeft, ChevronRight, X, SlidersHorizontal, Grid3X3, List, Plus, Package } from "lucide-react";
+import { Search, ShoppingCart, Filter, ChevronLeft, ChevronRight, X, SlidersHorizontal, Grid3X3, List, Plus, Minus, Package } from "lucide-react";
 import { toast } from "sonner";
 
 // Finish code to swatch color mapping for visual finish swatches
@@ -166,12 +166,13 @@ function ProductImagePlaceholder({ baseName }: { baseName: string }) {
 
 function ProductCard({ group, onAddToCart, isAdding }: { 
   group: ProductGroup; 
-  onAddToCart: (productId: number, e: React.MouseEvent) => void;
+  onAddToCart: (productId: number, quantity: number, e: React.MouseEvent) => void;
   isAdding: boolean;
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [imgError, setImgError] = useState(false);
   const [perSkuFailed, setPerSkuFailed] = useState(false);
+  const [quantity, setQuantity] = useState(1);
   const selected = group.variants[selectedIndex] || group.variants[0];
   
   // Reset image error state when selected variant changes
@@ -214,16 +215,6 @@ function ProductCard({ group, onAddToCart, isAdding }: {
           {showPlaceholder && (
             <ProductImagePlaceholder baseName={group.baseName} />
           )}
-          {/* Quick Add Button */}
-          <Button
-            size="sm"
-            className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-            onClick={(e) => onAddToCart(selected.id, e)}
-            disabled={isAdding}
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Add
-          </Button>
         </div>
       </Link>
       <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
@@ -278,7 +269,6 @@ function ProductCard({ group, onAddToCart, isAdding }: {
                       e.stopPropagation();
                       setSelectedIndex(idx);
                     }}
-                    onMouseEnter={() => setSelectedIndex(idx)}
                   />
                 );
               })}
@@ -297,14 +287,56 @@ function ProductCard({ group, onAddToCart, isAdding }: {
           </div>
         )}
         
-        {/* Price - pushed to bottom */}
-        <div className="flex items-center justify-between pt-1 mt-auto">
-          <p className="text-lg font-bold text-primary">
-            ${selected.retailPrice != null ? Number(selected.retailPrice).toFixed(2) : 'N/A'}
-          </p>
-          <Badge variant="default" className="text-xs bg-emerald-600 hover:bg-emerald-700">
-            Available
-          </Badge>
+        {/* Price */}
+        <div className="pt-1 mt-auto space-y-2">
+          <div className="flex items-center justify-between">
+            <p className="text-lg font-bold text-primary">
+              ${selected.retailPrice != null ? Number(selected.retailPrice).toFixed(2) : 'N/A'}
+            </p>
+            <Badge variant="default" className="text-xs bg-emerald-600 hover:bg-emerald-700">
+              Available
+            </Badge>
+          </div>
+
+          {/* Quantity selector + Add to Cart - always visible */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center border rounded-md">
+              <button
+                className="px-2 py-1 text-sm hover:bg-muted transition-colors disabled:opacity-50"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setQuantity(Math.max(1, quantity - 1));
+                }}
+                disabled={quantity <= 1}
+              >
+                <Minus className="h-3 w-3" />
+              </button>
+              <span className="px-2 py-1 text-sm font-medium min-w-[2rem] text-center">{quantity}</span>
+              <button
+                className="px-2 py-1 text-sm hover:bg-muted transition-colors"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setQuantity(quantity + 1);
+                }}
+              >
+                <Plus className="h-3 w-3" />
+              </button>
+            </div>
+            <Button
+              size="sm"
+              className="flex-1 shadow-sm"
+              onClick={(e) => {
+                onAddToCart(selected.id, quantity, e);
+                setQuantity(1);
+              }}
+              disabled={isAdding}
+            >
+              <ShoppingCart className="h-4 w-4 mr-1" />
+              Add to Cart
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>
@@ -387,10 +419,10 @@ export default function Shop() {
     },
   });
 
-  const handleAddToCart = (productId: number, e: React.MouseEvent) => {
+  const handleAddToCart = (productId: number, quantity: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart.mutate({ productId, quantity: 1, sessionId });
+    addToCart.mutate({ productId, quantity, sessionId });
   };
 
   const handleClearFilters = () => {
@@ -691,15 +723,16 @@ export default function Shop() {
 
             {/* Pagination */}
             {!isLoading && pagination.totalPages > 1 && (
-              <div className="flex items-center justify-center gap-2 mt-8">
+              <div className="flex flex-wrap items-center justify-center gap-2 mt-8 px-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
+                  className="shrink-0"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  <ChevronLeft className="h-4 w-4 mr-0 sm:mr-1" />
+                  <span className="hidden sm:inline">Previous</span>
                 </Button>
                 
                 <div className="flex items-center gap-1">
@@ -753,9 +786,10 @@ export default function Shop() {
                   size="sm"
                   onClick={() => setCurrentPage(p => Math.min(pagination.totalPages, p + 1))}
                   disabled={currentPage === pagination.totalPages}
+                  className="shrink-0"
                 >
-                  Next
-                  <ChevronRight className="h-4 w-4" />
+                  <span className="hidden sm:inline">Next</span>
+                  <ChevronRight className="h-4 w-4 ml-0 sm:ml-1" />
                 </Button>
               </div>
             )}

@@ -7,7 +7,7 @@ import { invokeLLM } from "./_core/llm";
 import { like, or, and, eq, sql, isNull, not } from "drizzle-orm";
 import { products, cartItems, gallery, orders, orderItems } from "../drizzle/schema";
 import { getDb } from "./db";
-import { createPaymentIntent, calculateShipping, calculateTax } from "./stripe";
+import { createPaymentIntent, calculateShipping, calculateTax, createCheckoutSession, getCheckoutSession } from "./stripe";
 import { sendOrderConfirmation, sendAdminOrderNotification } from "./email";
 import {
   createQuote,
@@ -1150,6 +1150,258 @@ When you have enough information, summarize what you've learned and offer to gen
 
   // Checkout
   checkout: router({
+    // Create Stripe Checkout Session - redirects user to Stripe's hosted checkout page
+    createCheckoutSession: publicProcedure
+      .input(z.object({
+        sessionId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        const userId = ctx.user?.id;
+        const sessionId = input.sessionId;
+
+        // Get cart items with full details
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+          imageUrl: products.imageUrl,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId
+              ? eq(cartItems.userId, userId)
+              : sessionId
+                ? eq(cartItems.sessionId, sessionId)
+                : sql`1=0`
+          );
+
+        if (items.length === 0) {
+          throw new Error('Cart is empty');
+        }
+
+        // Generate order number for tracking
+        const orderNumber = `CRT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
+
+        // Build line items for Stripe Checkout
+        const lineItems = items.map((item) => {
+          // Build per-SKU image URL for Stripe product display
+          let imageUrl: string | null = null;
+          if (item.productSku && item.productSku.length >= 2) {
+            imageUrl = `https://www.topknobs.com/media/resized/490/${item.productSku[0]}/${item.productSku[1]}/${item.productSku}_0.jpg`;
+          }
+          if (!imageUrl && item.imageUrl) {
+            imageUrl = item.imageUrl;
+          }
+          return {
+            name: item.productName || 'Hardware Product',
+            sku: item.productSku || '',
+            unitPrice: parseFloat(item.retailPrice || '0'),
+            quantity: item.quantity,
+            imageUrl,
+          };
+        });
+
+        // Determine base URL for success/cancel redirects
+        const baseUrl = ctx.req.headers.origin
+          || ctx.req.headers.referer?.replace(/\/[^/]*$/, '')
+          || 'https://critzerscabinets.com';
+
+        const session = await createCheckoutSession(
+          lineItems,
+          `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+          `${baseUrl}/cart`,
+          {
+            orderNumber,
+            cartSessionId: sessionId || '',
+            userId: userId?.toString() || '',
+          }
+        );
+
+        return {
+          url: session.url,
+          sessionId: session.id,
+          orderNumber,
+        };
+      }),
+
+    // Handle successful Stripe Checkout - creates order from completed session
+    handleCheckoutSuccess: publicProcedure
+      .input(z.object({
+        stripeSessionId: z.string(),
+        cartSessionId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database connection failed');
+
+        // Retrieve the Stripe Checkout Session
+        const checkoutSession = await getCheckoutSession(input.stripeSessionId);
+
+        if (checkoutSession.payment_status !== 'paid') {
+          throw new Error('Payment not completed');
+        }
+
+        const orderNumber = checkoutSession.metadata?.orderNumber || `CRT-${Date.now()}`;
+        const userId = ctx.user?.id;
+        const cartSessionId = input.cartSessionId || checkoutSession.metadata?.cartSessionId;
+
+        // Check if order already exists (idempotency)
+        const existingOrder = await db.select()
+          .from(orders)
+          .where(eq(orders.orderNumber, orderNumber))
+          .limit(1);
+
+        if (existingOrder.length > 0) {
+          return {
+            success: true,
+            orderId: existingOrder[0].id,
+            orderNumber: existingOrder[0].orderNumber,
+            alreadyProcessed: true,
+          };
+        }
+
+        // Get cart items
+        const items = await db.select({
+          id: cartItems.id,
+          productId: cartItems.productId,
+          quantity: cartItems.quantity,
+          productName: products.name,
+          productSku: products.sku,
+          retailPrice: products.retailPrice,
+        })
+          .from(cartItems)
+          .leftJoin(products, eq(cartItems.productId, products.id))
+          .where(
+            userId
+              ? eq(cartItems.userId, userId)
+              : cartSessionId
+                ? eq(cartItems.sessionId, cartSessionId)
+                : sql`1=0`
+          );
+
+        if (items.length === 0) {
+          // Cart may have been cleared already
+          return {
+            success: true,
+            orderId: 0,
+            orderNumber,
+            alreadyProcessed: true,
+          };
+        }
+
+        // Extract customer and shipping info from Stripe session
+        const customerEmail = checkoutSession.customer_details?.email || '';
+        const customerName = checkoutSession.customer_details?.name || '';
+        const shippingDetails = (checkoutSession as any).shipping_details;
+        const shippingAddress = shippingDetails?.address;
+
+        // Calculate subtotal from cart
+        const subtotal = items.reduce((sum, item) => {
+          const price = parseFloat(item.retailPrice || '0');
+          return sum + (price * item.quantity);
+        }, 0);
+
+        const totalAmount = (checkoutSession.amount_total || 0) / 100;
+        const shippingCost = (checkoutSession.shipping_cost?.amount_total || 0) / 100;
+        const taxAmount = totalAmount - subtotal - shippingCost;
+
+        // Create order
+        const [order] = await db.insert(orders).values({
+          userId: userId || null,
+          sessionId: cartSessionId || null,
+          orderNumber,
+          customerName,
+          customerEmail,
+          customerPhone: checkoutSession.customer_details?.phone || null,
+          shippingAddress: shippingAddress
+            ? `${shippingAddress.line1}${shippingAddress.line2 ? ', ' + shippingAddress.line2 : ''}`
+            : null,
+          shippingCity: shippingAddress?.city || null,
+          shippingState: shippingAddress?.state || null,
+          shippingZip: shippingAddress?.postal_code || null,
+          shippingMethod: 'Stripe Checkout',
+          subtotal: subtotal.toFixed(2),
+          shipping: shippingCost.toFixed(2),
+          tax: taxAmount > 0 ? taxAmount.toFixed(2) : '0.00',
+          total: totalAmount.toFixed(2),
+          status: 'pending',
+          paymentStatus: 'paid',
+          stripePaymentIntentId: typeof checkoutSession.payment_intent === 'string'
+            ? checkoutSession.payment_intent
+            : checkoutSession.payment_intent?.id || null,
+        });
+
+        const orderId = order.insertId;
+
+        // Create order items
+        for (const item of items) {
+          const price = parseFloat(item.retailPrice || '0');
+          const itemSubtotal = price * item.quantity;
+
+          await db.insert(orderItems).values({
+            orderId: Number(orderId),
+            productId: item.productId,
+            sku: item.productSku || '',
+            productName: item.productName || '',
+            quantity: item.quantity,
+            price: price.toFixed(2),
+            subtotal: itemSubtotal.toFixed(2),
+          });
+        }
+
+        // Clear cart
+        await db.delete(cartItems).where(
+          userId
+            ? eq(cartItems.userId, userId)
+            : cartSessionId
+              ? eq(cartItems.sessionId, cartSessionId)
+              : sql`1=0`
+        );
+
+        // Send order confirmation emails
+        const orderEmailData = {
+          orderNumber,
+          customerName,
+          customerEmail,
+          orderItems: items.map(item => ({
+            name: item.productName || '',
+            sku: item.productSku || '',
+            quantity: item.quantity,
+            price: (parseFloat(item.retailPrice || '0')).toFixed(2),
+            subtotal: (parseFloat(item.retailPrice || '0') * item.quantity).toFixed(2),
+          })),
+          subtotal: subtotal.toFixed(2),
+          shipping: shippingCost.toFixed(2),
+          tax: taxAmount > 0 ? taxAmount.toFixed(2) : '0.00',
+          total: totalAmount.toFixed(2),
+          shippingAddress: shippingAddress
+            ? `${shippingAddress.line1}${shippingAddress.line2 ? ', ' + shippingAddress.line2 : ''}\n${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code}`
+            : 'N/A',
+          shippingMethod: 'Stripe Checkout',
+        };
+
+        sendOrderConfirmation(orderEmailData).catch(err => {
+          console.error('Failed to send order confirmation:', err);
+        });
+        sendAdminOrderNotification(orderEmailData).catch(err => {
+          console.error('Failed to send admin notification:', err);
+        });
+
+        return {
+          success: true,
+          orderId: Number(orderId),
+          orderNumber,
+          alreadyProcessed: false,
+        };
+      }),
+
     // Calculate cart totals with shipping and tax
     calculateTotals: publicProcedure
       .input(z.object({
