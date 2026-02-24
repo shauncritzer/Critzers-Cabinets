@@ -9,8 +9,10 @@ import { trpc } from "@/lib/trpc";
 import { Loader2, CheckCircle, Calculator } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
+import { useLocation } from "wouter";
 
 export default function Quote() {
+  const [, setLocation] = useLocation();
   const [step, setStep] = useState(1);
   const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
   const [projectData, setProjectData] = useState({
@@ -165,7 +167,7 @@ export default function Quote() {
                 <p className="text-sm text-muted-foreground">
                   We've sent a confirmation email to <strong>{contactInfo.email}</strong>
                 </p>
-                <Button onClick={() => window.location.href = "/"} className="mt-4">
+                <Button onClick={() => setLocation("/")} className="mt-4">
                   Return to Home
                 </Button>
               </div>

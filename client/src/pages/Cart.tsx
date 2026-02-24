@@ -6,6 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
+// Construct a per-SKU image URL from Top Knobs public website
+function getPerSkuImageUrl(sku: string | null): string | null {
+  if (!sku || sku.length < 2) return null;
+  return `https://www.topknobs.com/media/resized/490/${sku[0]}/${sku[1]}/${sku}_0.jpg`;
+}
 
 export default function Cart() {
 
@@ -83,6 +88,10 @@ export default function Cart() {
       {/* Header */}
       <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-12">
         <div className="container">
+          <Link href="/shop" className="inline-flex items-center gap-2 text-emerald-200 hover:text-white transition-colors mb-4 text-sm">
+            <ArrowLeft className="h-4 w-4" />
+            Continue Shopping
+          </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Shopping Cart</h1>
           <p className="text-emerald-100 text-lg">
             {count === 0 ? "Your cart is empty" : `${count} item${count !== 1 ? 's' : ''} in your cart`}
@@ -114,11 +123,16 @@ export default function Cart() {
                     <div className="flex gap-6">
                       {/* Product Image */}
                       <div className="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        {item.imageUrl ? (
+                        {(getPerSkuImageUrl(item.productSku) || item.imageUrl) ? (
                           <img
-                            src={item.imageUrl}
+                            src={getPerSkuImageUrl(item.productSku) || item.imageUrl!}
                             alt={item.productName || "Product"}
                             className="w-full h-full object-cover rounded-lg"
+                            onError={(e) => {
+                              if (item.imageUrl && e.currentTarget.src !== item.imageUrl) {
+                                e.currentTarget.src = item.imageUrl;
+                              }
+                            }}
                           />
                         ) : (
                           <ShoppingCart className="h-8 w-8 text-muted-foreground" />

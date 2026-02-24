@@ -9,6 +9,12 @@ import { trpc } from "@/lib/trpc";
 import { ArrowLeft, ShoppingCart, Minus, Plus, Package, Ruler, Tag, Check, Truck, Phone, Shield } from "lucide-react";
 import { toast } from "sonner";
 
+// Construct a per-SKU image URL from Top Knobs public website
+function getPerSkuImageUrl(sku: string | null): string | null {
+  if (!sku || sku.length < 2) return null;
+  return `https://www.topknobs.com/media/resized/490/${sku[0]}/${sku[1]}/${sku}_0.jpg`;
+}
+
 export default function ProductDetail() {
   const [, params] = useRoute("/shop/product/:id");
   const [, setLocation] = useLocation();
@@ -146,11 +152,18 @@ export default function ProductDetail() {
             <Card className="overflow-hidden">
               <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
                 <img
-                  src={product.imageUrl || "/images/topknobs-showcase.jpg"}
+                  src={getPerSkuImageUrl(product.sku) || product.imageUrl || "/images/topknobs-showcase.jpg"}
                   alt={product.name}
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    e.currentTarget.src = "/images/topknobs-showcase.jpg";
+                    // If per-SKU URL fails, fall back to database imageUrl, then placeholder
+                    const currentSrc = e.currentTarget.src;
+                    const perSkuUrl = getPerSkuImageUrl(product.sku);
+                    if (currentSrc === perSkuUrl && product.imageUrl) {
+                      e.currentTarget.src = product.imageUrl;
+                    } else {
+                      e.currentTarget.src = "/images/topknobs-showcase.jpg";
+                    }
                   }}
                 />
               </div>

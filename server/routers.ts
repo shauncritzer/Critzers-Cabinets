@@ -556,10 +556,11 @@ When you have enough information, summarize what you've learned and offer to gen
         function getBaseName(productName: string): string {
           let name = productName;
           
-          // First, strip "w/ [Finish] Base" patterns
+          // First, strip "w/ [Finish] Base" or "w/ [Finish] Shell" patterns
           // e.g. 'Amber Crystal Knob 1 1/8" w/ Brushed Satin Nickel Base'
+          // e.g. 'Black Crystal Center Knob 1 1/16" w/ Brushed Satin Nickel Shell'
           // Also handles 'w/ Oil Rubbed Bronze Base', 'w/ Polished Chrome Base', etc.
-          const wBaseMatch = name.match(/^(.+?)\s+w\/\s+.+?\s+Base\s*$/);
+          const wBaseMatch = name.match(/^(.+?)\s+w\/\s+.+?\s+(?:Base|Shell)\s*$/);
           if (wBaseMatch) {
             return wBaseMatch[1].trim();
           }

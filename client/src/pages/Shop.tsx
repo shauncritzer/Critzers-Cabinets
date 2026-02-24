@@ -117,6 +117,14 @@ function getSwatchColor(finish: string | null): string {
   return FINISH_SWATCH_COLORS[finish] || FINISH_SWATCH_COLORS[FINISH_CODE_TO_NAME[finish] || ''] || '#888888';
 }
 
+// Construct a per-SKU image URL from Top Knobs public website
+// Pattern: https://www.topknobs.com/media/resized/490/{SKU[0]}/{SKU[1]}/{SKU}_0.jpg
+// This provides finish-specific product photos (different image per finish variant)
+function getPerSkuImageUrl(sku: string | null): string | null {
+  if (!sku || sku.length < 2) return null;
+  return `https://www.topknobs.com/media/resized/490/${sku[0]}/${sku[1]}/${sku}_0.jpg`;
+}
+
 interface ProductVariant {
   id: number;
   sku: string;
@@ -163,18 +171,24 @@ function ProductCard({ group, onAddToCart, isAdding }: {
 }) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [imgError, setImgError] = useState(false);
+  const [perSkuFailed, setPerSkuFailed] = useState(false);
   const selected = group.variants[selectedIndex] || group.variants[0];
   
   // Reset image error state when selected variant changes
   useEffect(() => {
     setImgError(false);
+    setPerSkuFailed(false);
   }, [selectedIndex]);
   
   if (!selected) return null;
 
   const finishName = getFinishDisplayName(selected.finish);
   const hasMultipleFinishes = group.variants.length > 1;
-  const showPlaceholder = !selected.imageUrl || imgError;
+  // Use per-SKU image URL from Top Knobs public site for finish-specific photos
+  // Falls back to the database imageUrl if per-SKU URL fails
+  const perSkuUrl = getPerSkuImageUrl(selected.sku);
+  const displayImageUrl = (!perSkuFailed && perSkuUrl) ? perSkuUrl : selected.imageUrl;
+  const showPlaceholder = !displayImageUrl || imgError;
 
   return (
     <Card className="group hover:shadow-lg transition-all overflow-hidden border hover:border-primary/30 flex flex-col">
@@ -182,12 +196,19 @@ function ProductCard({ group, onAddToCart, isAdding }: {
         <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-6 relative">
           {!showPlaceholder && (
             <img 
-              key={`product-img-${selected.id}`}
-              src={selected.imageUrl!} 
+              key={`product-img-${selected.sku}-${perSkuFailed ? 'fallback' : 'primary'}`}
+              src={displayImageUrl!} 
               alt={selected.name}
               className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
-              onError={() => setImgError(true)}
+              onError={() => {
+                // If per-SKU URL fails, try falling back to database imageUrl
+                if (!perSkuFailed && perSkuUrl && selected.imageUrl) {
+                  setPerSkuFailed(true);
+                  return;
+                }
+                setImgError(true);
+              }}
             />
           )}
           {showPlaceholder && (
