@@ -145,11 +145,11 @@ export default function ProductDetail() {
             <Card className="overflow-hidden">
               <div className="aspect-square bg-slate-50 flex items-center justify-center p-8">
                 <img
-                  src={product.imageUrl || "/images/topknobs/placeholder-knobs.jpg"}
+                  src={product.imageUrl || "/images/topknobs-showcase.jpg"}
                   alt={product.name}
                   className="w-full h-full object-contain"
                   onError={(e) => {
-                    e.currentTarget.src = "/images/topknobs/placeholder-knobs.jpg";
+                    e.currentTarget.src = "/images/topknobs-showcase.jpg";
                   }}
                 />
               </div>
@@ -166,8 +166,8 @@ export default function ProductDetail() {
             <div>
               <div className="flex items-start justify-between gap-4 mb-2">
                 <h1 className="text-3xl font-bold">{product.name}</h1>
-                <Badge variant={product.inStock === 'yes' ? 'default' : 'secondary'}>
-                  {product.inStock === 'yes' ? 'In Stock' : 'Out of Stock'}
+                <Badge variant="default" className="bg-emerald-600">
+                  Available
                 </Badge>
               </div>
               
@@ -352,7 +352,7 @@ export default function ProductDetail() {
                   size="lg"
                   className="flex-1"
                   onClick={handleAddToCart}
-                  disabled={product.inStock !== 'yes' || addToCart.isPending}
+                  disabled={addToCart.isPending}
                 >
                   {addToCart.isPending ? (
                     <>Adding...</>
@@ -376,11 +376,7 @@ export default function ProductDetail() {
                 </Link>
               </div>
 
-              {product.inStock !== 'yes' && (
-                <p className="text-sm text-muted-foreground">
-                  This product is currently out of stock. Please contact us for availability.
-                </p>
-              )}
+
             </div>
 
             {/* Trust Badges */}
@@ -420,12 +416,12 @@ export default function ProductDetail() {
                   <Link href={`/shop/product/${related.id}`}>
                     <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-4">
                       <img 
-                        src={related.imageUrl || "/images/topknobs/placeholder-knobs.jpg"} 
+                        src={related.imageUrl || "/images/topknobs-showcase.jpg"} 
                         alt={related.name}
                         className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
                         loading="lazy"
                         onError={(e) => {
-                          e.currentTarget.src = "/images/topknobs/placeholder-knobs.jpg";
+                          e.currentTarget.src = "/images/topknobs-showcase.jpg";
                         }}
                       />
                     </div>

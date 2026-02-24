@@ -50,7 +50,7 @@ export const products = mysqlTable("products", {
   weight: varchar("weight", { length: 50 }),
   upc: varchar("upc", { length: 50 }),
   imageUrl: text("image_url"),
-  inStock: mysqlEnum("in_stock", ["yes", "no", "unknown"]).default("unknown"),
+  inStock: mysqlEnum("in_stock", ["yes", "no", "unknown"]).default("yes"),
   featured: mysqlEnum("featured", ["yes", "no"]).default("no"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),

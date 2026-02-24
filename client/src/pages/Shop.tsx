@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,19 +10,264 @@ import { trpc } from "@/lib/trpc";
 import { Search, ShoppingCart, Filter, ChevronLeft, ChevronRight, X, SlidersHorizontal, Grid3X3, List, Plus } from "lucide-react";
 import { toast } from "sonner";
 
-const PRODUCT_TYPE_ICONS: Record<string, string> = {
-  'Pull': '🔲',
-  'Knob': '⚫',
-  'Backplate': '🔳',
-  'Handle': '🔲',
-  'Hook': '🪝',
-  'Hardware': '🔧',
+// Finish code to swatch color mapping for visual finish swatches
+const FINISH_SWATCH_COLORS: Record<string, string> = {
+  'Polished Chrome': '#D4D4D8',
+  'PC': '#D4D4D8',
+  'Brushed Satin Nickel': '#A8A8A0',
+  'BSN': '#A8A8A0',
+  'Flat Black': '#1C1C1C',
+  'BLK': '#1C1C1C',
+  'Oil Rubbed Bronze': '#3D2B1F',
+  'ORB': '#3D2B1F',
+  'Oil Rubbed Bronze 2': '#4A3728',
+  'ORB2': '#4A3728',
+  'Polished Nickel': '#C0C0C0',
+  'PN': '#C0C0C0',
+  'Polished Brass': '#CFB53B',
+  'PB': '#CFB53B',
+  'Honey Bronze': '#8B6914',
+  'HB': '#8B6914',
+  'Ash Gray': '#808080',
+  'AG': '#808080',
+  'Antique Copper': '#B87333',
+  'AC': '#B87333',
+  'German Bronze': '#5C4033',
+  'GBZ': '#5C4033',
+  'Tuscan Bronze': '#6B4226',
+  'TB': '#6B4226',
+  'Dark Antique Brass': '#8B7D3C',
+  'DAB': '#8B7D3C',
+  'Pewter': '#96A8A1',
+  'PT': '#96A8A1',
+  'Pewter Antique': '#7D7F7D',
+  'PTA': '#7D7F7D',
+  'Pewter Light': '#B0B7B0',
+  'PTL': '#B0B7B0',
+  'Brass': '#D4AF37',
+  'BR': '#D4AF37',
+  'Brass Antique': '#9C7A3C',
+  'BA': '#9C7A3C',
+  'Sable': '#4A3C2A',
+  'SAB': '#4A3C2A',
+  'Umbrio': '#3C2415',
+  'UM': '#3C2415',
+  'Rust': '#B7410E',
+  'RST': '#B7410E',
+  'White': '#F5F5F5',
+  'WHT': '#F5F5F5',
+  'Aluminum': '#A9ACB6',
+  'ALU': '#A9ACB6',
+  'Black Iron': '#2C2C2C',
+  'BI': '#2C2C2C',
+  'Black Nickel': '#353535',
+  'BNI': '#353535',
+  'Coal Black': '#1A1A1A',
+  'CB': '#1A1A1A',
+  'Cast Iron': '#3B3B3B',
+  'CI': '#3B3B3B',
+  'Light Bronze': '#8B7355',
+  'LB': '#8B7355',
+  'Medium Bronze': '#6B5B3E',
+  'MB': '#6B5B3E',
+  'Mahogany Bronze': '#4E3524',
+  'MCB': '#4E3524',
+  'Old English Copper': '#A0522D',
+  'OEC': '#A0522D',
+  'Patina Antique Brass': '#7D6B3C',
+  'PAB': '#7D6B3C',
+  'Patina Rouge': '#8B2500',
+  'PAR': '#8B2500',
+  'Brushed Stainless Steel': '#B8B8B8',
+  'PS': '#B8B8B8',
+  'Polished Stainless Steel': '#CCCCCC',
+  'PSS': '#CCCCCC',
+  'Silicon Bronze Light': '#9B7D4A',
+  'SBL': '#9B7D4A',
+  'Stainless Steel': '#C0C0C0',
+  'SS': '#C0C0C0',
 };
+
+// Finish code to full name mapping
+const FINISH_CODE_TO_NAME: Record<string, string> = {
+  'AC': 'Antique Copper', 'AG': 'Ash Gray', 'ALU': 'Aluminum',
+  'BA': 'Brass Antique', 'BI': 'Black Iron', 'BLK': 'Flat Black',
+  'BNI': 'Black Nickel', 'BR': 'Brass', 'BSN': 'Brushed Satin Nickel',
+  'CB': 'Coal Black', 'CI': 'Cast Iron', 'DAB': 'Dark Antique Brass',
+  'GBZ': 'German Bronze', 'HB': 'Honey Bronze', 'LB': 'Light Bronze',
+  'MB': 'Medium Bronze', 'MCB': 'Mahogany Bronze', 'OEC': 'Old English Copper',
+  'ORB': 'Oil Rubbed Bronze', 'ORB2': 'Oil Rubbed Bronze 2',
+  'PAB': 'Patina Antique Brass', 'PAR': 'Patina Rouge',
+  'PB': 'Polished Brass', 'PC': 'Polished Chrome',
+  'PN': 'Polished Nickel', 'PS': 'Brushed Stainless Steel',
+  'PSS': 'Polished Stainless Steel', 'PT': 'Pewter',
+  'PTA': 'Pewter Antique', 'PTL': 'Pewter Light',
+  'RST': 'Rust', 'SAB': 'Sable', 'SBL': 'Silicon Bronze Light',
+  'SS': 'Stainless Steel', 'TB': 'Tuscan Bronze', 'UM': 'Umbrio',
+  'WHT': 'White',
+};
+
+function getFinishDisplayName(finish: string | null): string {
+  if (!finish) return '';
+  return FINISH_CODE_TO_NAME[finish] || finish;
+}
+
+function getSwatchColor(finish: string | null): string {
+  if (!finish) return '#888888';
+  return FINISH_SWATCH_COLORS[finish] || FINISH_SWATCH_COLORS[FINISH_CODE_TO_NAME[finish] || ''] || '#888888';
+}
+
+interface ProductVariant {
+  id: number;
+  sku: string;
+  name: string;
+  finish: string | null;
+  finishCode: string | null;
+  retailPrice: string | null;
+  listPrice: string | null;
+  imageUrl: string | null;
+  centerToCenter: string | null;
+  dimensions: string | null;
+  length: string | null;
+  width: string | null;
+  projection: string | null;
+  material: string | null;
+}
+
+interface ProductGroup {
+  baseName: string;
+  collection: string | null;
+  productType: string | null;
+  brand: string | null;
+  variants: ProductVariant[];
+}
+
+function ProductCard({ group, onAddToCart, isAdding }: { 
+  group: ProductGroup; 
+  onAddToCart: (productId: number, e: React.MouseEvent) => void;
+  isAdding: boolean;
+}) {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const selected = group.variants[selectedIndex] || group.variants[0];
+  
+  if (!selected) return null;
+
+  const finishName = getFinishDisplayName(selected.finish);
+  const hasMultipleFinishes = group.variants.length > 1;
+
+  return (
+    <Card className="group hover:shadow-lg transition-all overflow-hidden border hover:border-primary/30 flex flex-col">
+      <Link href={`/shop/product/${selected.id}`}>
+        <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-6 relative">
+          <img 
+            src={selected.imageUrl || "/images/topknobs-showcase.jpg"} 
+            alt={selected.name}
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+            onError={(e) => {
+              e.currentTarget.src = "/images/topknobs-showcase.jpg";
+            }}
+          />
+          {/* Quick Add Button */}
+          <Button
+            size="sm"
+            className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+            onClick={(e) => onAddToCart(selected.id, e)}
+            disabled={isAdding}
+          >
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
+      </Link>
+      <CardContent className="p-4 space-y-3 flex-1 flex flex-col">
+        {/* Product Name */}
+        <Link href={`/shop/product/${selected.id}`} className="block">
+          <h3 className="font-semibold text-sm leading-tight line-clamp-2 group-hover:text-primary transition-colors min-h-[2.5rem]">
+            {group.baseName}
+          </h3>
+        </Link>
+        
+        {/* SKU and Collection */}
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <span>SKU: {selected.sku}</span>
+        </div>
+        
+        {/* Collection and Type badges */}
+        <div className="flex items-center gap-1 flex-wrap">
+          {group.collection && (
+            <Badge variant="outline" className="text-xs">{group.collection}</Badge>
+          )}
+          {group.productType && (
+            <Badge variant="outline" className="text-xs">{group.productType}</Badge>
+          )}
+        </div>
+
+        {/* Finish Swatches */}
+        {hasMultipleFinishes && (
+          <div className="space-y-1.5">
+            <p className="text-xs text-muted-foreground">
+              {finishName || selected.finish || 'Select Finish'} 
+              <span className="ml-1 opacity-60">({group.variants.length} finishes)</span>
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {group.variants.map((variant, idx) => {
+                const color = getSwatchColor(variant.finish);
+                const isSelected = idx === selectedIndex;
+                const isLight = color === '#F5F5F5' || color === '#FFFFFF';
+                return (
+                  <button
+                    key={variant.id}
+                    className={`w-6 h-6 rounded-full border-2 transition-all hover:scale-110 ${
+                      isSelected 
+                        ? 'border-primary ring-2 ring-primary/30 scale-110' 
+                        : isLight 
+                          ? 'border-gray-300 hover:border-primary/50' 
+                          : 'border-transparent hover:border-primary/50'
+                    }`}
+                    style={{ backgroundColor: color }}
+                    title={getFinishDisplayName(variant.finish) || variant.finish || 'Unknown'}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSelectedIndex(idx);
+                    }}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Single finish display */}
+        {!hasMultipleFinishes && finishName && (
+          <div className="flex items-center gap-2">
+            <div 
+              className="w-4 h-4 rounded-full border border-gray-300" 
+              style={{ backgroundColor: getSwatchColor(selected.finish) }}
+            />
+            <span className="text-xs text-muted-foreground">{finishName}</span>
+          </div>
+        )}
+        
+        {/* Price - pushed to bottom */}
+        <div className="flex items-center justify-between pt-1 mt-auto">
+          <p className="text-lg font-bold text-primary">
+            ${selected.retailPrice != null ? Number(selected.retailPrice).toFixed(2) : 'N/A'}
+          </p>
+          <Badge variant="default" className="text-xs bg-emerald-600 hover:bg-emerald-700">
+            Available
+          </Badge>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
 
 export default function Shop() {
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | undefined>();
   const [selectedCollection, setSelectedCollection] = useState<string | undefined>();
   const [selectedFinish, setSelectedFinish] = useState<string | undefined>();
   const [selectedProductType, setSelectedProductType] = useState<string | undefined>();
@@ -30,7 +275,6 @@ export default function Shop() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize] = useState(24);
   const [showFilters, setShowFilters] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
 
   // Session ID for cart
   const [sessionId, setSessionId] = useState<string>("");
@@ -55,11 +299,10 @@ export default function Shop() {
   // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedCategory, selectedCollection, selectedFinish, selectedProductType, sortBy]);
+  }, [selectedCollection, selectedFinish, selectedProductType, sortBy]);
 
-  // Fetch products with filters and pagination
-  const { data: productsData, isLoading } = trpc.shop.getAllProducts.useQuery({
-    category: selectedCategory,
+  // Fetch grouped products
+  const { data: groupedData, isLoading } = trpc.shop.getGroupedProducts.useQuery({
     collection: selectedCollection,
     finish: selectedFinish,
     productType: selectedProductType,
@@ -71,6 +314,15 @@ export default function Shop() {
 
   // Fetch filter options
   const { data: filters } = trpc.shop.getFilters.useQuery();
+
+  // Compute finish display names for filter dropdown
+  const finishOptions = useMemo(() => {
+    if (!filters?.finishes) return [];
+    return filters.finishes.map((f: any) => ({
+      ...f,
+      displayName: getFinishDisplayName(f.name) || f.name,
+    })).sort((a: any, b: any) => a.displayName.localeCompare(b.displayName));
+  }, [filters?.finishes]);
 
   // Add to cart mutation
   const addToCart = trpc.cart.addToCart.useMutation({
@@ -95,7 +347,6 @@ export default function Shop() {
   };
 
   const handleClearFilters = () => {
-    setSelectedCategory(undefined);
     setSelectedCollection(undefined);
     setSelectedFinish(undefined);
     setSelectedProductType(undefined);
@@ -104,10 +355,10 @@ export default function Shop() {
     setCurrentPage(1);
   };
 
-  const activeFiltersCount = [selectedCategory, selectedCollection, selectedFinish, selectedProductType, debouncedSearch].filter(Boolean).length;
+  const activeFiltersCount = [selectedCollection, selectedFinish, selectedProductType, debouncedSearch].filter(Boolean).length;
 
-  const products = productsData?.products || [];
-  const pagination = productsData?.pagination || { page: 1, pageSize: 24, totalCount: 0, totalPages: 0 };
+  const groups: ProductGroup[] = groupedData?.groups || [];
+  const pagination = groupedData?.pagination || { page: 1, pageSize: 24, totalCount: 0, totalPages: 0 };
 
   return (
     <div className="min-h-screen bg-background">
@@ -121,10 +372,7 @@ export default function Shop() {
               <img 
                 src="/images/topknobs-logo.png" 
                 alt="Top Knobs" 
-                className="h-10 object-contain brightness-0 invert"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                }}
+                className="h-16 md:h-20 object-contain brightness-0 invert"
               />
             </div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
@@ -149,7 +397,7 @@ export default function Shop() {
             >
               All Products
             </Button>
-            {filters?.productTypes?.map((type) => (
+            {filters?.productTypes?.map((type: any) => (
               <Button
                 key={type.name}
                 variant={selectedProductType === type.name ? "default" : "outline"}
@@ -157,7 +405,7 @@ export default function Shop() {
                 onClick={() => setSelectedProductType(type.name === selectedProductType ? undefined : type.name)}
                 className="whitespace-nowrap"
               >
-                {PRODUCT_TYPE_ICONS[type.name] || '🔧'} {type.name}s
+                {type.name}s
                 <span className="ml-1 text-xs opacity-70">({type.count})</span>
               </Button>
             ))}
@@ -207,7 +455,7 @@ export default function Shop() {
                     </SelectTrigger>
                     <SelectContent className="max-h-64">
                       <SelectItem value="all">All Collections</SelectItem>
-                      {filters?.collections?.map((col) => (
+                      {filters?.collections?.map((col: any) => (
                         <SelectItem key={col.name} value={col.name}>
                           {col.name} ({col.count})
                         </SelectItem>
@@ -225,9 +473,15 @@ export default function Shop() {
                     </SelectTrigger>
                     <SelectContent className="max-h-64">
                       <SelectItem value="all">All Finishes</SelectItem>
-                      {filters?.finishes?.map((finish) => (
+                      {finishOptions.map((finish: any) => (
                         <SelectItem key={finish.name} value={finish.name}>
-                          {finish.name} ({finish.count})
+                          <span className="flex items-center gap-2">
+                            <span 
+                              className="w-3 h-3 rounded-full border border-gray-300 inline-block" 
+                              style={{ backgroundColor: getSwatchColor(finish.name) }}
+                            />
+                            {finish.displayName} ({finish.count})
+                          </span>
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -263,7 +517,7 @@ export default function Shop() {
                       )}
                       {selectedFinish && (
                         <Badge variant="secondary" className="text-xs cursor-pointer" onClick={() => setSelectedFinish(undefined)}>
-                          {selectedFinish} <X className="ml-1 h-3 w-3" />
+                          {getFinishDisplayName(selectedFinish) || selectedFinish} <X className="ml-1 h-3 w-3" />
                         </Badge>
                       )}
                       {debouncedSearch && (
@@ -295,7 +549,7 @@ export default function Shop() {
                 <p className="text-sm text-muted-foreground">
                   {isLoading ? "Loading..." : (
                     <>
-                      <span className="font-medium text-foreground">{pagination.totalCount.toLocaleString()}</span> products
+                      <span className="font-medium text-foreground">{pagination.totalCount.toLocaleString()}</span> product styles
                       {pagination.totalPages > 1 && (
                         <> · Page {pagination.page} of {pagination.totalPages}</>
                       )}
@@ -329,38 +583,24 @@ export default function Shop() {
                     <SelectItem value="newest">Newest First</SelectItem>
                   </SelectContent>
                 </Select>
-
-                {/* View Toggle */}
-                <div className="hidden sm:flex border rounded-md">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="h-9 w-9 rounded-r-none"
-                    onClick={() => setViewMode('grid')}
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="icon"
-                    className="h-9 w-9 rounded-l-none"
-                    onClick={() => setViewMode('list')}
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
               </div>
             </div>
 
             {/* Loading State */}
             {isLoading && (
-              <div className={viewMode === 'grid' ? "grid sm:grid-cols-2 xl:grid-cols-3 gap-4" : "space-y-3"}>
-                {[...Array(pageSize > 12 ? 12 : pageSize)].map((_, i) => (
+              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                {[...Array(12)].map((_, i) => (
                   <Card key={i} className="animate-pulse">
-                    <div className={viewMode === 'grid' ? "aspect-square bg-muted" : "h-32 bg-muted"} />
+                    <div className="aspect-square bg-muted" />
                     <CardContent className="p-4 space-y-2">
                       <div className="h-4 bg-muted rounded" />
                       <div className="h-3 bg-muted rounded w-2/3" />
+                      <div className="h-4 bg-muted rounded w-1/3" />
+                      <div className="flex gap-1">
+                        {[...Array(4)].map((_, j) => (
+                          <div key={j} className="w-6 h-6 rounded-full bg-muted" />
+                        ))}
+                      </div>
                       <div className="h-6 bg-muted rounded w-1/2" />
                     </CardContent>
                   </Card>
@@ -368,135 +608,22 @@ export default function Shop() {
               </div>
             )}
 
-            {/* Grid View */}
-            {!isLoading && products.length > 0 && viewMode === 'grid' && (
+            {/* Product Grid */}
+            {!isLoading && groups.length > 0 && (
               <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {products.map((product) => (
-                  <Card key={product.id} className="group hover:shadow-lg transition-all overflow-hidden border hover:border-primary/50">
-                    <Link href={`/shop/product/${product.id}`}>
-                      <div className="aspect-square overflow-hidden bg-slate-50 flex items-center justify-center p-4 relative">
-                        <img 
-                          src={product.imageUrl || "/images/topknobs/placeholder-knobs.jpg"} 
-                          alt={product.name}
-                          className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.src = "/images/topknobs/placeholder-knobs.jpg";
-                          }}
-                        />
-                        {product.featured === 'yes' && (
-                          <Badge className="absolute top-2 left-2 text-xs">Featured</Badge>
-                        )}
-                        {/* Quick Add Button */}
-                        <Button
-                          size="sm"
-                          className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                          onClick={(e) => handleAddToCart(product.id, e)}
-                          disabled={product.inStock !== 'yes' || addToCart.isPending}
-                        >
-                          <Plus className="h-4 w-4 mr-1" />
-                          Add
-                        </Button>
-                      </div>
-                    </Link>
-                    <CardContent className="p-4 space-y-2">
-                      <Link href={`/shop/product/${product.id}`} className="block">
-                        <h3 className="font-semibold text-sm line-clamp-2 group-hover:text-primary transition-colors">
-                          {product.name}
-                        </h3>
-                      </Link>
-                      
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <span>SKU: {product.sku}</span>
-                        {product.productType && (
-                          <>
-                            <span>·</span>
-                            <span>{product.productType}</span>
-                          </>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center gap-1 flex-wrap">
-                        {product.collection && (
-                          <Badge variant="outline" className="text-xs">{product.collection}</Badge>
-                        )}
-                        {product.finish && (
-                          <Badge variant="outline" className="text-xs">{product.finish}</Badge>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center justify-between pt-1">
-                        <p className="text-lg font-bold text-primary">
-                          ${product.retailPrice != null ? Number(product.retailPrice).toFixed(2) : 'N/A'}
-                        </p>
-                        <Badge variant={product.inStock === 'yes' ? 'default' : 'secondary'} className="text-xs">
-                          {product.inStock === 'yes' ? 'In Stock' : 'Out of Stock'}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
-
-            {/* List View */}
-            {!isLoading && products.length > 0 && viewMode === 'list' && (
-              <div className="space-y-3">
-                {products.map((product) => (
-                  <Card key={product.id} className="group hover:shadow-md transition-all overflow-hidden border hover:border-primary/50">
-                    <CardContent className="p-4">
-                      <div className="flex gap-4">
-                        <Link href={`/shop/product/${product.id}`} className="flex-shrink-0">
-                          <div className="w-24 h-24 bg-slate-50 rounded-lg overflow-hidden flex items-center justify-center p-2">
-                            <img 
-                              src={product.imageUrl || "/images/topknobs/placeholder-knobs.jpg"} 
-                              alt={product.name}
-                              className="w-full h-full object-contain"
-                              loading="lazy"
-                              onError={(e) => {
-                                e.currentTarget.src = "/images/topknobs/placeholder-knobs.jpg";
-                              }}
-                            />
-                          </div>
-                        </Link>
-                        <div className="flex-1 min-w-0">
-                          <Link href={`/shop/product/${product.id}`}>
-                            <h3 className="font-semibold group-hover:text-primary transition-colors line-clamp-1">
-                              {product.name}
-                            </h3>
-                          </Link>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <span>SKU: {product.sku}</span>
-                            {product.collection && <><span>·</span><span>{product.collection}</span></>}
-                            {product.finish && <><span>·</span><span>{product.finish}</span></>}
-                            {product.productType && <><span>·</span><span>{product.productType}</span></>}
-                          </div>
-                          {product.centerToCenter && (
-                            <p className="text-xs text-muted-foreground mt-1">Center to Center: {product.centerToCenter}</p>
-                          )}
-                        </div>
-                        <div className="flex flex-col items-end gap-2">
-                          <p className="text-lg font-bold text-primary">
-                            ${product.retailPrice != null ? Number(product.retailPrice).toFixed(2) : 'N/A'}
-                          </p>
-                          <Button
-                            size="sm"
-                            onClick={(e) => handleAddToCart(product.id, e)}
-                            disabled={product.inStock !== 'yes' || addToCart.isPending}
-                          >
-                            <ShoppingCart className="h-4 w-4 mr-1" />
-                            Add to Cart
-                          </Button>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                {groups.map((group) => (
+                  <ProductCard
+                    key={group.baseName}
+                    group={group}
+                    onAddToCart={handleAddToCart}
+                    isAdding={addToCart.isPending}
+                  />
                 ))}
               </div>
             )}
 
             {/* Empty State */}
-            {!isLoading && products.length === 0 && (
+            {!isLoading && groups.length === 0 && (
               <div className="text-center py-16">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-muted mb-4">
                   <Filter className="h-8 w-8 text-muted-foreground" />

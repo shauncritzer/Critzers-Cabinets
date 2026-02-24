@@ -441,6 +441,202 @@ When you have enough information, summarize what you've learned and offer to gen
           },
         };
       }),
+
+    // Get products grouped by base style name with finish variants
+    getGroupedProducts: publicProcedure
+      .input(z.object({
+        collection: z.string().optional(),
+        finish: z.string().optional(),
+        productType: z.string().optional(),
+        search: z.string().optional(),
+        sortBy: z.enum(['price-asc', 'price-desc', 'name-asc', 'name-desc', 'newest']).optional(),
+        page: z.number().min(1).default(1),
+        pageSize: z.number().min(1).max(100).default(24),
+      }).optional())
+      .query(async ({ input }) => {
+        const db = await getDb();
+        if (!db) throw new Error('Database not available');
+        const conditions = [];
+        
+        // Filter out discontinued products
+        conditions.push(
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
+          )
+        );
+        
+        // Filter: must have a valid retail price
+        conditions.push(
+          not(isNull(products.retailPrice))
+        );
+        
+        if (input?.collection) {
+          conditions.push(eq(products.collection, input.collection));
+        }
+        if (input?.finish) {
+          conditions.push(eq(products.finish, input.finish));
+        }
+        if (input?.productType) {
+          conditions.push(eq(products.productType, input.productType));
+        }
+        if (input?.search) {
+          conditions.push(
+            or(
+              like(products.name, `%${input.search}%`),
+              like(products.description, `%${input.search}%`),
+              like(products.sku, `%${input.search}%`),
+              like(products.collection, `%${input.search}%`)
+            )
+          );
+        }
+        
+        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        
+        // Build query with sorting
+        let orderClause;
+        switch (input?.sortBy) {
+          case 'price-asc':
+            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) ASC`;
+            break;
+          case 'price-desc':
+            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) DESC`;
+            break;
+          case 'name-asc':
+            orderClause = sql`${products.name} ASC`;
+            break;
+          case 'name-desc':
+            orderClause = sql`${products.name} DESC`;
+            break;
+          case 'newest':
+            orderClause = sql`${products.createdAt} DESC`;
+            break;
+          default:
+            orderClause = sql`${products.name} ASC`;
+        }
+        
+        // Fetch ALL matching products (we group client-side for simplicity)
+        // But limit to a reasonable amount to avoid memory issues
+        const allProducts = await db.select().from(products)
+          .where(whereClause)
+          .orderBy(orderClause)
+          .limit(5000);
+        
+        // Group products by base style name
+        // The name field may include finish suffix like "Allendale Knob 1 1/4\" - Ash Gray"
+        // We strip the finish suffix to get the base name
+        const FINISH_NAMES = [
+          'Antique Copper', 'Ash Gray', 'Aluminum', 'Brass Antique', 'Black Iron',
+          'Flat Black', 'Black Nickel', 'Brass', 'Brushed Satin Nickel', 'Coal Black',
+          'Cast Iron', 'Dark Antique Brass', 'German Bronze', 'Honey Bronze', 'Light Bronze',
+          'Medium Bronze', 'Mahogany Bronze', 'Old English Copper', 'Oil Rubbed Bronze',
+          'Oil Rubbed Bronze 2', 'Patina Antique Brass', 'Patina Rouge', 'Polished Brass',
+          'Polished Chrome', 'Polished Nickel', 'Brushed Stainless Steel',
+          'Polished Stainless Steel', 'Pewter', 'Pewter Antique', 'Pewter Light',
+          'Rust', 'Sable', 'Silicon Bronze Light', 'Stainless Steel', 'Tuscan Bronze',
+          'Umbrio', 'White', 'Flat Black and Honey Bronze', 'Honey Bronze and Flat Black',
+          'Flat Black and Pewter Antique', 'Pewter Antique and Flat Black',
+        ];
+        
+        function getBaseName(productName: string): string {
+          // Try to strip " - FinishName" from the end
+          for (const fn of FINISH_NAMES) {
+            const suffix = ` - ${fn}`;
+            if (productName.endsWith(suffix)) {
+              return productName.slice(0, -suffix.length).trim();
+            }
+          }
+          // Also try splitting at the last " - "
+          const lastDash = productName.lastIndexOf(' - ');
+          if (lastDash > 0) {
+            const possibleFinish = productName.slice(lastDash + 3).trim();
+            // Check if the part after " - " looks like a finish (not a size)
+            if (possibleFinish.length > 2 && !possibleFinish.match(/^\d/)) {
+              return productName.slice(0, lastDash).trim();
+            }
+          }
+          return productName.trim();
+        }
+        
+        const groups = new Map<string, any[]>();
+        for (const p of allProducts) {
+          const baseName = getBaseName(p.name);
+          if (!groups.has(baseName)) {
+            groups.set(baseName, []);
+          }
+          groups.get(baseName)!.push(p);
+        }
+        
+        // Convert to array and sort
+        let groupedArray = Array.from(groups.entries()).map(([baseName, variants]) => {
+          // Sort variants by finish name for consistent ordering
+          variants.sort((a: any, b: any) => (a.finish || '').localeCompare(b.finish || ''));
+          const primary = variants[0];
+          return {
+            baseName,
+            collection: primary.collection,
+            productType: primary.productType,
+            brand: primary.brand,
+            variants: variants.map((v: any) => ({
+              id: v.id,
+              sku: v.sku,
+              name: v.name,
+              finish: v.finish,
+              finishCode: v.finishCode,
+              retailPrice: v.retailPrice,
+              listPrice: v.listPrice,
+              imageUrl: v.imageUrl,
+              centerToCenter: v.centerToCenter,
+              dimensions: v.dimensions,
+              length: v.length,
+              width: v.width,
+              projection: v.projection,
+              material: v.material,
+            })),
+          };
+        });
+        
+        // Sort groups
+        switch (input?.sortBy) {
+          case 'price-asc':
+            groupedArray.sort((a, b) => {
+              const pa = parseFloat(a.variants[0]?.retailPrice || '0');
+              const pb = parseFloat(b.variants[0]?.retailPrice || '0');
+              return pa - pb;
+            });
+            break;
+          case 'price-desc':
+            groupedArray.sort((a, b) => {
+              const pa = parseFloat(a.variants[0]?.retailPrice || '0');
+              const pb = parseFloat(b.variants[0]?.retailPrice || '0');
+              return pb - pa;
+            });
+            break;
+          case 'name-desc':
+            groupedArray.sort((a, b) => b.baseName.localeCompare(a.baseName));
+            break;
+          case 'name-asc':
+          default:
+            groupedArray.sort((a, b) => a.baseName.localeCompare(b.baseName));
+            break;
+        }
+        
+        const totalGroups = groupedArray.length;
+        const page = input?.page || 1;
+        const pageSize = input?.pageSize || 24;
+        const offset = (page - 1) * pageSize;
+        const pagedGroups = groupedArray.slice(offset, offset + pageSize);
+        
+        return {
+          groups: pagedGroups,
+          pagination: {
+            page,
+            pageSize,
+            totalCount: totalGroups,
+            totalPages: Math.ceil(totalGroups / pageSize),
+          },
+        };
+      }),
   }),
   
   // Gallery management
