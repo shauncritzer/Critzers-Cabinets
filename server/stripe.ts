@@ -173,6 +173,9 @@ export async function createCheckoutSession(
       },
     ],
     automatic_tax: { enabled: false },
+    payment_intent_data: {
+      statement_descriptor: 'CRITZERS CABINETS',
+    },
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata: metadata || {},
