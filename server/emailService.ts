@@ -68,127 +68,138 @@ export async function sendEmail({ to, subject, text, html }: SendEmailParams): P
   }
 }
 
+function row(label: string, value: string | undefined | null): string {
+  if (!value) return '';
+  return `
+    <tr>
+      <td style="padding:8px 12px;font-weight:bold;color:#2c5530;background:#f0f5f0;width:35%;vertical-align:top;">${label}</td>
+      <td style="padding:8px 12px;background:#fff;">${value}</td>
+    </tr>`;
+}
+
+function textRow(label: string, value: string | undefined | null): string {
+  if (!value) return '';
+  return `${label}: ${value}\n`;
+}
+
 /**
  * Send quote notification email to business owner
+ * Parses conversationData JSON to extract all form fields
  */
 export async function sendQuoteNotification(quote: {
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
-  projectDescription?: string;
+  conversationData?: string;
   quoteId: number;
-  // Project details
-  roomType?: string;
-  doorStyle?: string;
-  woodSpecies?: string;
-  finish?: string;
-  countertopType?: string;
-  linearFeet?: string;
-  dimensions?: string;
-  // Educational questions
-  currentCondition?: string;
-  timeline?: string;
-  budgetRange?: string;
-  stylePreference?: string;
-  specialFeatures?: string;
-  referralSource?: string;
-  estimatedPrice?: number;
 }): Promise<boolean> {
   const TO_EMAIL = process.env.QUOTE_NOTIFICATION_EMAIL || 'info@critzerscabinets.com';
 
-  const subject = `New Quote Request from ${quote.customerName}`;
-  
-  const formatLabel = (key: string): string => {
-    return key.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-  };
+  // Parse conversationData if available
+  let projectData: Record<string, string> = {};
+  let estimatedPrice: number | null = null;
+  try {
+    if (quote.conversationData) {
+      const parsed = JSON.parse(quote.conversationData);
+      projectData = parsed.projectData || {};
+      estimatedPrice = parsed.estimatedPrice || null;
+    }
+  } catch {
+    // If parsing fails, fall back to empty
+  }
 
-  const projectDetails = [
-    quote.roomType && `Room Type: ${formatLabel(quote.roomType)}`,
-    quote.doorStyle && `Door Style: ${formatLabel(quote.doorStyle)}`,
-    quote.woodSpecies && `Wood Species: ${formatLabel(quote.woodSpecies)}`,
-    quote.finish && `Finish: ${formatLabel(quote.finish)}`,
-    quote.countertopType && `Countertop: ${formatLabel(quote.countertopType)}`,
-    quote.linearFeet && `Linear Feet: ${quote.linearFeet}`,
-    quote.dimensions && `Dimensions: ${quote.dimensions}`,
-    quote.estimatedPrice && `Estimated Price: $${quote.estimatedPrice.toLocaleString()}`,
-  ].filter(Boolean).join('\n- ');
+  const subject = `🏠 New Quote Request from ${quote.customerName} — Critzer's Cabinets`;
 
-  const additionalInfo = [
-    quote.currentCondition && `Current Condition: ${formatLabel(quote.currentCondition)}`,
-    quote.timeline && `Timeline: ${formatLabel(quote.timeline)}`,
-    quote.budgetRange && `Budget Range: ${formatLabel(quote.budgetRange)}`,
-    quote.stylePreference && `Style Preference: ${formatLabel(quote.stylePreference)}`,
-    quote.specialFeatures && `Special Features: ${formatLabel(quote.specialFeatures)}`,
-    quote.referralSource && `How They Found Us: ${formatLabel(quote.referralSource)}`,
-  ].filter(Boolean).join('\n- ');
-
+  // Plain text version
   const text = `
-New Quote Request Received
+NEW QUOTE REQUEST — CRITZER'S CABINET CREATIONS
+================================================
 
-Customer Information:
-- Name: ${quote.customerName}
-- Email: ${quote.customerEmail}
-- Phone: ${quote.customerPhone || 'Not provided'}
+CUSTOMER INFORMATION
+${textRow('Name', quote.customerName)}${textRow('Email', quote.customerEmail)}${textRow('Phone', quote.customerPhone || 'Not provided')}
+PRELIMINARY ESTIMATE: ${estimatedPrice ? `$${estimatedPrice.toLocaleString()}` : 'Not calculated'}
 
-Project Details:
-${projectDetails || 'No details provided'}
-
-${additionalInfo ? `Additional Information:\n- ${additionalInfo}` : ''}
-
-${quote.projectDescription ? `Additional Notes:\n${quote.projectDescription}` : ''}
+PROJECT DETAILS
+${textRow('Room Type', projectData.roomType)}${textRow('Door Style', projectData.doorStyle)}${textRow('Wood Species', projectData.woodSpecies)}${textRow('Finish', projectData.finish)}${textRow('Countertop', projectData.countertopType)}${textRow('Linear Feet', projectData.linearFeet ? projectData.linearFeet + ' ft' : '')}${textRow('Dimensions', projectData.dimensions)}
+PROJECT BACKGROUND
+${textRow('Current Condition', projectData.currentCondition)}${textRow('Timeline', projectData.projectTimeline)}${textRow('Budget Range', projectData.budgetRange)}${textRow('Style Preference', projectData.stylePreference)}${textRow('Special Features', projectData.specialFeatures)}${textRow('How They Found Us', projectData.referralSource)}
+ADDITIONAL NOTES
+${projectData.additionalNotes || 'None provided'}
 
 Quote ID: ${quote.quoteId}
-
 ---
-This is an automated notification from your website quote system.
+Automated notification from critzerscabinets.com
   `.trim();
 
+  // HTML version
   const html = `
 <!DOCTYPE html>
 <html>
 <head>
-  <style>
-    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background-color: #2c5530; color: white; padding: 20px; text-align: center; }
-    .content { background-color: #f9f9f9; padding: 20px; border: 1px solid #ddd; }
-    .info-row { margin: 10px 0; }
-    .label { font-weight: bold; color: #2c5530; }
-    .footer { margin-top: 20px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #666; }
-  </style>
+  <meta charset="utf-8">
 </head>
-<body>
-  <div class="container">
-    <div class="header">
-      <h1>New Quote Request</h1>
+<body style="font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0;background:#f4f4f4;">
+  <div style="max-width:640px;margin:20px auto;background:#fff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+    
+    <!-- Header -->
+    <div style="background:#2c5530;color:white;padding:24px 32px;text-align:center;">
+      <h1 style="margin:0;font-size:22px;">🏠 New Quote Request</h1>
+      <p style="margin:8px 0 0;opacity:0.85;font-size:14px;">Critzer's Cabinet Creations</p>
     </div>
-    <div class="content">
-      <h2>Customer Information</h2>
-      <div class="info-row">
-        <span class="label">Name:</span> ${quote.customerName}
-      </div>
-      <div class="info-row">
-        <span class="label">Email:</span> <a href="mailto:${quote.customerEmail}">${quote.customerEmail}</a>
-      </div>
-      <div class="info-row">
-        <span class="label">Phone:</span> ${quote.customerPhone || 'Not provided'}
-      </div>
-      
-      <h2>Project Details</h2>
-      ${projectDetails ? projectDetails.split('\n- ').map(detail => `<div class="info-row">${detail.replace(/^(.+?):\s*/, '<span class="label">$1:</span> ')}</div>`).join('') : '<p>No details provided</p>'}
-      
-      ${additionalInfo ? `<h2>Additional Information</h2>
-      ${additionalInfo.split('\n- ').map(detail => `<div class="info-row">${detail.replace(/^(.+?):\s*/, '<span class="label">$1:</span> ')}</div>`).join('')}` : ''}
-      
-      ${quote.projectDescription ? `<h2>Additional Notes</h2>
-      <p>${quote.projectDescription}</p>` : ''}
-      
-      <div class="info-row">
-        <span class="label">Quote ID:</span> ${quote.quoteId}
-      </div>
+
+    <!-- Estimate Banner -->
+    ${estimatedPrice ? `
+    <div style="background:#e8f5e9;border-bottom:3px solid #2c5530;padding:20px 32px;text-align:center;">
+      <p style="margin:0;font-size:13px;color:#555;">Preliminary Estimate</p>
+      <p style="margin:4px 0 0;font-size:36px;font-weight:bold;color:#2c5530;">$${estimatedPrice.toLocaleString()}</p>
+      <p style="margin:4px 0 0;font-size:11px;color:#888;">*Rough estimate — final quote after consultation</p>
+    </div>` : ''}
+
+    <div style="padding:24px 32px;">
+
+      <!-- Customer Info -->
+      <h2 style="color:#2c5530;font-size:16px;border-bottom:2px solid #e0e0e0;padding-bottom:8px;margin-top:0;">Customer Information</h2>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+        ${row('Name', quote.customerName)}
+        ${row('Email', `<a href="mailto:${quote.customerEmail}" style="color:#2c5530;">${quote.customerEmail}</a>`)}
+        ${row('Phone', quote.customerPhone || 'Not provided')}
+      </table>
+
+      <!-- Project Details -->
+      <h2 style="color:#2c5530;font-size:16px;border-bottom:2px solid #e0e0e0;padding-bottom:8px;">Project Details</h2>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+        ${row('Room Type', projectData.roomType)}
+        ${row('Door Style', projectData.doorStyle)}
+        ${row('Wood Species', projectData.woodSpecies)}
+        ${row('Finish', projectData.finish)}
+        ${row('Countertop', projectData.countertopType)}
+        ${row('Linear Feet', projectData.linearFeet ? projectData.linearFeet + ' ft' : null)}
+        ${row('Dimensions', projectData.dimensions)}
+      </table>
+
+      <!-- Project Background -->
+      <h2 style="color:#2c5530;font-size:16px;border-bottom:2px solid #e0e0e0;padding-bottom:8px;">Project Background</h2>
+      <table style="width:100%;border-collapse:collapse;margin-bottom:24px;">
+        ${row('Current Condition', projectData.currentCondition)}
+        ${row('Timeline', projectData.projectTimeline)}
+        ${row('Budget Range', projectData.budgetRange)}
+        ${row('Style Preference', projectData.stylePreference)}
+        ${row('Special Features', projectData.specialFeatures)}
+        ${row('How They Found Us', projectData.referralSource)}
+      </table>
+
+      <!-- Additional Notes -->
+      ${projectData.additionalNotes ? `
+      <h2 style="color:#2c5530;font-size:16px;border-bottom:2px solid #e0e0e0;padding-bottom:8px;">Additional Notes</h2>
+      <div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:4px;padding:12px 16px;margin-bottom:24px;">
+        <p style="margin:0;white-space:pre-wrap;">${projectData.additionalNotes}</p>
+      </div>` : ''}
+
     </div>
-    <div class="footer">
-      <p>This is an automated notification from your website quote system at critzerscabinets.com</p>
+
+    <!-- Footer -->
+    <div style="background:#f4f4f4;padding:16px 32px;text-align:center;font-size:12px;color:#888;border-top:1px solid #e0e0e0;">
+      <p style="margin:0;">Quote ID #${quote.quoteId} &nbsp;|&nbsp; Automated notification from <a href="https://critzerscabinets.com" style="color:#2c5530;">critzerscabinets.com</a></p>
     </div>
   </div>
 </body>

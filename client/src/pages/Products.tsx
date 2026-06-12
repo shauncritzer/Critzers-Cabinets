@@ -19,7 +19,7 @@ export default function Products() {
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             <Card className="overflow-hidden">
               <div className="h-48 bg-gradient-to-br from-amber-100 to-amber-200 flex items-center justify-center relative overflow-hidden">
-                <img src="/images/gallery/7nAUkEFBXEaf.jpg" alt="Omega Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
+                <img src="/manus-storage/7nAUkEFBXEaf_785b0bb9.jpg" alt="Omega Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <div className="text-4xl font-bold text-white">OMEGA</div>
                 </div>
@@ -41,7 +41,7 @@ export default function Products() {
 
             <Card className="overflow-hidden">
               <div className="h-48 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center relative overflow-hidden">
-                <img src="/images/gallery/RHHoKWmplcBC.jpg" alt="Wolf Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
+                <img src="/manus-storage/RHHoKWmplcBC_6685e73b.jpg" alt="Wolf Cabinetry" className="absolute inset-0 w-full h-full object-cover" />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <div className="text-4xl font-bold text-white">WOLF</div>
                 </div>
@@ -75,7 +75,7 @@ export default function Products() {
           <div className="grid md:grid-cols-4 gap-6">
             <Card className="text-center overflow-hidden">
               <div className="h-40 overflow-hidden">
-                <img src="/countertop-granite.jpg" alt="Granite Countertop" className="w-full h-full object-cover" />
+                <img src="/manus-storage/countertop-granite_782ce988.jpg" alt="Granite Countertop" className="w-full h-full object-cover" />
               </div>
               <CardHeader>
                 <CardTitle>Granite</CardTitle>
@@ -89,7 +89,7 @@ export default function Products() {
 
             <Card className="text-center overflow-hidden">
               <div className="h-40 overflow-hidden">
-                <img src="/countertop-marble.jpg" alt="Marble Countertop" className="w-full h-full object-cover" />
+                <img src="/manus-storage/countertop-marble_18ced171.jpg" alt="Marble Countertop" className="w-full h-full object-cover" />
               </div>
               <CardHeader>
                 <CardTitle>Marble</CardTitle>
@@ -103,7 +103,7 @@ export default function Products() {
 
             <Card className="text-center overflow-hidden">
               <div className="h-40 overflow-hidden">
-                <img src="/countertop-quartz.jpg" alt="Quartz Countertop" className="w-full h-full object-cover" />
+                <img src="/manus-storage/countertop-quartz_7c88f96d.jpg" alt="Quartz Countertop" className="w-full h-full object-cover" />
               </div>
               <CardHeader>
                 <CardTitle>Quartz</CardTitle>
@@ -117,7 +117,7 @@ export default function Products() {
 
             <Card className="text-center overflow-hidden">
               <div className="h-40 overflow-hidden">
-                <img src="/countertop-corian.jpg" alt="Corian Solid Surface Countertop" className="w-full h-full object-cover" />
+                <img src="/manus-storage/countertop-corian_4168534a.jpg" alt="Corian Solid Surface Countertop" className="w-full h-full object-cover" />
               </div>
               <CardHeader>
                 <CardTitle>Solid Surface (Corian)</CardTitle>
@@ -149,7 +149,7 @@ export default function Products() {
           
           <Card className="max-w-3xl mx-auto overflow-hidden">
             <div className="h-64 bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center relative overflow-hidden">
-              <img src="/images/topknobs-showcase.jpg" alt="Top Knobs Hardware" className="absolute inset-0 w-full h-full object-cover" />
+              <img src="/manus-storage/topknobs-showcase_87747049.jpg" alt="Top Knobs Hardware" className="absolute inset-0 w-full h-full object-cover" />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                 <div className="text-center space-y-4">
                   <div className="text-5xl font-bold text-white">TOP KNOBS</div>

@@ -6,11 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Minus, Plus, Trash2, ShoppingCart, ArrowLeft } from "lucide-react";
 import Navigation from "@/components/Navigation";
 
-// Construct a per-SKU image URL from Top Knobs public website
-function getPerSkuImageUrl(sku: string | null): string | null {
-  if (!sku || sku.length < 2) return null;
-  return `https://www.topknobs.com/media/resized/490/${sku[0]}/${sku[1]}/${sku}_0.jpg`;
-}
 
 export default function Cart() {
 
@@ -66,23 +61,6 @@ export default function Cart() {
     }
   };
 
-  // Stripe Checkout handler
-  const createCheckoutSession = trpc.checkout.createCheckoutSession.useMutation({
-    onSuccess: (data) => {
-      // Redirect to Stripe Checkout
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    },
-    onError: (error) => {
-      alert(`Checkout error: ${error.message}`);
-    },
-  });
-
-  const handleCheckout = () => {
-    createCheckoutSession.mutate({ sessionId });
-  };
-
   if (!cartData) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-12">
@@ -102,21 +80,17 @@ export default function Cart() {
       {/* Shared Navigation */}
       <Navigation />
       
-      {/* Header - fixed mobile overflow */}
-      <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-8 md:py-12">
-        <div className="container px-4 sm:px-6 lg:px-8">
-          <Link href="/shop" className="inline-flex items-center gap-2 text-emerald-200 hover:text-white transition-colors mb-3 md:mb-4 text-sm">
-            <ArrowLeft className="h-4 w-4" />
-            Continue Shopping
-          </Link>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-2 md:mb-4">Shopping Cart</h1>
-          <p className="text-emerald-100 text-base md:text-lg">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-emerald-700 to-emerald-600 text-white py-12">
+        <div className="container">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Shopping Cart</h1>
+          <p className="text-emerald-100 text-lg">
             {count === 0 ? "Your cart is empty" : `${count} item${count !== 1 ? 's' : ''} in your cart`}
           </p>
         </div>
       </div>
 
-      <div className="container px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+      <div className="container py-12">
         {items.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
@@ -131,52 +105,35 @@ export default function Cart() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+          <div className="grid lg:grid-cols-3 gap-8">
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
                 <Card key={item.id}>
-                  <CardContent className="p-4 md:p-6">
-                    {/* Mobile: stacked layout; Desktop: horizontal layout */}
-                    <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+                  <CardContent className="p-6">
+                    <div className="flex gap-6">
                       {/* Product Image */}
-                      <div className="w-20 h-20 sm:w-24 sm:h-24 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0 mx-auto sm:mx-0">
-                        {(getPerSkuImageUrl(item.productSku) || item.imageUrl) ? (
+                      <div className="w-24 h-24 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {item.imageUrl ? (
                           <img
-                            src={getPerSkuImageUrl(item.productSku) || item.imageUrl!}
+                            src={item.imageUrl}
                             alt={item.productName || "Product"}
                             className="w-full h-full object-cover rounded-lg"
-                            onError={(e) => {
-                              if (item.imageUrl && e.currentTarget.src !== item.imageUrl) {
-                                e.currentTarget.src = item.imageUrl;
-                              }
-                            }}
                           />
                         ) : (
                           <ShoppingCart className="h-8 w-8 text-muted-foreground" />
                         )}
                       </div>
 
-                      {/* Product Info + Price - responsive */}
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-base md:text-lg mb-1 text-center sm:text-left">
+                      {/* Product Info */}
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg mb-1">
                           {item.productName || "Unknown Product"}
                         </h3>
-                        <p className="text-sm text-muted-foreground mb-3 text-center sm:text-left">
+                        <p className="text-sm text-muted-foreground mb-3">
                           SKU: {item.productSku}
                         </p>
-                        
-                        {/* Price on mobile - shown above controls */}
-                        <div className="sm:hidden text-center mb-3">
-                          <p className="font-semibold text-lg">
-                            ${parseFloat(item.retailPrice || "0").toFixed(2)} each
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Subtotal: ${(parseFloat(item.retailPrice || "0") * item.quantity).toFixed(2)}
-                          </p>
-                        </div>
-
-                        <div className="flex items-center justify-center sm:justify-start gap-4">
+                        <div className="flex items-center gap-4">
                           {/* Quantity Controls */}
                           <div className="flex items-center gap-2">
                             <Button
@@ -216,8 +173,8 @@ export default function Cart() {
                         </div>
                       </div>
 
-                      {/* Price - desktop only */}
-                      <div className="hidden sm:block text-right flex-shrink-0">
+                      {/* Price */}
+                      <div className="text-right">
                         <p className="text-sm text-muted-foreground mb-1">Price</p>
                         <p className="font-semibold text-lg">
                           ${parseFloat(item.retailPrice || "0").toFixed(2)}
@@ -264,17 +221,14 @@ export default function Cart() {
                         ${total.toFixed(2)}
                       </span>
                     </div>
-                    <Button
-                      className="w-full"
-                      size="lg"
-                      onClick={handleCheckout}
-                      disabled={createCheckoutSession.isPending}
-                    >
-                      {createCheckoutSession.isPending ? "Redirecting..." : "Proceed to Checkout"}
-                    </Button>
+                    <Link href="/checkout">
+                      <Button className="w-full" size="lg">
+                        Proceed to Checkout
+                      </Button>
+                    </Link>
                   </div>
                   <p className="text-xs text-center text-muted-foreground">
-                    Secure checkout powered by Stripe
+                    Secure checkout powered by Critzer's Cabinets
                   </p>
                 </CardContent>
               </Card>

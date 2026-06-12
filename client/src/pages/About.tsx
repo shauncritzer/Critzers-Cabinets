@@ -26,7 +26,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
                   <img 
-                    src="/images/team/larry_critzer_professional.png" 
+                    src="/manus-storage/larry_critzer_professional_a68ed76b.png" 
                     alt="Larry Critzer"
                     className="w-full h-full object-cover object-center"
                   />
@@ -46,7 +46,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
                   <img 
-                    src="/images/team/dana-quick.png" 
+                    src="/manus-storage/dana-quick_ee5aee56.png" 
                     alt="Dana Quick"
                     className="w-full h-full object-cover object-top"
                   />
@@ -66,7 +66,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="aspect-square bg-gradient-to-br from-primary/20 to-secondary/20 flex items-center justify-center overflow-hidden">
                   <img 
-                    src="/images/team/shaun-critzer.png" 
+                    src="/manus-storage/shaun-critzer_0b1d0395.png" 
                     alt="Shaun Critzer"
                     className="w-full h-full object-cover object-top"
                   />
@@ -105,7 +105,7 @@ export default function About() {
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img 
-                src="/images/gallery/FbkkkCWXInZS.jpg" 
+                src="/manus-storage/FbkkkCWXInZS_8d8f4666.jpg" 
                 alt="Traditional cherry kitchen cabinets"
                 className="w-full h-80 object-cover"
               />
@@ -121,7 +121,7 @@ export default function About() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div className="rounded-lg overflow-hidden shadow-xl order-2 md:order-1">
                 <img 
-                  src="/images/gallery/53H0NAM0eSvE.webp" 
+                  src="/manus-storage/53H0NAM0eSvE_b8778d83.webp" 
                   alt="Modern gray kitchen design"
                   className="w-full h-96 object-cover"
                 />
@@ -159,7 +159,7 @@ export default function About() {
             </div>
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img 
-                src="/images/gallery/ubBFg9QkproG.jpg" 
+                src="/manus-storage/ubBFg9QkproG_6e8e5f9e.jpg" 
                 alt="Transitional white kitchen"
                 className="w-full h-80 object-cover"
               />
@@ -235,7 +235,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-white flex items-center justify-center p-8">
                   <img 
-                    src="/images/omega-logo.png" 
+                    src="/manus-storage/omega-logo_9db24c11.png" 
                     alt="Omega Cabinetry"
                     className="w-full h-full object-contain"
                   />
@@ -253,7 +253,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-white flex items-center justify-center p-8">
                   <img 
-                    src="/images/wolf-logo.png" 
+                    src="/manus-storage/wolf-logo_c5061568.png" 
                     alt="Wolf Cabinetry"
                     className="w-full h-full object-contain"
                   />
@@ -271,7 +271,7 @@ export default function About() {
               <Card className="overflow-hidden">
                 <div className="h-48 bg-white flex items-center justify-center p-8">
                   <img 
-                    src="/images/topknobs-logo.png" 
+                    src="/manus-storage/topknobs-logo_07eb411a.png" 
                     alt="Top Knobs Hardware"
                     className="w-full h-full object-contain"
                   />

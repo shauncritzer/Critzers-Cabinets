@@ -7,7 +7,7 @@ import { invokeLLM } from "./_core/llm";
 import { like, or, and, eq, sql, isNull, not } from "drizzle-orm";
 import { products, cartItems, gallery, orders, orderItems } from "../drizzle/schema";
 import { getDb } from "./db";
-import { createPaymentIntent, calculateShipping, calculateTax, createCheckoutSession, getCheckoutSession } from "./stripe";
+import { createPaymentIntent, calculateShipping, calculateTax } from "./stripe";
 import { sendOrderConfirmation, sendAdminOrderNotification } from "./email";
 import {
   createQuote,
@@ -55,21 +55,6 @@ export const appRouter = router({
         roomType: z.string().optional(),
         projectDescription: z.string().optional(),
         conversationData: z.string().optional(),
-        // Project detail fields from the structured quote form
-        doorStyle: z.string().optional(),
-        woodSpecies: z.string().optional(),
-        finish: z.string().optional(),
-        countertopType: z.string().optional(),
-        linearFeet: z.string().optional(),
-        dimensions: z.string().optional(),
-        estimatedPrice: z.number().optional(),
-        // Educational qualification questions
-        currentCondition: z.string().optional(),
-        timeline: z.string().optional(),
-        budgetRange: z.string().optional(),
-        stylePreference: z.string().optional(),
-        specialFeatures: z.string().optional(),
-        referralSource: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const quoteId = await createQuote({
@@ -241,31 +226,15 @@ When you have enough information, summarize what you've learned and offer to gen
         category: z.string().optional(),
         collection: z.string().optional(),
         finish: z.string().optional(),
-        productType: z.string().optional(),
-        brand: z.string().optional(),
         minPrice: z.number().optional(),
         maxPrice: z.number().optional(),
         search: z.string().optional(),
         featured: z.boolean().optional(),
-        sortBy: z.enum(['price-asc', 'price-desc', 'name-asc', 'name-desc', 'newest']).optional(),
-        page: z.number().min(1).default(1),
-        pageSize: z.number().min(1).max(100).default(24),
       }).optional())
       .query(async ({ input }) => {
         const db = await getDb();
         if (!db) throw new Error('Database not available');
         const conditions = [];
-        
-        // Filter out discontinued products by default (check both name and description)
-        conditions.push(
-          and(
-            not(like(products.name, '%DISCONTINUED%')),
-            or(
-              isNull(products.description),
-              not(like(products.description, '%DISCONTINUED%'))
-            )
-          )
-        );
         
         if (input?.category) {
           conditions.push(eq(products.category, input.category));
@@ -276,25 +245,18 @@ When you have enough information, summarize what you've learned and offer to gen
         if (input?.finish) {
           conditions.push(eq(products.finish, input.finish));
         }
-        if (input?.productType) {
-          conditions.push(eq(products.productType, input.productType));
-        }
-        if (input?.brand) {
-          conditions.push(eq(products.brand, input.brand));
-        }
         if (input?.minPrice !== undefined) {
-          conditions.push(sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) >= ${input.minPrice}`);
+          conditions.push(sql`${products.retailPrice} >= ${input.minPrice}`);
         }
         if (input?.maxPrice !== undefined) {
-          conditions.push(sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) <= ${input.maxPrice}`);
+          conditions.push(sql`${products.retailPrice} <= ${input.maxPrice}`);
         }
         if (input?.search) {
           conditions.push(
             or(
               like(products.name, `%${input.search}%`),
               like(products.description, `%${input.search}%`),
-              like(products.sku, `%${input.search}%`),
-              like(products.collection, `%${input.search}%`)
+              like(products.sku, `%${input.search}%`)
             )
           );
         }
@@ -302,55 +264,11 @@ When you have enough information, summarize what you've learned and offer to gen
           conditions.push(eq(products.featured, 'yes'));
         }
         
-        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+        const query = conditions.length > 0 
+          ? db.select().from(products).where(and(...conditions))
+          : db.select().from(products);
         
-        // Get total count
-        const countResult = await db.select({ count: sql<number>`count(*)` })
-          .from(products)
-          .where(whereClause);
-        const totalCount = countResult[0]?.count || 0;
-        
-        // Build query with sorting
-        let orderClause;
-        switch (input?.sortBy) {
-          case 'price-asc':
-            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) ASC`;
-            break;
-          case 'price-desc':
-            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) DESC`;
-            break;
-          case 'name-asc':
-            orderClause = sql`${products.name} ASC`;
-            break;
-          case 'name-desc':
-            orderClause = sql`${products.name} DESC`;
-            break;
-          case 'newest':
-            orderClause = sql`${products.createdAt} DESC`;
-            break;
-          default:
-            orderClause = sql`${products.id} ASC`;
-        }
-        
-        const page = input?.page || 1;
-        const pageSize = input?.pageSize || 24;
-        const offset = (page - 1) * pageSize;
-        
-        const productsList = await db.select().from(products)
-          .where(whereClause)
-          .orderBy(orderClause)
-          .limit(pageSize)
-          .offset(offset);
-        
-        return {
-          products: productsList,
-          pagination: {
-            page,
-            pageSize,
-            totalCount,
-            totalPages: Math.ceil(totalCount / pageSize),
-          },
-        };
+        return await query;
       }),
     
     getProductById: publicProcedure
@@ -376,291 +294,28 @@ When you have enough information, summarize what you've learned and offer to gen
         const db = await getDb();
         if (!db) throw new Error('Database not available');
         
-        // Base condition: exclude discontinued products from all filter counts
-        const notDiscontinued = and(
-          not(like(products.name, '%DISCONTINUED%')),
-          or(
-            isNull(products.description),
-            not(like(products.description, '%DISCONTINUED%'))
-          )
-        );
-        
-        // Get unique collections with counts
-        const collections = await db.select({ 
-          collection: products.collection,
-          count: sql<number>`count(*)` 
-        })
+        // Get unique collections
+        const collections = await db.select({ collection: products.collection })
           .from(products)
-          .where(and(not(isNull(products.collection)), notDiscontinued))
-          .groupBy(products.collection)
-          .orderBy(sql`count(*) DESC`);
+          .where(not(isNull(products.collection)))
+          .groupBy(products.collection);
         
-        // Get unique finishes with counts
-        const finishes = await db.select({ 
-          finish: products.finish,
-          count: sql<number>`count(*)` 
-        })
+        // Get unique finishes
+        const finishes = await db.select({ finish: products.finish })
           .from(products)
-          .where(and(not(isNull(products.finish)), notDiscontinued))
-          .groupBy(products.finish)
-          .orderBy(sql`count(*) DESC`);
+          .where(not(isNull(products.finish)))
+          .groupBy(products.finish);
         
-        // Get unique categories with counts
-        const categories = await db.select({ 
-          category: products.category,
-          count: sql<number>`count(*)` 
-        })
+        // Get unique categories
+        const categories = await db.select({ category: products.category })
           .from(products)
-          .where(and(not(isNull(products.category)), notDiscontinued))
-          .groupBy(products.category)
-          .orderBy(sql`count(*) DESC`);
-        
-        // Get unique product types with counts
-        const productTypes = await db.select({ 
-          productType: products.productType,
-          count: sql<number>`count(*)` 
-        })
-          .from(products)
-          .where(and(not(isNull(products.productType)), notDiscontinued))
-          .groupBy(products.productType)
-          .orderBy(sql`count(*) DESC`);
-        
-        // Get unique brands with counts
-        const brands = await db.select({ 
-          brand: products.brand,
-          count: sql<number>`count(*)` 
-        })
-          .from(products)
-          .where(and(not(isNull(products.brand)), notDiscontinued))
-          .groupBy(products.brand)
-          .orderBy(sql`count(*) DESC`);
-        
-        // Get price range
-        const priceRange = await db.select({
-          minPrice: sql<number>`MIN(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
-          maxPrice: sql<number>`MAX(CAST(${products.retailPrice} AS DECIMAL(10,2)))`,
-        }).from(products).where(notDiscontinued);
+          .where(not(isNull(products.category)))
+          .groupBy(products.category);
         
         return {
-          collections: collections.map((c: any) => ({ name: c.collection, count: c.count })).filter((c: any) => c.name),
-          finishes: finishes.map((f: any) => ({ name: f.finish, count: f.count })).filter((f: any) => f.name),
-          categories: categories.map((c: any) => ({ name: c.category, count: c.count })).filter((c: any) => c.name),
-          productTypes: productTypes.map((t: any) => ({ name: t.productType, count: t.count })).filter((t: any) => t.name),
-          brands: brands.map((b: any) => ({ name: b.brand, count: b.count })).filter((b: any) => b.name),
-          priceRange: {
-            min: priceRange[0]?.minPrice != null ? Number(priceRange[0].minPrice) : 0,
-            max: priceRange[0]?.maxPrice != null ? Number(priceRange[0].maxPrice) : 1000,
-          },
-        };
-      }),
-
-    // Get products grouped by base style name with finish variants
-    getGroupedProducts: publicProcedure
-      .input(z.object({
-        collection: z.string().optional(),
-        finish: z.string().optional(),
-        productType: z.string().optional(),
-        search: z.string().optional(),
-        sortBy: z.enum(['price-asc', 'price-desc', 'name-asc', 'name-desc', 'newest']).optional(),
-        page: z.number().min(1).default(1),
-        pageSize: z.number().min(1).max(100).default(24),
-      }).optional())
-      .query(async ({ input }) => {
-        const db = await getDb();
-        if (!db) throw new Error('Database not available');
-        const conditions = [];
-        
-        // Filter out discontinued products (check both name and description)
-        conditions.push(
-          and(
-            not(like(products.name, '%DISCONTINUED%')),
-            or(
-              isNull(products.description),
-              not(like(products.description, '%DISCONTINUED%'))
-            )
-          )
-        );
-        
-        // Filter: must have a valid retail price
-        conditions.push(
-          not(isNull(products.retailPrice))
-        );
-        
-        if (input?.collection) {
-          conditions.push(eq(products.collection, input.collection));
-        }
-        if (input?.finish) {
-          conditions.push(eq(products.finish, input.finish));
-        }
-        if (input?.productType) {
-          conditions.push(eq(products.productType, input.productType));
-        }
-        if (input?.search) {
-          conditions.push(
-            or(
-              like(products.name, `%${input.search}%`),
-              like(products.description, `%${input.search}%`),
-              like(products.sku, `%${input.search}%`),
-              like(products.collection, `%${input.search}%`)
-            )
-          );
-        }
-        
-        const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
-        
-        // Build query with sorting
-        let orderClause;
-        switch (input?.sortBy) {
-          case 'price-asc':
-            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) ASC`;
-            break;
-          case 'price-desc':
-            orderClause = sql`CAST(${products.retailPrice} AS DECIMAL(10,2)) DESC`;
-            break;
-          case 'name-asc':
-            orderClause = sql`${products.name} ASC`;
-            break;
-          case 'name-desc':
-            orderClause = sql`${products.name} DESC`;
-            break;
-          case 'newest':
-            orderClause = sql`${products.createdAt} DESC`;
-            break;
-          default:
-            orderClause = sql`${products.name} ASC`;
-        }
-        
-        // Fetch ALL matching products (we group client-side for simplicity)
-        // But limit to a reasonable amount to avoid memory issues
-        const allProducts = await db.select().from(products)
-          .where(whereClause)
-          .orderBy(orderClause)
-          .limit(5000);
-        
-        // Group products by base style name
-        // The name field may include finish suffix like "Allendale Knob 1 1/4\" - Ash Gray"
-        // We strip the finish suffix to get the base name
-        const FINISH_NAMES = [
-          'Antique Copper', 'Ash Gray', 'Aluminum', 'Brass Antique', 'Black Iron',
-          'Flat Black', 'Black Nickel', 'Brass', 'Brushed Satin Nickel', 'Coal Black',
-          'Cast Iron', 'Dark Antique Brass', 'German Bronze', 'Honey Bronze', 'Light Bronze',
-          'Medium Bronze', 'Mahogany Bronze', 'Old English Copper', 'Oil Rubbed Bronze',
-          'Oil Rubbed Bronze 2', 'Patina Antique Brass', 'Patina Rouge', 'Polished Brass',
-          'Polished Chrome', 'Polished Nickel', 'Brushed Stainless Steel',
-          'Polished Stainless Steel', 'Pewter', 'Pewter Antique', 'Pewter Light',
-          'Rust', 'Sable', 'Silicon Bronze Light', 'Stainless Steel', 'Tuscan Bronze',
-          'Umbrio', 'White', 'Flat Black and Honey Bronze', 'Honey Bronze and Flat Black',
-          'Flat Black and Pewter Antique', 'Pewter Antique and Flat Black',
-        ];
-        
-        function getBaseName(productName: string): string {
-          let name = productName;
-          
-          // First, strip "w/ [Finish] Base" or "w/ [Finish] Shell" patterns
-          // e.g. 'Amber Crystal Knob 1 1/8" w/ Brushed Satin Nickel Base'
-          // e.g. 'Black Crystal Center Knob 1 1/16" w/ Brushed Satin Nickel Shell'
-          // Also handles 'w/ Oil Rubbed Bronze Base', 'w/ Polished Chrome Base', etc.
-          const wBaseMatch = name.match(/^(.+?)\s+w\/\s+.+?\s+(?:Base|Shell)\s*$/);
-          if (wBaseMatch) {
-            return wBaseMatch[1].trim();
-          }
-          
-          // Try to strip " - FinishName" from the end
-          for (const fn of FINISH_NAMES) {
-            const suffix = ` - ${fn}`;
-            if (name.endsWith(suffix)) {
-              return name.slice(0, -suffix.length).trim();
-            }
-          }
-          // Also try splitting at the last " - "
-          const lastDash = name.lastIndexOf(' - ');
-          if (lastDash > 0) {
-            const possibleFinish = name.slice(lastDash + 3).trim();
-            // Check if the part after " - " looks like a finish (not a size)
-            if (possibleFinish.length > 2 && !possibleFinish.match(/^\d/)) {
-              return name.slice(0, lastDash).trim();
-            }
-          }
-          return name.trim();
-        }
-        
-        const groups = new Map<string, any[]>();
-        for (const p of allProducts) {
-          const baseName = getBaseName(p.name);
-          if (!groups.has(baseName)) {
-            groups.set(baseName, []);
-          }
-          groups.get(baseName)!.push(p);
-        }
-        
-        // Convert to array and sort
-        let groupedArray = Array.from(groups.entries()).map(([baseName, variants]) => {
-          // Sort variants by finish name for consistent ordering
-          variants.sort((a: any, b: any) => (a.finish || '').localeCompare(b.finish || ''));
-          const primary = variants[0];
-          return {
-            baseName,
-            collection: primary.collection,
-            productType: primary.productType,
-            brand: primary.brand,
-            variants: variants.map((v: any) => ({
-              id: v.id,
-              sku: v.sku,
-              name: v.name,
-              finish: v.finish,
-              finishCode: v.finishCode,
-              retailPrice: v.retailPrice,
-              listPrice: v.listPrice,
-              imageUrl: v.imageUrl,
-              centerToCenter: v.centerToCenter,
-              dimensions: v.dimensions,
-              length: v.length,
-              width: v.width,
-              projection: v.projection,
-              material: v.material,
-            })),
-          };
-        });
-        
-        // Sort groups
-        switch (input?.sortBy) {
-          case 'price-asc':
-            groupedArray.sort((a, b) => {
-              const pa = parseFloat(a.variants[0]?.retailPrice || '0');
-              const pb = parseFloat(b.variants[0]?.retailPrice || '0');
-              return pa - pb;
-            });
-            break;
-          case 'price-desc':
-            groupedArray.sort((a, b) => {
-              const pa = parseFloat(a.variants[0]?.retailPrice || '0');
-              const pb = parseFloat(b.variants[0]?.retailPrice || '0');
-              return pb - pa;
-            });
-            break;
-          case 'name-desc':
-            groupedArray.sort((a, b) => b.baseName.localeCompare(a.baseName));
-            break;
-          case 'name-asc':
-          default:
-            groupedArray.sort((a, b) => a.baseName.localeCompare(b.baseName));
-            break;
-        }
-        
-        const totalGroups = groupedArray.length;
-        const page = input?.page || 1;
-        const pageSize = input?.pageSize || 24;
-        const offset = (page - 1) * pageSize;
-        const pagedGroups = groupedArray.slice(offset, offset + pageSize);
-        
-        return {
-          groups: pagedGroups,
-          pagination: {
-            page,
-            pageSize,
-            totalCount: totalGroups,
-            totalPages: Math.ceil(totalGroups / pageSize),
-          },
+          collections: collections.map((c: any) => c.collection).filter(Boolean),
+          finishes: finishes.map((f: any) => f.finish).filter(Boolean),
+          categories: categories.map((c: any) => c.category).filter(Boolean),
         };
       }),
   }),
@@ -841,14 +496,11 @@ When you have enough information, summarize what you've learned and offer to gen
 
         const conditions = [];
         
-        // Filter out discontinued products (check both name and description)
+        // Filter out discontinued products
         conditions.push(
-          and(
-            not(like(products.name, '%DISCONTINUED%')),
-            or(
-              isNull(products.description),
-              not(like(products.description, '%DISCONTINUED%'))
-            )
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
           )
         );
         
@@ -968,14 +620,11 @@ When you have enough information, summarize what you've learned and offer to gen
             break;
         }
 
-        // Add filter to exclude discontinued products (check both name and description)
+        // Add filter to exclude discontinued products
         conditions.push(
-          and(
-            not(like(products.name, '%DISCONTINUED%')),
-            or(
-              isNull(products.description),
-              not(like(products.description, '%DISCONTINUED%'))
-            )
+          or(
+            isNull(products.description),
+            not(like(products.description, '%DISCONTINUED%'))
           )
         );
 
@@ -1150,258 +799,6 @@ When you have enough information, summarize what you've learned and offer to gen
 
   // Checkout
   checkout: router({
-    // Create Stripe Checkout Session - redirects user to Stripe's hosted checkout page
-    createCheckoutSession: publicProcedure
-      .input(z.object({
-        sessionId: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new Error('Database connection failed');
-
-        const userId = ctx.user?.id;
-        const sessionId = input.sessionId;
-
-        // Get cart items with full details
-        const items = await db.select({
-          id: cartItems.id,
-          productId: cartItems.productId,
-          quantity: cartItems.quantity,
-          productName: products.name,
-          productSku: products.sku,
-          retailPrice: products.retailPrice,
-          imageUrl: products.imageUrl,
-        })
-          .from(cartItems)
-          .leftJoin(products, eq(cartItems.productId, products.id))
-          .where(
-            userId
-              ? eq(cartItems.userId, userId)
-              : sessionId
-                ? eq(cartItems.sessionId, sessionId)
-                : sql`1=0`
-          );
-
-        if (items.length === 0) {
-          throw new Error('Cart is empty');
-        }
-
-        // Generate order number for tracking
-        const orderNumber = `CRT-${Date.now()}-${Math.random().toString(36).substr(2, 6).toUpperCase()}`;
-
-        // Build line items for Stripe Checkout
-        const lineItems = items.map((item) => {
-          // Build per-SKU image URL for Stripe product display
-          let imageUrl: string | null = null;
-          if (item.productSku && item.productSku.length >= 2) {
-            imageUrl = `https://www.topknobs.com/media/resized/490/${item.productSku[0]}/${item.productSku[1]}/${item.productSku}_0.jpg`;
-          }
-          if (!imageUrl && item.imageUrl) {
-            imageUrl = item.imageUrl;
-          }
-          return {
-            name: item.productName || 'Hardware Product',
-            sku: item.productSku || '',
-            unitPrice: parseFloat(item.retailPrice || '0'),
-            quantity: item.quantity,
-            imageUrl,
-          };
-        });
-
-        // Determine base URL for success/cancel redirects
-        const baseUrl = ctx.req.headers.origin
-          || ctx.req.headers.referer?.replace(/\/[^/]*$/, '')
-          || 'https://critzerscabinets.com';
-
-        const session = await createCheckoutSession(
-          lineItems,
-          `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-          `${baseUrl}/cart`,
-          {
-            orderNumber,
-            cartSessionId: sessionId || '',
-            userId: userId?.toString() || '',
-          }
-        );
-
-        return {
-          url: session.url,
-          sessionId: session.id,
-          orderNumber,
-        };
-      }),
-
-    // Handle successful Stripe Checkout - creates order from completed session
-    handleCheckoutSuccess: publicProcedure
-      .input(z.object({
-        stripeSessionId: z.string(),
-        cartSessionId: z.string().optional(),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        const db = await getDb();
-        if (!db) throw new Error('Database connection failed');
-
-        // Retrieve the Stripe Checkout Session
-        const checkoutSession = await getCheckoutSession(input.stripeSessionId);
-
-        if (checkoutSession.payment_status !== 'paid') {
-          throw new Error('Payment not completed');
-        }
-
-        const orderNumber = checkoutSession.metadata?.orderNumber || `CRT-${Date.now()}`;
-        const userId = ctx.user?.id;
-        const cartSessionId = input.cartSessionId || checkoutSession.metadata?.cartSessionId;
-
-        // Check if order already exists (idempotency)
-        const existingOrder = await db.select()
-          .from(orders)
-          .where(eq(orders.orderNumber, orderNumber))
-          .limit(1);
-
-        if (existingOrder.length > 0) {
-          return {
-            success: true,
-            orderId: existingOrder[0].id,
-            orderNumber: existingOrder[0].orderNumber,
-            alreadyProcessed: true,
-          };
-        }
-
-        // Get cart items
-        const items = await db.select({
-          id: cartItems.id,
-          productId: cartItems.productId,
-          quantity: cartItems.quantity,
-          productName: products.name,
-          productSku: products.sku,
-          retailPrice: products.retailPrice,
-        })
-          .from(cartItems)
-          .leftJoin(products, eq(cartItems.productId, products.id))
-          .where(
-            userId
-              ? eq(cartItems.userId, userId)
-              : cartSessionId
-                ? eq(cartItems.sessionId, cartSessionId)
-                : sql`1=0`
-          );
-
-        if (items.length === 0) {
-          // Cart may have been cleared already
-          return {
-            success: true,
-            orderId: 0,
-            orderNumber,
-            alreadyProcessed: true,
-          };
-        }
-
-        // Extract customer and shipping info from Stripe session
-        const customerEmail = checkoutSession.customer_details?.email || '';
-        const customerName = checkoutSession.customer_details?.name || '';
-        const shippingDetails = (checkoutSession as any).shipping_details;
-        const shippingAddress = shippingDetails?.address;
-
-        // Calculate subtotal from cart
-        const subtotal = items.reduce((sum, item) => {
-          const price = parseFloat(item.retailPrice || '0');
-          return sum + (price * item.quantity);
-        }, 0);
-
-        const totalAmount = (checkoutSession.amount_total || 0) / 100;
-        const shippingCost = (checkoutSession.shipping_cost?.amount_total || 0) / 100;
-        const taxAmount = totalAmount - subtotal - shippingCost;
-
-        // Create order
-        const [order] = await db.insert(orders).values({
-          userId: userId || null,
-          sessionId: cartSessionId || null,
-          orderNumber,
-          customerName,
-          customerEmail,
-          customerPhone: checkoutSession.customer_details?.phone || null,
-          shippingAddress: shippingAddress
-            ? `${shippingAddress.line1}${shippingAddress.line2 ? ', ' + shippingAddress.line2 : ''}`
-            : null,
-          shippingCity: shippingAddress?.city || null,
-          shippingState: shippingAddress?.state || null,
-          shippingZip: shippingAddress?.postal_code || null,
-          shippingMethod: 'Stripe Checkout',
-          subtotal: subtotal.toFixed(2),
-          shipping: shippingCost.toFixed(2),
-          tax: taxAmount > 0 ? taxAmount.toFixed(2) : '0.00',
-          total: totalAmount.toFixed(2),
-          status: 'pending',
-          paymentStatus: 'paid',
-          stripePaymentIntentId: typeof checkoutSession.payment_intent === 'string'
-            ? checkoutSession.payment_intent
-            : checkoutSession.payment_intent?.id || null,
-        });
-
-        const orderId = order.insertId;
-
-        // Create order items
-        for (const item of items) {
-          const price = parseFloat(item.retailPrice || '0');
-          const itemSubtotal = price * item.quantity;
-
-          await db.insert(orderItems).values({
-            orderId: Number(orderId),
-            productId: item.productId,
-            sku: item.productSku || '',
-            productName: item.productName || '',
-            quantity: item.quantity,
-            price: price.toFixed(2),
-            subtotal: itemSubtotal.toFixed(2),
-          });
-        }
-
-        // Clear cart
-        await db.delete(cartItems).where(
-          userId
-            ? eq(cartItems.userId, userId)
-            : cartSessionId
-              ? eq(cartItems.sessionId, cartSessionId)
-              : sql`1=0`
-        );
-
-        // Send order confirmation emails
-        const orderEmailData = {
-          orderNumber,
-          customerName,
-          customerEmail,
-          orderItems: items.map(item => ({
-            name: item.productName || '',
-            sku: item.productSku || '',
-            quantity: item.quantity,
-            price: (parseFloat(item.retailPrice || '0')).toFixed(2),
-            subtotal: (parseFloat(item.retailPrice || '0') * item.quantity).toFixed(2),
-          })),
-          subtotal: subtotal.toFixed(2),
-          shipping: shippingCost.toFixed(2),
-          tax: taxAmount > 0 ? taxAmount.toFixed(2) : '0.00',
-          total: totalAmount.toFixed(2),
-          shippingAddress: shippingAddress
-            ? `${shippingAddress.line1}${shippingAddress.line2 ? ', ' + shippingAddress.line2 : ''}\n${shippingAddress.city}, ${shippingAddress.state} ${shippingAddress.postal_code}`
-            : 'N/A',
-          shippingMethod: 'Stripe Checkout',
-        };
-
-        sendOrderConfirmation(orderEmailData).catch(err => {
-          console.error('Failed to send order confirmation:', err);
-        });
-        sendAdminOrderNotification(orderEmailData).catch(err => {
-          console.error('Failed to send admin notification:', err);
-        });
-
-        return {
-          success: true,
-          orderId: Number(orderId),
-          orderNumber,
-          alreadyProcessed: false,
-        };
-      }),
-
     // Calculate cart totals with shipping and tax
     calculateTotals: publicProcedure
       .input(z.object({
@@ -1874,161 +1271,63 @@ When you have enough information, summarize what you've learned and offer to gen
 
         const fileBuffer = await fs.readFile(filePath);
         const workbook = xlsx.read(fileBuffer, { type: 'buffer' });
-        
-        // Finish code to full name mapping
-        const FINISH_MAP: Record<string, string> = {
-          'AC': 'Antique Copper', 'AG': 'Ash Gray', 'ALU': 'Aluminum',
-          'BA': 'Brass Antique', 'BI': 'Black Iron', 'BLK': 'Flat Black',
-          'BNI': 'Black Nickel', 'BR': 'Brass', 'BSN': 'Brushed Satin Nickel',
-          'CB': 'Coal Black', 'CI': 'Cast Iron', 'DAB': 'Dark Antique Brass',
-          'GBZ': 'German Bronze', 'HB': 'Honey Bronze', 'LB': 'Light Bronze',
-          'MB': 'Medium Bronze', 'MCB': 'Mahogany Bronze', 'OEC': 'Old English Copper',
-          'ORB': 'Oil Rubbed Bronze', 'ORB2': 'Oil Rubbed Bronze 2',
-          'PAB': 'Patina Antique Brass', 'PAR': 'Patina Rouge',
-          'PB': 'Polished Brass', 'PC': 'Polished Chrome',
-          'PN': 'Polished Nickel', 'PS': 'Brushed Stainless Steel',
-          'PSS': 'Polished Stainless Steel', 'PT': 'Pewter',
-          'PTA': 'Pewter Antique', 'PTL': 'Pewter Light',
-          'RST': 'Rust', 'SAB': 'Sable', 'SBL': 'Silicon Bronze Light',
-          'SS': 'Stainless Steel', 'TB': 'Tuscan Bronze', 'UM': 'Umbrio',
-          'WHT': 'White', 'BLK/HB': 'Flat Black and Honey Bronze',
-          'HB/BLK': 'Honey Bronze and Flat Black',
-          'BLK/PTA': 'Flat Black and Pewter Antique',
-          'PTA/BLK': 'Pewter Antique and Flat Black',
-        };
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const data: any[] = xlsx.utils.sheet_to_json(worksheet);
 
-        // Helper to determine product type from description
-        const getProductType = (desc: string): string => {
-          const d = desc.toLowerCase();
-          if (d.includes('knob')) return 'Knob';
-          if (d.includes('pull')) return 'Pull';
-          if (d.includes('handle')) return 'Handle';
-          if (d.includes('hook')) return 'Hook';
-          if (d.includes('backplate')) return 'Backplate';
-          if (d.includes('strike plate')) return 'Strike Plate';
-          if (d.includes('ring')) return 'Towel Ring';
-          if (d.includes('bar')) return 'Towel Bar';
-          if (d.includes('tissue')) return 'Tissue Holder';
-          return 'Hardware';
-        };
+        console.log(`Found ${data.length} rows in Excel file`);
+        if (data.length > 0) {
+          console.log('Available columns:', Object.keys(data[0]));
+        }
 
         let imported = 0;
         let skipped = 0;
         let discontinued = 0;
         let noPricing = 0;
 
-        // Process Knobs_Pulls sheet (main sheet)
-        const mainSheet = workbook.Sheets[workbook.SheetNames[0]];
-        const mainData: any[] = xlsx.utils.sheet_to_json(mainSheet);
-        console.log(`Found ${mainData.length} rows in main sheet`);
+        for (const row of data) {
+          // Try multiple column name variations
+          const sku = row['Item Number'] || row['SKU'] || row['Item #'] || row['Part Number'] || '';
+          const name = row['Item Description'] || row['Description'] || row['Product Name'] || '';
+          const retailPrice = row['Retail Price'] || row['List Price'] || row['Price'] || null;
 
-        for (const row of mainData) {
-          const sku = row['Part Number'] || row['Item Number'] || row['SKU'] || '';
-          const description = row['Description'] || row['Item Description'] || '';
-          const finishCode = row['Finish'] || '';
-          const collection = row['Collection'] || '';
-          const listPrice = row['List Price - January 2026'] || row['Retail Price'] || row['List Price'] || null;
-          const length = row['Length'] || null;
-          const width = row['Width'] || null;
-          const projection = row['Projection'] || null;
-          const centerToCenter = row['Center to Center (c-c)'] || row['Center to Center'] || null;
-          const baseDiameter = row['Base Diameter'] || null;
-          const weight = row['Weight'] || null;
-          const material = row['Base Material'] || null;
-          const upc = row['UPC'] || null;
+          // Skip if no SKU or name
+          if (!sku && !name) {
+            skipped++;
+            continue;
+          }
 
-          if (!sku && !description) { skipped++; continue; }
-
-          // Filter out discontinued products
-          const descStr = String(description || '');
-          if (descStr.toUpperCase().includes('DISCONTINUED') ||
-              descStr.toUpperCase().includes('LIMITED AVAILABILITY')) {
+          // FILTER OUT DISCONTINUED PRODUCTS
+          if (name && (
+            name.toUpperCase().includes('DISCONTINUED') ||
+            name.toUpperCase().includes('DEMO') ||
+            name.toUpperCase().includes('LIMITED AVAILABILITY')
+          )) {
             discontinued++;
             continue;
           }
 
-          // Filter out products with no valid pricing
-          const priceNum = listPrice ? parseFloat(String(listPrice).replace(/[$,]/g, '')) : 0;
-          if (!priceNum || priceNum <= 0) { noPricing++; continue; }
-
-          // Resolve finish name
-          const finishCodeClean = String(finishCode).trim();
-          const finishName = FINISH_MAP[finishCodeClean] || finishCodeClean;
-
-          // Determine product type
-          const productType = getProductType(descStr);
-
-          // Build dimensions string
-          const dims = [length, width, projection].filter(Boolean).join(' x ');
+          // FILTER OUT PRODUCTS WITH NO VALID PRICING
+          const priceNum = retailPrice ? parseFloat(String(retailPrice).replace(/[$,]/g, '')) : 0;
+          if (!priceNum || priceNum <= 0) {
+            noPricing++;
+            continue;
+          }
 
           try {
             await db.insert(products).values({
               sku: String(sku).trim(),
-              name: descStr.split(' - ')[0]?.trim() || String(sku).trim(),
-              description: descStr.trim(),
-              brand: 'Top Knobs',
-              collection: String(collection).trim() || null,
-              finish: finishName || null,
-              finishCode: finishCodeClean || null,
-              category: 'Hardware',
-              productType,
-              listPrice: String(priceNum.toFixed(2)),
+              name: String(name).trim() || String(sku).trim(),
+              collection: row['Collection'] || row['Series'] || null,
+              finish: row['Finish'] || row['Color'] || null,
               retailPrice: String(priceNum.toFixed(2)),
-              dimensions: dims || null,
-              length: length ? String(length).trim() : null,
-              width: width ? String(width).trim() : null,
-              projection: projection ? String(projection).trim() : null,
-              centerToCenter: centerToCenter ? String(centerToCenter).trim() : null,
-              baseDiameter: baseDiameter ? String(baseDiameter).trim() : null,
-              material: material ? String(material).trim() : null,
-              weight: weight ? String(weight) : null,
-              upc: upc ? String(upc) : null,
-              inStock: 'yes',
+              category: row['Category'] || 'Hardware',
+              inStock: 'yes', // Default to in stock, can be updated later
             });
             imported++;
           } catch (error) {
+            // Skip duplicates or errors
             skipped++;
-          }
-        }
-
-        // Process Hooks sheet
-        if (workbook.SheetNames.includes('Hooks January 2026')) {
-          const hooksSheet = workbook.Sheets['Hooks January 2026'];
-          const hooksData: any[] = xlsx.utils.sheet_to_json(hooksSheet);
-          for (const row of hooksData) {
-            const sku = row['Part Number'] || '';
-            const description = row['Description'] || '';
-            const finishCode = row['Finish'] || '';
-            const listPrice = row['List Price - January 2026'] || null;
-            if (!sku || !description) continue;
-            const descStr = String(description);
-            if (descStr.toUpperCase().includes('DISCONTINUED')) continue;
-            const priceNum = listPrice ? parseFloat(String(listPrice).replace(/[$,]/g, '')) : 0;
-            if (!priceNum || priceNum <= 0) continue;
-            const finishCodeClean = String(finishCode).trim();
-            const finishName = FINISH_MAP[finishCodeClean] || finishCodeClean;
-            try {
-              await db.insert(products).values({
-                sku: String(sku).trim(),
-                name: descStr.split(' - ')[0]?.trim() || String(sku).trim(),
-                description: descStr.trim(),
-                brand: 'Top Knobs',
-                finish: finishName || null,
-                finishCode: finishCodeClean || null,
-                category: 'Hardware',
-                productType: 'Hook',
-                listPrice: String(priceNum.toFixed(2)),
-                retailPrice: String(priceNum.toFixed(2)),
-                length: row['Length'] ? String(row['Length']).trim() : null,
-                width: row['Width'] ? String(row['Width']).trim() : null,
-                projection: row['Projection'] ? String(row['Projection']).trim() : null,
-                material: row['Base Material'] ? String(row['Base Material']).trim() : null,
-                weight: row['Weight'] ? String(row['Weight']) : null,
-                upc: row['UPC'] ? String(row['UPC']) : null,
-                inStock: 'yes',
-              });
-              imported++;
-            } catch (error) { skipped++; }
           }
         }
 
@@ -2037,14 +1336,14 @@ When you have enough information, summarize what you've learned and offer to gen
         console.log(`  - Skipped (discontinued): ${discontinued}`);
         console.log(`  - Skipped (no pricing): ${noPricing}`);
         console.log(`  - Skipped (other): ${skipped}`);
-        console.log(`  - Total processed: ${mainData.length}`);
+        console.log(`  - Total processed: ${data.length}`);
 
         return {
           count: imported,
           skipped: skipped + discontinued + noPricing,
           discontinued,
           noPricing,
-          total: mainData.length
+          total: data.length
         };
       }),
 

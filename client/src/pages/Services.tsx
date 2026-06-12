@@ -13,7 +13,7 @@ export default function Services() {
       <section className="relative bg-gradient-to-r from-primary/10 to-primary/5 py-16">
         <div 
           className="absolute inset-0 bg-cover bg-center opacity-10"
-          style={{ backgroundImage: "url('/images/gallery/KL9ldeZDUcbT.jpg')" }}
+          style={{ backgroundImage: "url('/manus-storage/KL9ldeZDUcbT_5b827923.jpg')" }}
         />
         <div className="container relative z-10">
           <div className="max-w-3xl mx-auto text-center space-y-4">
@@ -32,7 +32,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-design.jpg" alt="Professional Design" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-design_71c95202.jpg" alt="Professional Design" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Professional Design</CardTitle>
                 <CardDescription>Expert kitchen & bath design services</CardDescription>
@@ -51,7 +51,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-cabinetry.jpg" alt="Custom Cabinetry" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-cabinetry_858e08bd.jpg" alt="Custom Cabinetry" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Custom Cabinetry</CardTitle>
                 <CardDescription>Quality cabinets built to your specifications</CardDescription>
@@ -70,7 +70,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-countertop.jpg" alt="Countertop Fabrication" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-countertop_52b5e928.jpg" alt="Countertop Fabrication" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Countertop Fabrication</CardTitle>
                 <CardDescription>Custom countertops in premium materials</CardDescription>
@@ -89,7 +89,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-installation.jpg" alt="Professional Installation" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-installation_9eb8723d.jpg" alt="Professional Installation" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Professional Installation</CardTitle>
                 <CardDescription>Expert installation by experienced craftsmen</CardDescription>
@@ -108,7 +108,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-delivery.jpg" alt="Delivery & Logistics" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-delivery_10a3c6e3.jpg" alt="Delivery & Logistics" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Delivery & Logistics</CardTitle>
                 <CardDescription>Careful handling and timely delivery</CardDescription>
@@ -127,7 +127,7 @@ export default function Services() {
             <Card>
               <CardHeader>
                 <div className="w-full h-48 overflow-hidden rounded-lg mb-4">
-                  <img src="/service-hardware.jpg" alt="Hardware Selection" className="w-full h-full object-cover" />
+                  <img src="/manus-storage/service-hardware_79906571.jpg" alt="Hardware Selection" className="w-full h-full object-cover" />
                 </div>
                 <CardTitle>Hardware Selection</CardTitle>
                 <CardDescription>Perfect finishing touches for your project</CardDescription>

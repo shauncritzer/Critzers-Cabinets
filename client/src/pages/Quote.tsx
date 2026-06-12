@@ -6,13 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
-import { Loader2, CheckCircle, Calculator } from "lucide-react";
+import { Loader2, CheckCircle, Calculator, Lightbulb } from "lucide-react";
 import { toast } from "sonner";
 import Navigation from "@/components/Navigation";
-import { useLocation } from "wouter";
 
 export default function Quote() {
-  const [, setLocation] = useLocation();
   const [step, setStep] = useState(1);
   const [estimatedPrice, setEstimatedPrice] = useState<number | null>(null);
   const [projectData, setProjectData] = useState({
@@ -26,7 +24,7 @@ export default function Quote() {
     additionalNotes: "",
     // Educational questions
     currentCondition: "",
-    timeline: "",
+    projectTimeline: "",
     budgetRange: "",
     stylePreference: "",
     specialFeatures: "",
@@ -55,7 +53,6 @@ export default function Quote() {
     let basePrice = 0;
     const linearFeet = parseInt(projectData.linearFeet) || 0;
 
-    // Base price per linear foot based on door style
     const doorStylePrices: Record<string, number> = {
       "shaker": 350,
       "raised-panel": 450,
@@ -64,7 +61,6 @@ export default function Quote() {
       "glass-front": 500,
     };
 
-    // Wood species multiplier
     const woodMultipliers: Record<string, number> = {
       "oak": 1.0,
       "maple": 1.1,
@@ -74,7 +70,6 @@ export default function Quote() {
       "thermofoil": 0.8,
     };
 
-    // Countertop additions (per linear foot)
     const countertopPrices: Record<string, number> = {
       "laminate": 50,
       "granite": 100,
@@ -88,8 +83,6 @@ export default function Quote() {
     const countertopPrice = countertopPrices[projectData.countertopType] || 0;
 
     basePrice = (doorStylePrice * woodMultiplier * linearFeet) + (countertopPrice * linearFeet);
-
-    // Add 15% for hardware and installation
     basePrice = basePrice * 1.15;
 
     setEstimatedPrice(Math.round(basePrice));
@@ -97,7 +90,7 @@ export default function Quote() {
 
   const handleCalculate = () => {
     if (!projectData.linearFeet || !projectData.doorStyle || !projectData.woodSpecies) {
-      toast.error("Please fill in room type, door style, wood species, and linear feet to calculate estimate");
+      toast.error("Please fill in door style, wood species, and linear feet to calculate estimate");
       return;
     }
     calculateEstimate();
@@ -113,30 +106,14 @@ export default function Quote() {
     const conversationData = JSON.stringify({
       projectData,
       estimatedPrice,
+      contactInfo,
     });
 
     createQuote.mutate({
       customerName: contactInfo.name,
       customerEmail: contactInfo.email,
-      customerPhone: contactInfo.phone || undefined,
+      customerPhone: contactInfo.phone,
       conversationData,
-      // Pass all structured form fields directly for DB storage and email notification
-      roomType: projectData.roomType || undefined,
-      doorStyle: projectData.doorStyle || undefined,
-      woodSpecies: projectData.woodSpecies || undefined,
-      finish: projectData.finish || undefined,
-      countertopType: projectData.countertopType || undefined,
-      linearFeet: projectData.linearFeet || undefined,
-      dimensions: projectData.dimensions || undefined,
-      estimatedPrice: estimatedPrice || undefined,
-      projectDescription: projectData.additionalNotes || undefined,
-      // Educational qualification questions
-      currentCondition: projectData.currentCondition || undefined,
-      timeline: projectData.timeline || undefined,
-      budgetRange: projectData.budgetRange || undefined,
-      stylePreference: projectData.stylePreference || undefined,
-      specialFeatures: projectData.specialFeatures || undefined,
-      referralSource: projectData.referralSource || undefined,
     });
   };
 
@@ -165,9 +142,9 @@ export default function Quote() {
                   </div>
                 )}
                 <p className="text-sm text-muted-foreground">
-                  We've sent a confirmation email to <strong>{contactInfo.email}</strong>
+                  We've sent a confirmation to <strong>{contactInfo.email}</strong>
                 </p>
-                <Button onClick={() => setLocation("/")} className="mt-4">
+                <Button onClick={() => window.location.href = "/"} className="mt-4">
                   Return to Home
                 </Button>
               </div>
@@ -182,11 +159,11 @@ export default function Quote() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* Hero with Kitchen Background */}
-      <div 
+      {/* Hero */}
+      <div
         className="relative bg-cover bg-center py-12"
         style={{
-          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/images/gallery/7nAUkEFBXEaf.jpg')",
+          backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('/manus-storage/7nAUkEFBXEaf_785b0bb9.jpg')",
         }}
       >
         <div className="container text-center text-white">
@@ -200,300 +177,343 @@ export default function Quote() {
       <div className="container py-8">
         <div className="max-w-4xl mx-auto">
           {step === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Project Details</CardTitle>
-                <CardDescription>
-                  Tell us about your kitchen or bathroom project
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {/* Room Type */}
-                  <div className="space-y-2">
-                    <Label htmlFor="roomType">Room Type *</Label>
-                    <Select
-                      value={projectData.roomType}
-                      onValueChange={(value) => setProjectData({ ...projectData, roomType: value })}
-                    >
-                      <SelectTrigger id="roomType">
-                        <SelectValue placeholder="Select room type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="kitchen">Kitchen</SelectItem>
-                        <SelectItem value="bathroom">Bathroom</SelectItem>
-                        <SelectItem value="laundry">Laundry Room</SelectItem>
-                        <SelectItem value="mudroom">Mudroom</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <div className="space-y-6">
+              {/* Step 1: Project Details */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Project Details</CardTitle>
+                  <CardDescription>Tell us about your kitchen or bathroom project</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    {/* Room Type */}
+                    <div className="space-y-2">
+                      <Label htmlFor="roomType">Room Type *</Label>
+                      <Select
+                        value={projectData.roomType}
+                        onValueChange={(value) => setProjectData({ ...projectData, roomType: value })}
+                      >
+                        <SelectTrigger id="roomType">
+                          <SelectValue placeholder="Select room type" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="kitchen">Kitchen</SelectItem>
+                          <SelectItem value="bathroom">Bathroom</SelectItem>
+                          <SelectItem value="laundry">Laundry Room</SelectItem>
+                          <SelectItem value="mudroom">Mudroom</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Door Style */}
-                  <div className="space-y-2">
-                    <Label htmlFor="doorStyle">Door Style *</Label>
-                    <Select
-                      value={projectData.doorStyle}
-                      onValueChange={(value) => setProjectData({ ...projectData, doorStyle: value })}
-                    >
-                      <SelectTrigger id="doorStyle">
-                        <SelectValue placeholder="Select door style" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="shaker">Shaker</SelectItem>
-                        <SelectItem value="raised-panel">Raised Panel</SelectItem>
-                        <SelectItem value="flat-panel">Flat Panel / Slab</SelectItem>
-                        <SelectItem value="beadboard">Beadboard</SelectItem>
-                        <SelectItem value="glass-front">Glass Front</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Door Style */}
+                    <div className="space-y-2">
+                      <Label htmlFor="doorStyle">Door Style *</Label>
+                      <Select
+                        value={projectData.doorStyle}
+                        onValueChange={(value) => setProjectData({ ...projectData, doorStyle: value })}
+                      >
+                        <SelectTrigger id="doorStyle">
+                          <SelectValue placeholder="Select door style" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="shaker">Shaker</SelectItem>
+                          <SelectItem value="raised-panel">Raised Panel</SelectItem>
+                          <SelectItem value="flat-panel">Flat Panel / Slab</SelectItem>
+                          <SelectItem value="beadboard">Beadboard</SelectItem>
+                          <SelectItem value="glass-front">Glass Front</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Wood Species */}
-                  <div className="space-y-2">
-                    <Label htmlFor="woodSpecies">Wood Species / Material *</Label>
-                    <Select
-                      value={projectData.woodSpecies}
-                      onValueChange={(value) => setProjectData({ ...projectData, woodSpecies: value })}
-                    >
-                      <SelectTrigger id="woodSpecies">
-                        <SelectValue placeholder="Select wood species" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="oak">Oak</SelectItem>
-                        <SelectItem value="maple">Maple</SelectItem>
-                        <SelectItem value="cherry">Cherry</SelectItem>
-                        <SelectItem value="hickory">Hickory</SelectItem>
-                        <SelectItem value="birch">Birch</SelectItem>
-                        <SelectItem value="thermofoil">Thermofoil</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Wood Species */}
+                    <div className="space-y-2">
+                      <Label htmlFor="woodSpecies">Wood Species / Material *</Label>
+                      <Select
+                        value={projectData.woodSpecies}
+                        onValueChange={(value) => setProjectData({ ...projectData, woodSpecies: value })}
+                      >
+                        <SelectTrigger id="woodSpecies">
+                          <SelectValue placeholder="Select wood species" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="oak">Oak</SelectItem>
+                          <SelectItem value="maple">Maple</SelectItem>
+                          <SelectItem value="cherry">Cherry</SelectItem>
+                          <SelectItem value="hickory">Hickory</SelectItem>
+                          <SelectItem value="birch">Birch</SelectItem>
+                          <SelectItem value="thermofoil">Thermofoil</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Finish */}
-                  <div className="space-y-2">
-                    <Label htmlFor="finish">Finish</Label>
-                    <Select
-                      value={projectData.finish}
-                      onValueChange={(value) => setProjectData({ ...projectData, finish: value })}
-                    >
-                      <SelectTrigger id="finish">
-                        <SelectValue placeholder="Select finish" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="natural">Natural / Clear</SelectItem>
-                        <SelectItem value="stain">Stain</SelectItem>
-                        <SelectItem value="paint">Paint</SelectItem>
-                        <SelectItem value="glaze">Glaze</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Finish */}
+                    <div className="space-y-2">
+                      <Label htmlFor="finish">Finish</Label>
+                      <Select
+                        value={projectData.finish}
+                        onValueChange={(value) => setProjectData({ ...projectData, finish: value })}
+                      >
+                        <SelectTrigger id="finish">
+                          <SelectValue placeholder="Select finish" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="natural">Natural / Clear</SelectItem>
+                          <SelectItem value="stain">Stain</SelectItem>
+                          <SelectItem value="paint">Paint</SelectItem>
+                          <SelectItem value="glaze">Glaze</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Countertop Type */}
-                  <div className="space-y-2">
-                    <Label htmlFor="countertopType">Countertop Material</Label>
-                    <Select
-                      value={projectData.countertopType}
-                      onValueChange={(value) => setProjectData({ ...projectData, countertopType: value })}
-                    >
-                      <SelectTrigger id="countertopType">
-                        <SelectValue placeholder="Select countertop material" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="laminate">Laminate</SelectItem>
-                        <SelectItem value="granite">Granite</SelectItem>
-                        <SelectItem value="quartz">Quartz</SelectItem>
-                        <SelectItem value="marble">Marble</SelectItem>
-                        <SelectItem value="butcher-block">Butcher Block</SelectItem>
-                        <SelectItem value="none">No Countertop Needed</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    {/* Countertop Type */}
+                    <div className="space-y-2">
+                      <Label htmlFor="countertopType">Countertop Material</Label>
+                      <Select
+                        value={projectData.countertopType}
+                        onValueChange={(value) => setProjectData({ ...projectData, countertopType: value })}
+                      >
+                        <SelectTrigger id="countertopType">
+                          <SelectValue placeholder="Select countertop material" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="laminate">Laminate</SelectItem>
+                          <SelectItem value="granite">Granite</SelectItem>
+                          <SelectItem value="quartz">Quartz</SelectItem>
+                          <SelectItem value="marble">Marble</SelectItem>
+                          <SelectItem value="butcher-block">Butcher Block</SelectItem>
+                          <SelectItem value="none">No Countertop Needed</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
 
-                  {/* Linear Feet */}
-                  <div className="space-y-2">
-                    <Label htmlFor="linearFeet">Approximate Linear Feet of Cabinets *</Label>
-                    <Input
-                      id="linearFeet"
-                      type="number"
-                      placeholder="e.g., 20"
-                      value={projectData.linearFeet}
-                      onChange={(e) => setProjectData({ ...projectData, linearFeet: e.target.value })}
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      Measure the total length of wall space where cabinets will be installed
-                    </p>
-                  </div>
+                    {/* Linear Feet */}
+                    <div className="space-y-2">
+                      <Label htmlFor="linearFeet">Approximate Linear Feet of Cabinets *</Label>
+                      <Input
+                        id="linearFeet"
+                        type="number"
+                        placeholder="e.g., 20"
+                        value={projectData.linearFeet}
+                        onChange={(e) => setProjectData({ ...projectData, linearFeet: e.target.value })}
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Measure the total length of wall space where cabinets will be installed
+                      </p>
+                    </div>
 
-                  {/* Dimensions */}
-                  <div className="space-y-2">
-                    <Label htmlFor="dimensions">Room Dimensions (optional)</Label>
-                    <Input
-                      id="dimensions"
-                      placeholder="e.g., 12' x 15'"
-                      value={projectData.dimensions}
-                      onChange={(e) => setProjectData({ ...projectData, dimensions: e.target.value })}
-                    />
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
-                      <p className="text-xs font-semibold text-blue-900 mb-2">📱 Need help measuring? Download these free apps:</p>
-                      <div className="flex flex-wrap gap-2 text-xs">
-                        <a href="https://apps.apple.com/us/app/magicplan/id427424432" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">MagicPlan (iOS/Android)</a>
-                        <a href="https://apps.apple.com/us/app/roomscan-pro/id571436618" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">RoomScan Pro (iOS)</a>
-                        <a href="https://play.google.com/store/apps/details?id=com.google.ar.measure" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">Google Measure (Android)</a>
+                    {/* Dimensions */}
+                    <div className="space-y-2">
+                      <Label htmlFor="dimensions">Room Dimensions (optional)</Label>
+                      <Input
+                        id="dimensions"
+                        placeholder="e.g., 12' x 15'"
+                        value={projectData.dimensions}
+                        onChange={(e) => setProjectData({ ...projectData, dimensions: e.target.value })}
+                      />
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mt-2">
+                        <p className="text-xs font-semibold text-blue-900 mb-2">📱 Need help measuring? Download these free apps:</p>
+                        <div className="flex flex-wrap gap-2 text-xs">
+                          <a href="https://apps.apple.com/us/app/magicplan/id427424432" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">MagicPlan (iOS/Android)</a>
+                          <a href="https://apps.apple.com/us/app/roomscan-pro/id571436618" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">RoomScan Pro (iOS)</a>
+                          <a href="https://play.google.com/store/apps/details?id=com.google.ar.measure" target="_blank" rel="noopener noreferrer" className="bg-white border border-blue-300 text-blue-700 px-3 py-1 rounded hover:bg-blue-50 transition-colors">Google Measure (Android)</a>
+                        </div>
                       </div>
                     </div>
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Educational Questions */}
-                  <div className="space-y-4 border-t pt-6">
-                    <h3 className="font-semibold text-lg">Help Us Understand Your Project Better</h3>
-                    
+              {/* Step 1b: Educational Questions */}
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center gap-2">
+                    <Lightbulb className="h-5 w-5 text-amber-500" />
+                    <CardTitle>Help Us Understand Your Project Better</CardTitle>
+                  </div>
+                  <CardDescription>
+                    These questions help us prepare the most accurate quote and ensure we're the right fit for your project.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+
                     {/* Current Condition */}
                     <div className="space-y-2">
-                      <Label htmlFor="currentCondition">What's the current condition? 💡</Label>
-                      <p className="text-sm text-muted-foreground">This helps us understand the scope of work needed.</p>
-                      <Select value={projectData.currentCondition} onValueChange={(value) => setProjectData({ ...projectData, currentCondition: value })}>
+                      <Label htmlFor="currentCondition">What is the current condition of the space?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 This helps us understand the scope of work — whether we're starting from scratch, replacing existing cabinets, or working around existing structures.
+                      </p>
+                      <Select
+                        value={projectData.currentCondition}
+                        onValueChange={(value) => setProjectData({ ...projectData, currentCondition: value })}
+                      >
                         <SelectTrigger id="currentCondition">
-                          <SelectValue placeholder="Select condition" />
+                          <SelectValue placeholder="Select current condition" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="new-construction">New Construction</SelectItem>
-                          <SelectItem value="full-remodel">Full Remodel</SelectItem>
-                          <SelectItem value="cabinet-replacement">Cabinet Replacement Only</SelectItem>
-                          <SelectItem value="refacing">Cabinet Refacing</SelectItem>
-                          <SelectItem value="repair">Repair/Restoration</SelectItem>
+                          <SelectItem value="new-construction">New Construction — no cabinets yet</SelectItem>
+                          <SelectItem value="full-remodel">Full Remodel — removing everything and starting over</SelectItem>
+                          <SelectItem value="cabinet-replacement">Cabinet Replacement — keeping layout, replacing cabinets</SelectItem>
+                          <SelectItem value="addition">Addition — adding cabinets to existing space</SelectItem>
+                          <SelectItem value="refacing">Refacing — keeping cabinet boxes, replacing doors/fronts</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Timeline */}
                     <div className="space-y-2">
-                      <Label htmlFor="timeline">When would you like to start? 💡</Label>
-                      <p className="text-sm text-muted-foreground">Helps us schedule and plan materials.</p>
-                      <Select value={projectData.timeline} onValueChange={(value) => setProjectData({ ...projectData, timeline: value })}>
-                        <SelectTrigger id="timeline">
+                      <Label htmlFor="projectTimeline">When are you hoping to start this project?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Cabinet lead times typically range from 4–12 weeks depending on the manufacturer and style. Knowing your timeline helps us plan accordingly and avoid delays.
+                      </p>
+                      <Select
+                        value={projectData.projectTimeline}
+                        onValueChange={(value) => setProjectData({ ...projectData, projectTimeline: value })}
+                      >
+                        <SelectTrigger id="projectTimeline">
                           <SelectValue placeholder="Select timeline" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="asap">As Soon As Possible</SelectItem>
-                          <SelectItem value="1-3-months">1-3 Months</SelectItem>
-                          <SelectItem value="3-6-months">3-6 Months</SelectItem>
-                          <SelectItem value="6-12-months">6-12 Months</SelectItem>
-                          <SelectItem value="12plus-months">12+ Months (Planning Stage)</SelectItem>
+                          <SelectItem value="asap">As soon as possible</SelectItem>
+                          <SelectItem value="1-3-months">Within 1–3 months</SelectItem>
+                          <SelectItem value="3-6-months">3–6 months from now</SelectItem>
+                          <SelectItem value="6-12-months">6–12 months from now</SelectItem>
+                          <SelectItem value="12-plus-months">More than 12 months out — just planning ahead</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Budget Range */}
                     <div className="space-y-2">
-                      <Label htmlFor="budgetRange">What's your budget range? 💡</Label>
-                      <p className="text-sm text-muted-foreground">Helps us recommend options that fit your investment level.</p>
-                      <Select value={projectData.budgetRange} onValueChange={(value) => setProjectData({ ...projectData, budgetRange: value })}>
+                      <Label htmlFor="budgetRange">What is your approximate budget for this project?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Knowing your budget helps us recommend the right cabinet lines. We carry options from value-focused to premium custom — and we'll always be upfront if a project is outside what we can deliver at your price point.
+                      </p>
+                      <Select
+                        value={projectData.budgetRange}
+                        onValueChange={(value) => setProjectData({ ...projectData, budgetRange: value })}
+                      >
                         <SelectTrigger id="budgetRange">
                           <SelectValue placeholder="Select budget range" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="under-10k">Under $10,000</SelectItem>
-                          <SelectItem value="10k-25k">$10,000 - $25,000</SelectItem>
-                          <SelectItem value="25k-50k">$25,000 - $50,000</SelectItem>
-                          <SelectItem value="50k-75k">$50,000 - $75,000</SelectItem>
+                          <SelectItem value="10k-20k">$10,000 – $20,000</SelectItem>
+                          <SelectItem value="20k-35k">$20,000 – $35,000</SelectItem>
+                          <SelectItem value="35k-50k">$35,000 – $50,000</SelectItem>
+                          <SelectItem value="50k-75k">$50,000 – $75,000</SelectItem>
                           <SelectItem value="75k-plus">$75,000+</SelectItem>
-                          <SelectItem value="flexible">Flexible/Not Sure</SelectItem>
+                          <SelectItem value="not-sure">Not sure yet — need guidance</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Style Preference */}
                     <div className="space-y-2">
-                      <Label htmlFor="stylePreference">What style do you prefer? 💡</Label>
-                      <p className="text-sm text-muted-foreground">Helps us visualize your dream space.</p>
-                      <Select value={projectData.stylePreference} onValueChange={(value) => setProjectData({ ...projectData, stylePreference: value })}>
+                      <Label htmlFor="stylePreference">How would you describe your design style?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Your style preference guides everything from door profiles to hardware finishes. If you're unsure, our design team can walk you through options during your consultation.
+                      </p>
+                      <Select
+                        value={projectData.stylePreference}
+                        onValueChange={(value) => setProjectData({ ...projectData, stylePreference: value })}
+                      >
                         <SelectTrigger id="stylePreference">
-                          <SelectValue placeholder="Select style" />
+                          <SelectValue placeholder="Select style preference" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="traditional">Traditional</SelectItem>
-                          <SelectItem value="modern">Modern/Contemporary</SelectItem>
-                          <SelectItem value="farmhouse">Farmhouse/Rustic</SelectItem>
-                          <SelectItem value="transitional">Transitional</SelectItem>
-                          <SelectItem value="craftsman">Craftsman</SelectItem>
-                          <SelectItem value="industrial">Industrial</SelectItem>
-                          <SelectItem value="coastal">Coastal</SelectItem>
-                          <SelectItem value="not-sure">Not Sure Yet</SelectItem>
+                          <SelectItem value="traditional">Traditional — classic raised panels, ornate details</SelectItem>
+                          <SelectItem value="transitional">Transitional — blend of traditional and modern</SelectItem>
+                          <SelectItem value="modern">Modern / Contemporary — clean lines, minimal hardware</SelectItem>
+                          <SelectItem value="farmhouse">Farmhouse / Cottage — shaker style, warm tones</SelectItem>
+                          <SelectItem value="craftsman">Craftsman — natural wood, mission-style details</SelectItem>
+                          <SelectItem value="coastal">Coastal / Beach — light colors, relaxed feel</SelectItem>
+                          <SelectItem value="not-sure">Not sure — I'd love design guidance</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Special Features */}
                     <div className="space-y-2">
-                      <Label htmlFor="specialFeatures">Any special features needed? 💡</Label>
-                      <p className="text-sm text-muted-foreground">Custom solutions we should consider.</p>
-                      <Select value={projectData.specialFeatures} onValueChange={(value) => setProjectData({ ...projectData, specialFeatures: value })}>
+                      <Label htmlFor="specialFeatures">Are there any special features or requirements?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 Special features like pull-out shelves, soft-close hinges, built-in organizers, or accessibility modifications can significantly impact both design and cost. Let us know upfront so we can plan accordingly.
+                      </p>
+                      <Select
+                        value={projectData.specialFeatures}
+                        onValueChange={(value) => setProjectData({ ...projectData, specialFeatures: value })}
+                      >
                         <SelectTrigger id="specialFeatures">
-                          <SelectValue placeholder="Select special features" />
+                          <SelectValue placeholder="Select any special features" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="none">None</SelectItem>
-                          <SelectItem value="accessibility">Accessibility Features</SelectItem>
-                          <SelectItem value="custom-storage">Custom Storage Solutions</SelectItem>
-                          <SelectItem value="island">Kitchen Island</SelectItem>
-                          <SelectItem value="pantry">Walk-in Pantry</SelectItem>
-                          <SelectItem value="appliance-garage">Appliance Garage</SelectItem>
-                          <SelectItem value="wine-storage">Wine Storage</SelectItem>
-                          <SelectItem value="multiple">Multiple Features</SelectItem>
+                          <SelectItem value="none">No special features needed</SelectItem>
+                          <SelectItem value="pull-outs">Pull-out shelves / drawers</SelectItem>
+                          <SelectItem value="island">Kitchen island</SelectItem>
+                          <SelectItem value="pantry">Walk-in pantry or tall pantry cabinets</SelectItem>
+                          <SelectItem value="accessibility">Accessibility / ADA modifications</SelectItem>
+                          <SelectItem value="built-ins">Built-in appliances or refrigerator panels</SelectItem>
+                          <SelectItem value="custom-storage">Custom storage solutions (lazy susans, organizers)</SelectItem>
+                          <SelectItem value="multiple">Multiple special features — I'll explain in notes</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
                     {/* Referral Source */}
                     <div className="space-y-2">
-                      <Label htmlFor="referralSource">How did you hear about us? 💡</Label>
-                      <p className="text-sm text-muted-foreground">Helps us know what's working!</p>
-                      <Select value={projectData.referralSource} onValueChange={(value) => setProjectData({ ...projectData, referralSource: value })}>
+                      <Label htmlFor="referralSource">How did you hear about Critzer's Cabinets?</Label>
+                      <p className="text-xs text-muted-foreground">
+                        💡 This helps us understand how customers find us so we can continue serving our community effectively.
+                      </p>
+                      <Select
+                        value={projectData.referralSource}
+                        onValueChange={(value) => setProjectData({ ...projectData, referralSource: value })}
+                      >
                         <SelectTrigger id="referralSource">
-                          <SelectValue placeholder="Select source" />
+                          <SelectValue placeholder="Select how you found us" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="google">Google Search</SelectItem>
-                          <SelectItem value="social-media">Social Media</SelectItem>
-                          <SelectItem value="referral">Friend/Family Referral</SelectItem>
-                          <SelectItem value="contractor">Contractor Referral</SelectItem>
-                          <SelectItem value="previous-customer">Previous Customer</SelectItem>
-                          <SelectItem value="drive-by">Saw Your Work</SelectItem>
+                          <SelectItem value="referral">Friend or Family Referral</SelectItem>
+                          <SelectItem value="contractor">Contractor / Builder Referral</SelectItem>
+                          <SelectItem value="facebook">Facebook / Social Media</SelectItem>
+                          <SelectItem value="houzz">Houzz</SelectItem>
+                          <SelectItem value="nextdoor">Nextdoor</SelectItem>
+                          <SelectItem value="repeat">Returning Customer</SelectItem>
+                          <SelectItem value="drive-by">Drove by the showroom</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
-                  </div>
 
-                  {/* Additional Notes */}
-                  <div className="space-y-2">
-                    <Label htmlFor="additionalNotes">Additional Notes</Label>
-                    <Textarea
-                      id="additionalNotes"
-                      placeholder="Any special requirements, features, or questions..."
-                      rows={4}
-                      value={projectData.additionalNotes}
-                      onChange={(e) => setProjectData({ ...projectData, additionalNotes: e.target.value })}
-                    />
-                  </div>
+                    {/* Additional Notes */}
+                    <div className="space-y-2">
+                      <Label htmlFor="additionalNotes">Additional Notes or Questions</Label>
+                      <Textarea
+                        id="additionalNotes"
+                        placeholder="Any special requirements, features, or questions you'd like us to know about..."
+                        rows={4}
+                        value={projectData.additionalNotes}
+                        onChange={(e) => setProjectData({ ...projectData, additionalNotes: e.target.value })}
+                      />
+                    </div>
 
-                  <Button onClick={handleCalculate} className="w-full" size="lg">
-                    <Calculator className="mr-2 h-5 w-5" />
-                    Calculate Estimate
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+                    <Button onClick={handleCalculate} className="w-full" size="lg">
+                      <Calculator className="mr-2 h-5 w-5" />
+                      Calculate My Estimate
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
           {step === 2 && (
             <Card>
               <CardHeader>
                 <CardTitle>Your Preliminary Estimate</CardTitle>
-                <CardDescription>
-                  Based on the information provided
-                </CardDescription>
+                <CardDescription>Based on the information provided</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -512,15 +532,15 @@ export default function Quote() {
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <p className="text-muted-foreground">Room Type</p>
-                        <p className="font-medium capitalize">{projectData.roomType}</p>
+                        <p className="font-medium capitalize">{projectData.roomType || "—"}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Door Style</p>
-                        <p className="font-medium capitalize">{projectData.doorStyle.replace("-", " ")}</p>
+                        <p className="font-medium capitalize">{projectData.doorStyle.replace("-", " ") || "—"}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Wood Species</p>
-                        <p className="font-medium capitalize">{projectData.woodSpecies}</p>
+                        <p className="font-medium capitalize">{projectData.woodSpecies || "—"}</p>
                       </div>
                       <div>
                         <p className="text-muted-foreground">Linear Feet</p>
@@ -530,6 +550,30 @@ export default function Quote() {
                         <div>
                           <p className="text-muted-foreground">Countertop</p>
                           <p className="font-medium capitalize">{projectData.countertopType.replace("-", " ")}</p>
+                        </div>
+                      )}
+                      {projectData.currentCondition && (
+                        <div>
+                          <p className="text-muted-foreground">Project Type</p>
+                          <p className="font-medium capitalize">{projectData.currentCondition.replace(/-/g, " ")}</p>
+                        </div>
+                      )}
+                      {projectData.projectTimeline && (
+                        <div>
+                          <p className="text-muted-foreground">Timeline</p>
+                          <p className="font-medium capitalize">{projectData.projectTimeline.replace(/-/g, " ")}</p>
+                        </div>
+                      )}
+                      {projectData.budgetRange && (
+                        <div>
+                          <p className="text-muted-foreground">Budget Range</p>
+                          <p className="font-medium">{projectData.budgetRange.replace(/-/g, " ")}</p>
+                        </div>
+                      )}
+                      {projectData.stylePreference && (
+                        <div>
+                          <p className="text-muted-foreground">Style</p>
+                          <p className="font-medium capitalize">{projectData.stylePreference.replace(/-/g, " ")}</p>
                         </div>
                       )}
                     </div>
@@ -574,8 +618,8 @@ export default function Quote() {
                     <Button variant="outline" onClick={() => setStep(1)} className="flex-1">
                       Back to Form
                     </Button>
-                    <Button 
-                      onClick={handleSubmit} 
+                    <Button
+                      onClick={handleSubmit}
                       disabled={createQuote.isPending}
                       className="flex-1"
                       size="lg"

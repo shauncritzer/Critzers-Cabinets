@@ -31,26 +31,17 @@ export const products = mysqlTable("products", {
   sku: varchar("sku", { length: 100 }).notNull().unique(),
   name: text("name").notNull(),
   description: text("description"),
-  brand: varchar("brand", { length: 100 }).default("Top Knobs"),
   collection: varchar("collection", { length: 255 }),
   finish: varchar("finish", { length: 255 }),
-  finishCode: varchar("finish_code", { length: 20 }),
   category: varchar("category", { length: 100 }),
-  productType: varchar("product_type", { length: 100 }), // Knob, Pull, Backplate, Hook, etc.
   listPrice: varchar("list_price", { length: 20 }),
   dealerPrice: varchar("dealer_price", { length: 20 }),
   retailPrice: varchar("retail_price", { length: 20 }),
   dimensions: text("dimensions"),
-  length: varchar("length", { length: 50 }),
-  width: varchar("width", { length: 50 }),
-  projection: varchar("projection", { length: 50 }),
-  centerToCenter: varchar("center_to_center", { length: 50 }),
-  baseDiameter: varchar("base_diameter", { length: 50 }),
-  material: varchar("material", { length: 100 }),
   weight: varchar("weight", { length: 50 }),
   upc: varchar("upc", { length: 50 }),
   imageUrl: text("image_url"),
-  inStock: mysqlEnum("in_stock", ["yes", "no", "unknown"]).default("yes"),
+  inStock: mysqlEnum("in_stock", ["yes", "no", "unknown"]).default("unknown"),
   featured: mysqlEnum("featured", ["yes", "no"]).default("no"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
@@ -168,22 +159,6 @@ export const quotes = mysqlTable("quotes", {
   // CRM Integration
   crmLeadId: varchar("crmLeadId", { length: 255 }),
   sentToCrm: int("sentToCrm").default(0).notNull(), // Boolean: 0 or 1
-  
-  // Educational Questions (for better lead qualification)
-  currentCondition: varchar("currentCondition", { length: 100 }), // new-construction, full-remodel, etc.
-  timeline: varchar("timeline", { length: 100 }), // asap, 1-3-months, etc.
-  budgetRange: varchar("budgetRange", { length: 100 }), // under-10k, 10k-25k, etc.
-  stylePreference: varchar("stylePreference", { length: 100 }), // traditional, modern, etc.
-  specialFeatures: varchar("specialFeatures", { length: 100 }), // accessibility, custom-storage, etc.
-  referralSource: varchar("referralSource", { length: 100 }), // google, social-media, referral, etc.
-  
-  // Additional project details from form
-  doorStyle: varchar("doorStyle", { length: 100 }),
-  woodSpecies: varchar("woodSpecies", { length: 100 }),
-  countertopType: varchar("countertopType", { length: 100 }),
-  linearFeet: varchar("linearFeet", { length: 50 }),
-  dimensions: varchar("dimensions", { length: 255 }),
-  estimatedPrice: int("estimatedPrice"),
   
   // Conversation data (JSON)
   conversationData: text("conversationData"), // Stores full AI chat history

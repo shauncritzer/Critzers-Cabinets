@@ -65,7 +65,7 @@ export default function Home() {
                 autoPlay
                 loop
               >
-                <source src="/videos/heygen-intro.mp4" type="video/mp4" />
+                <source src="/manus-storage/heygen-intro_44f656d7.mp4" type="video/mp4" />
                 Your browser does not support the video tag.
               </video>
             </div>
@@ -238,7 +238,7 @@ export default function Home() {
               {/* Payment Methods */}
               <div className="flex items-center gap-4">
                 <span className="text-sm text-secondary-foreground/80">We Accept:</span>
-                <img src="/images/payment-cards.jpg" alt="Payment Methods: Visa, Mastercard, American Express, Discover" className="h-8 object-contain" />
+                <img src="/manus-storage/payment-cards_b9688dbd.jpg" alt="Payment Methods: Visa, Mastercard, American Express, Discover" className="h-8 object-contain" />
               </div>
             </div>
           </div>

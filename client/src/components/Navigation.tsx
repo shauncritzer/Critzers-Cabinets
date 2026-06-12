@@ -58,7 +58,7 @@ export default function Navigation({ transparent = false }: NavigationProps) {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-3">
               <img 
-                src="/images/logo.png" 
+                src="/manus-storage/logo_bd4f6858.png" 
                 alt="Critzer's Cabinets Logo" 
                 className="h-10 w-10 md:h-12 md:w-12" 
               />

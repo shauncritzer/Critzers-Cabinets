@@ -10,22 +10,22 @@ interface CarouselSlide {
 
 const slides: CarouselSlide[] = [
   {
-    image: "/images/hero-bg.webp",
+    image: "/manus-storage/hero-bg_50413bf6.webp",
     title: "Critzer's Cabinet Creations",
     subtitle: "Serving Charlottesville Since 1986"
   },
   {
-    image: "/images/gallery/7nAUkEFBXEaf.jpg",
+    image: "/manus-storage/7nAUkEFBXEaf_785b0bb9.jpg",
     title: "Custom Kitchen Design",
     subtitle: "Transform Your Space with Expert Craftsmanship"
   },
   {
-    image: "/images/gallery/RHHoKWmplcBC.jpg",
+    image: "/manus-storage/RHHoKWmplcBC_6685e73b.jpg",
     title: "Quality Cabinetry",
     subtitle: "Authorized Omega & Wolf Dealer"
   },
   {
-    image: "/images/gallery/bt6Vi4lpCf4B.jpg",
+    image: "/manus-storage/bt6Vi4lpCf4B_2a2f6618.jpg",
     title: "Premium Hardware",
     subtitle: "Top Knobs Collection Available Online"
   }

@@ -110,24 +110,8 @@ export async function createQuote(quote: InsertQuote) {
       customerName: quote.customerName,
       customerEmail: quote.customerEmail,
       customerPhone: quote.customerPhone || undefined,
-      projectDescription: quote.projectDescription || undefined,
+      conversationData: quote.conversationData || undefined,
       quoteId,
-      // Project details
-      roomType: quote.roomType || undefined,
-      doorStyle: quote.doorStyle || undefined,
-      woodSpecies: quote.woodSpecies || undefined,
-      finish: quote.finish || undefined,
-      countertopType: quote.countertopType || undefined,
-      linearFeet: quote.linearFeet || undefined,
-      dimensions: quote.dimensions || undefined,
-      // Educational questions
-      currentCondition: quote.currentCondition || undefined,
-      timeline: quote.timeline || undefined,
-      budgetRange: quote.budgetRange || undefined,
-      stylePreference: quote.stylePreference || undefined,
-      specialFeatures: quote.specialFeatures || undefined,
-      referralSource: quote.referralSource || undefined,
-      estimatedPrice: quote.estimatedPrice || undefined,
     });
   } catch (error) {
     console.error('[createQuote] Failed to send email notification:', error);
