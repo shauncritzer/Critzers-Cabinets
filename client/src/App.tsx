@@ -1,7 +1,8 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
+import { useEffect } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -27,6 +28,27 @@ import ReturnPolicy from "@/pages/ReturnPolicy";
 import Login from "@/pages/Login";
 import ProductDetail from "@/pages/ProductDetail";
 import CheckoutSuccess from "@/pages/CheckoutSuccess";
+import Refresh from "@/pages/Refresh";
+import CabinetRefacing from "@/pages/services/CabinetRefacing";
+import CabinetRepair from "@/pages/services/CabinetRepair";
+import CountertopReplacement from "@/pages/services/CountertopReplacement";
+import HardwareUpgrades from "@/pages/services/HardwareUpgrades";
+import ClosetPantryDesign from "@/pages/services/ClosetPantryDesign";
+import KitchenBathRemodeling from "@/pages/services/KitchenBathRemodeling";
+
+/**
+ * Scroll to the top of the document on every route change.
+ *
+ * Without this, navigating from the bottom of a long service page to another
+ * page leaves the viewport mid-document, which reads as a broken page.
+ */
+function ScrollToTop() {
+  const [location] = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [location]);
+  return null;
+}
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -36,6 +58,21 @@ function Router() {
       <Route path={"/about"} component={About} />
       <Route path={"/products"} component={Products} />
       <Route path={"/services"} component={Services} />
+      {/* Dedicated SEO landing pages for each core service offering */}
+      <Route path={"/services/cabinet-refacing"} component={CabinetRefacing} />
+      <Route path={"/services/cabinet-repair"} component={CabinetRepair} />
+      <Route
+        path={"/services/countertop-replacement"}
+        component={CountertopReplacement}
+      />
+      <Route path={"/services/hardware-upgrades"} component={HardwareUpgrades} />
+      <Route path={"/services/closet-pantry-design"} component={ClosetPantryDesign} />
+      <Route
+        path={"/services/kitchen-bath-remodeling"}
+        component={KitchenBathRemodeling}
+      />
+      {/* Quick-turn, lower-cost services landing page */}
+      <Route path={"/refresh"} component={Refresh} />
       <Route path={"/contact"} component={Contact} />
       <Route path={"/shop"} component={Shop} />
       <Route path={"/shop/product/:id"} component={ProductDetail} />
@@ -75,6 +112,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
+          <ScrollToTop />
           <Router />
         </TooltipProvider>
       </ThemeProvider>
