@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
-import { useEffect } from "react";
+import { Suspense, lazy, useEffect, useState } from "react";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
@@ -35,13 +35,13 @@ import CountertopReplacement from "@/pages/services/CountertopReplacement";
 import HardwareUpgrades from "@/pages/services/HardwareUpgrades";
 import ClosetPantryDesign from "@/pages/services/ClosetPantryDesign";
 import KitchenBathRemodeling from "@/pages/services/KitchenBathRemodeling";
+import AdminAiLeads from "@/pages/AdminAiLeads";
 
-/**
- * Scroll to the top of the document on every route change.
- *
- * Without this, navigating from the bottom of a long service page to another
- * page leaves the viewport mid-document, which reads as a broken page.
- */
+// The AI sales agent widget is code-split and mounted after first paint so it
+// never delays initial page load.
+const SalesAgentWidget = lazy(() => import("./components/SalesAgentWidget"));
+
+/** Scroll to the top of the document on every route change. */
 function ScrollToTop() {
   const [location] = useLocation();
   useEffect(() => {
@@ -51,69 +51,94 @@ function ScrollToTop() {
 }
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
-      <Route path={"/about"} component={About} />
-      <Route path={"/products"} component={Products} />
-      <Route path={"/services"} component={Services} />
-      {/* Dedicated SEO landing pages for each core service offering */}
-      <Route path={"/services/cabinet-refacing"} component={CabinetRefacing} />
-      <Route path={"/services/cabinet-repair"} component={CabinetRepair} />
-      <Route
-        path={"/services/countertop-replacement"}
-        component={CountertopReplacement}
-      />
-      <Route path={"/services/hardware-upgrades"} component={HardwareUpgrades} />
-      <Route path={"/services/closet-pantry-design"} component={ClosetPantryDesign} />
-      <Route
-        path={"/services/kitchen-bath-remodeling"}
-        component={KitchenBathRemodeling}
-      />
-      {/* Quick-turn, lower-cost services landing page */}
-      <Route path={"/refresh"} component={Refresh} />
-      <Route path={"/contact"} component={Contact} />
-      <Route path={"/shop"} component={Shop} />
-      <Route path={"/shop/product/:id"} component={ProductDetail} />
-      <Route path={"/quote"} component={Quote} />
-      <Route path={"/dashboard"} component={Dashboard} />
-      <Route path={"/admin"} component={Admin} />
-      <Route path={"/admin-utilities"} component={AdminUtilities} />
-      <Route path={"/gallery"} component={Gallery} />
-      <Route path={"/cart"} component={Cart} />
-      <Route path={"/checkout"} component={Checkout} />
-      <Route path={"/checkout/success"} component={CheckoutSuccess} />
-      <Route path={"/order-confirmation"} component={OrderConfirmation} />
-      <Route path={"/shipping-policy"} component={ShippingPolicy} />
-      <Route path={"/return-policy"} component={ReturnPolicy} />
-      <Route path={"/login"} component={Login} />
-        <Route path="/admin/product-images" component={ProductImageUpload} />
-        <Route path="/admin/data-import" component={AdminDataImport} />
-        <Route path="/admin/orders" component={AdminOrders} />
-      <Route path={"/404"} component={NotFound} />
-      {/* Final fallback route */}
+      <Route path="/" component={Home} />
+      <Route path="/about" component={About} />
+      <Route path="/products" component={Products} />
+      <Route path="/services" component={Services} />
+      <Route path="/services/cabinet-refacing" component={CabinetRefacing} />
+      <Route path="/services/cabinet-repair" component={CabinetRepair} />
+      <Route path="/services/countertop-replacement" component={CountertopReplacement} />
+      <Route path="/services/hardware-upgrades" component={HardwareUpgrades} />
+      <Route path="/services/closet-pantry-design" component={ClosetPantryDesign} />
+      <Route path="/services/kitchen-bath-remodeling" component={KitchenBathRemodeling} />
+      <Route path="/refresh" component={Refresh} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/shop" component={Shop} />
+      <Route path="/shop/coming-soon" component={ShopComingSoon} />
+      <Route path="/shop/product/:id" component={ProductDetail} />
+      <Route path="/quote" component={Quote} />
+      <Route path="/dashboard" component={Dashboard} />
+      <Route path="/admin" component={Admin} />
+      <Route path="/admin-utilities" component={AdminUtilities} />
+      <Route path="/gallery" component={Gallery} />
+      <Route path="/cart" component={Cart} />
+      <Route path="/checkout" component={Checkout} />
+      <Route path="/checkout/success" component={CheckoutSuccess} />
+      <Route path="/order-confirmation" component={OrderConfirmation} />
+      <Route path="/shipping-policy" component={ShippingPolicy} />
+      <Route path="/return-policy" component={ReturnPolicy} />
+      <Route path="/login" component={Login} />
+      <Route path="/admin/product-images" component={ProductImageUpload} />
+      <Route path="/admin/data-import" component={AdminDataImport} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/ai-leads" component={AdminAiLeads} />
+      <Route path="/404" component={NotFound} />
       <Route component={NotFound} />
     </Switch>
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
+/**
+ * Defers mounting the chat widget until the browser is idle (or ~2s after
+ * mount as a fallback), so the widget bundle and its network calls never
+ * compete with the page's own content.
+ */
+function DeferredSalesAgent() {
+  const [shouldMount, setShouldMount] = useState(false);
+
+  useEffect(() => {
+    const idle = (
+      window as typeof window & {
+        requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+        cancelIdleCallback?: (handle: number) => void;
+      }
+    ).requestIdleCallback;
+
+    if (idle) {
+      const handle = idle(() => setShouldMount(true), { timeout: 3000 });
+      return () => {
+        (
+          window as typeof window & {
+            cancelIdleCallback?: (handle: number) => void;
+          }
+        ).cancelIdleCallback?.(handle);
+      };
+    }
+
+    const timer = window.setTimeout(() => setShouldMount(true), 2000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!shouldMount) return null;
+
+  return (
+    <Suspense fallback={null}>
+      <SalesAgentWidget />
+    </Suspense>
+  );
+}
 
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider
-        defaultTheme="light"
-        // switchable
-      >
+      <ThemeProvider defaultTheme="light">
         <TooltipProvider>
           <Toaster />
           <ScrollToTop />
           <Router />
+          <DeferredSalesAgent />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>
@@ -121,3 +146,8 @@ function App() {
 }
 
 export default App;
+
+// NOTE: About Theme
+// - First choose a default theme according to your design style (dark or light bg), then change color palette in index.css
+//   to keep consistent foreground/background color across components
+// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook

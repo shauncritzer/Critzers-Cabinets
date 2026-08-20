@@ -44,6 +44,39 @@ async function safeAddColumn(
   }
 }
 
+async function safeCreateTable(
+  connection: mysql.Connection,
+  tableName: string,
+  createStatement: string
+): Promise<void> {
+  try {
+    const [tables] = await connection.query(
+      `
+      SELECT TABLE_NAME
+      FROM INFORMATION_SCHEMA.TABLES
+      WHERE TABLE_SCHEMA = DATABASE()
+        AND TABLE_NAME = ?
+    `,
+      [tableName]
+    );
+
+    if (Array.isArray(tables) && tables.length === 0) {
+      console.log(`  Creating table ${tableName}...`);
+      await connection.query(createStatement);
+      console.log(`  \u2713 Created ${tableName}`);
+    } else {
+      console.log(`  \u2713 Table ${tableName} already exists`);
+    }
+  } catch (error: any) {
+    if (error.code === 'ER_TABLE_EXISTS_ERROR') {
+      console.log(`  \u2713 Table ${tableName} already exists (caught duplicate error)`);
+    } else {
+      console.error(`  \u26a0 Warning with table ${tableName}:`, error.message);
+      // Don't throw - continue with other migrations
+    }
+  }
+}
+
 export async function runMigrations(): Promise<void> {
   if (!ENV.databaseUrl) {
     console.log('⚠ DATABASE_URL not set, skipping migrations');
@@ -100,6 +133,48 @@ export async function runMigrations(): Promise<void> {
     await safeAddColumn(connection, 'products', 'center_to_center', 'varchar(50)');
     await safeAddColumn(connection, 'products', 'base_diameter', 'varchar(50)');
     await safeAddColumn(connection, 'products', 'material', 'varchar(100)');
+
+    console.log('\nChecking ai_leads table...');
+
+    // AI Sales Agent lead capture table
+    await safeCreateTable(
+      connection,
+      'ai_leads',
+      `
+      CREATE TABLE IF NOT EXISTS \`ai_leads\` (
+        \`id\` int NOT NULL AUTO_INCREMENT,
+        \`session_id\` varchar(64) NOT NULL,
+        \`user_id\` int DEFAULT NULL,
+        \`name\` varchar(255) DEFAULT NULL,
+        \`email\` varchar(320) DEFAULT NULL,
+        \`phone\` varchar(50) DEFAULT NULL,
+        \`project_type\` varchar(100) DEFAULT NULL,
+        \`budget_range\` varchar(100) DEFAULT NULL,
+        \`timeline\` varchar(100) DEFAULT NULL,
+        \`room_size\` varchar(100) DEFAULT NULL,
+        \`style_preference\` varchar(100) DEFAULT NULL,
+        \`estimate_range\` varchar(100) DEFAULT NULL,
+        \`notes\` text,
+        \`conversation_json\` text,
+        \`appointment_preference\` varchar(255) DEFAULT NULL,
+        \`contact_captured\` int NOT NULL DEFAULT 0,
+        \`status\` enum('new','contacted','qualified','booked','won','lost','spam') NOT NULL DEFAULT 'new',
+        \`created_at\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        \`updated_at\` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (\`id\`),
+        UNIQUE KEY \`ai_leads_session_id_unique\` (\`session_id\`),
+        KEY \`ai_leads_created_at_idx\` (\`created_at\`)
+      )
+    `
+    );
+
+    // Columns added to ai_leads after its initial release
+    await safeAddColumn(connection, 'ai_leads', 'room_size', 'varchar(100)');
+    await safeAddColumn(connection, 'ai_leads', 'style_preference', 'varchar(100)');
+    await safeAddColumn(connection, 'ai_leads', 'estimate_range', 'varchar(100)');
+    await safeAddColumn(connection, 'ai_leads', 'appointment_preference', 'varchar(255)');
+    await safeAddColumn(connection, 'ai_leads', 'contact_captured', 'int NOT NULL DEFAULT 0');
+    await safeAddColumn(connection, 'ai_leads', 'notes', 'text');
 
     console.log('\n✅ All migrations completed successfully!');
   } catch (error: any) {

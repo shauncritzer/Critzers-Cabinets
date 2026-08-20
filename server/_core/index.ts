@@ -4,6 +4,7 @@ import { createServer } from "http";
 import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
+import { registerAiAgentRoutes } from "../aiAgentRoutes";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
@@ -49,6 +50,8 @@ async function startServer() {
   registerOAuthRoutes(app);
   // sitemap.xml + robots.txt, generated from the shared SEO registry
   registerSeoRoutes(app);
+  // AI Sales Agent streaming chat under /api/ai-agent/*
+  registerAiAgentRoutes(app);
   // tRPC API
   app.use(
     "/api/trpc",

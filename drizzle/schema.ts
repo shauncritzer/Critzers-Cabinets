@@ -296,3 +296,63 @@ export const customerUploads = mysqlTable("customerUploads", {
 
 export type CustomerUpload = typeof customerUploads.$inferSelect;
 export type InsertCustomerUpload = typeof customerUploads.$inferInsert;
+
+
+/**
+ * AI Sales Agent leads table.
+ *
+ * Every conversation started with the floating "design assistant" chat widget
+ * creates exactly one row here. The row is created on the first user message and
+ * then progressively enriched as the agent extracts contact details and project
+ * qualification data from the conversation.
+ */
+export const aiLeads = mysqlTable("ai_leads", {
+  id: int("id").autoincrement().primaryKey(),
+
+  /** Browser-generated session identifier so we can keep updating the same row. */
+  sessionId: varchar("session_id", { length: 64 }).notNull().unique(),
+
+  /** Linked account when the visitor happens to be signed in. */
+  userId: int("user_id").references(() => users.id),
+
+  // Contact information, captured conversationally
+  name: varchar("name", { length: 255 }),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 50 }),
+
+  // Qualification data extracted from the conversation
+  projectType: varchar("project_type", { length: 100 }),
+  budgetRange: varchar("budget_range", { length: 100 }),
+  timeline: varchar("timeline", { length: 100 }),
+  roomSize: varchar("room_size", { length: 100 }),
+  stylePreference: varchar("style_preference", { length: 100 }),
+  estimateRange: varchar("estimate_range", { length: 100 }),
+  notes: text("notes"),
+
+  /** Full chat transcript, serialized as a JSON array of {role, content}. */
+  conversationJson: text("conversation_json"),
+
+  /** How the visitor prefers to be contacted, when they say so. */
+  appointmentPreference: varchar("appointment_preference", { length: 255 }),
+
+  /** Set once the agent has name + (email or phone). */
+  contactCaptured: int("contact_captured").default(0).notNull(),
+
+  status: mysqlEnum("status", [
+    "new",
+    "contacted",
+    "qualified",
+    "booked",
+    "won",
+    "lost",
+    "spam",
+  ])
+    .default("new")
+    .notNull(),
+
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().onUpdateNow().notNull(),
+});
+
+export type AiLead = typeof aiLeads.$inferSelect;
+export type InsertAiLead = typeof aiLeads.$inferInsert;

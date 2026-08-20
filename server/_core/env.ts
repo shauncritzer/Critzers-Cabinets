@@ -13,6 +13,11 @@ export const ENV = {
   stripePublishableKey: process.env.STRIPE_PUBLISHABLE_KEY ?? "",
   stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET ?? "",
 
+  // OpenAI configuration (AI Sales Agent)
+  openaiApiKey: process.env.OPENAI_API_KEY ?? "",
+  openaiApiBase: process.env.OPENAI_API_BASE ?? "https://api.openai.com/v1",
+  openaiModel: process.env.OPENAI_MODEL ?? "gpt-4o-mini",
+
   // Email configuration (Gmail SMTP)
   emailHost: process.env.EMAIL_HOST ?? "smtp.gmail.com",
   emailPort: parseInt(process.env.EMAIL_PORT ?? "587"),

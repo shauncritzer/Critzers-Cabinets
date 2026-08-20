@@ -128,6 +128,194 @@ export const appRouter = router({
       }),
   }),
   
+  // AI Sales Agent - lead capture and admin management.
+  // The streaming chat transport itself lives at /api/ai-agent/chat (see
+  // server/aiAgentRoutes.ts) because tRPC's batch link cannot stream tokens.
+  aiAgent: router({
+    /** Public config probe used by the widget before it opens. */
+    config: publicProcedure.query(async () => {
+      const { isAgentConfigured, GREETING_MESSAGE, SUGGESTED_PROMPTS } =
+        await import("./aiSalesAgent");
+      return {
+        configured: isAgentConfigured(),
+        greeting: GREETING_MESSAGE,
+        suggestedPrompts: SUGGESTED_PROMPTS,
+      };
+    }),
+
+    /**
+     * Resume a conversation in the same browser session.
+     */
+    getSession: publicProcedure
+      .input(z.object({ sessionId: z.string().min(8).max(64) }))
+      .query(async ({ input }) => {
+        const { getLeadBySessionId } = await import("./aiSalesAgent");
+        const lead = await getLeadBySessionId(input.sessionId);
+        if (!lead) return { messages: [] as { role: string; content: string }[] };
+
+        try {
+          const parsed = JSON.parse(lead.conversationJson || "[]");
+          return {
+            messages: Array.isArray(parsed) ? parsed : [],
+          };
+        } catch {
+          return { messages: [] as { role: string; content: string }[] };
+        }
+      }),
+
+    /**
+     * Explicit lead submission, used when the visitor fills in the inline
+     * "send my details" card instead of typing contact info into the chat.
+     */
+    submitLead: publicProcedure
+      .input(
+        z.object({
+          sessionId: z.string().min(8).max(64),
+          name: z.string().min(1).max(255),
+          email: z.string().email().max(320).optional(),
+          phone: z.string().min(7).max(50).optional(),
+          projectType: z.string().max(100).optional(),
+          budgetRange: z.string().max(100).optional(),
+          timeline: z.string().max(100).optional(),
+          appointmentPreference: z.string().max(255).optional(),
+          notes: z.string().max(2000).optional(),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (!input.email && !input.phone) {
+          throw new Error("Please provide either an email address or a phone number");
+        }
+
+        const { getLeadBySessionId, saveConversationTurn } = await import(
+          "./aiSalesAgent"
+        );
+
+        const existing = await getLeadBySessionId(input.sessionId);
+        let messages: { role: "user" | "assistant"; content: string }[] = [];
+
+        if (existing?.conversationJson) {
+          try {
+            const parsed = JSON.parse(existing.conversationJson);
+            if (Array.isArray(parsed)) messages = parsed;
+          } catch {
+            messages = [];
+          }
+        }
+
+        const result = await saveConversationTurn({
+          sessionId: input.sessionId,
+          userId: ctx.user?.id ?? null,
+          messages,
+          extracted: {
+            name: input.name,
+            email: input.email,
+            phone: input.phone,
+            projectType: input.projectType,
+            budgetRange: input.budgetRange,
+            timeline: input.timeline,
+            appointmentPreference: input.appointmentPreference,
+            notes: input.notes,
+          },
+        });
+
+        return {
+          success: Boolean(result),
+          leadId: result?.leadId ?? null,
+        };
+      }),
+
+    // ----- Admin -----
+
+    getAllLeads: protectedProcedure
+      .input(
+        z
+          .object({
+            status: z
+              .enum([
+                "new",
+                "contacted",
+                "qualified",
+                "booked",
+                "won",
+                "lost",
+                "spam",
+              ])
+              .optional(),
+            contactedOnly: z.boolean().optional(),
+            limit: z.number().int().min(1).max(500).optional(),
+          })
+          .optional()
+      )
+      .query(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        const { listLeads } = await import("./aiSalesAgent");
+        return await listLeads(input);
+      }),
+
+    getLeadById: protectedProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .query(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        const { getLeadById } = await import("./aiSalesAgent");
+        return await getLeadById(input.id);
+      }),
+
+    getLeadStats: protectedProcedure.query(async ({ ctx }) => {
+      if (ctx.user.role !== "admin") {
+        throw new Error("Unauthorized");
+      }
+      const { getLeadStats } = await import("./aiSalesAgent");
+      return await getLeadStats();
+    }),
+
+    updateLead: protectedProcedure
+      .input(
+        z.object({
+          id: z.number().int().positive(),
+          updates: z.object({
+            status: z
+              .enum([
+                "new",
+                "contacted",
+                "qualified",
+                "booked",
+                "won",
+                "lost",
+                "spam",
+              ])
+              .optional(),
+            name: z.string().max(255).optional(),
+            email: z.string().email().max(320).optional(),
+            phone: z.string().max(50).optional(),
+            notes: z.string().max(2000).optional(),
+          }),
+        })
+      )
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        const { updateLead } = await import("./aiSalesAgent");
+        await updateLead(input.id, input.updates);
+        return { success: true };
+      }),
+
+    deleteLead: protectedProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== "admin") {
+          throw new Error("Unauthorized");
+        }
+        const { deleteLead } = await import("./aiSalesAgent");
+        await deleteLead(input.id);
+        return { success: true };
+      }),
+  }),
+
   // AI Chat consultation
   chat: router({
     sendMessage: publicProcedure

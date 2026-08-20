@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
-import { Loader2, Users, FileText, TrendingUp, DollarSign } from "lucide-react";
+import { Loader2, Users, FileText, TrendingUp, DollarSign, Bot } from "lucide-react";
 import { Link } from "wouter";
 import { toast } from "sonner";
 
@@ -32,6 +32,11 @@ export default function Admin() {
   );
   
   const { data: projects, isLoading: projectsLoading } = trpc.projects.getAll.useQuery(
+    undefined,
+    { enabled: isAuthenticated && user?.role === "admin" }
+  );
+
+  const { data: aiLeadStats } = trpc.aiAgent.getLeadStats.useQuery(
     undefined,
     { enabled: isAuthenticated && user?.role === "admin" }
   );
@@ -94,6 +99,12 @@ export default function Admin() {
             </a>
           </Link>
           <div className="flex items-center gap-4">
+            <Link href="/admin/ai-leads">
+              <Button variant="outline" size="sm">
+                <Bot className="h-4 w-4" />
+                AI Chat Leads
+              </Button>
+            </Link>
             <Link href="/dashboard">
               <Button variant="outline" size="sm">
                 My Dashboard
@@ -117,7 +128,23 @@ export default function Admin() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
+            <Link href="/admin/ai-leads" className="block">
+              <Card className="h-full transition-colors hover:border-primary">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">AI Chat Leads</CardTitle>
+                  <Bot className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {aiLeadStats?.withContact ?? 0}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {aiLeadStats?.total ?? 0} conversations captured
+                  </p>
+                </CardContent>
+              </Card>
+            </Link>
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Quotes</CardTitle>
