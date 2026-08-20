@@ -168,16 +168,46 @@ function renderPrerenderPage(page: PrerenderPage): string {
 }
 
 /**
+ * Applies `transform` to every part of `html` that is NOT inside an HTML
+ * comment.
+ *
+ * This matters because `client/index.html` documents this middleware in a
+ * comment that itself mentions tags such as `<title>`. Running the placeholder
+ * strip over the raw document made the `<title>` regex match from inside that
+ * comment through to the real `</title>`, deleting the comment's `-->`
+ * terminator. The browser then treated the remainder of the document -
+ * including `<div id="root">` and the module script - as commented out, so
+ * every route rendered a blank white page.
+ */
+function replaceOutsideComments(
+  html: string,
+  transform: (chunk: string) => string
+): string {
+  const commentPattern = /<!--[\s\S]*?-->/g;
+  let result = "";
+  let lastIndex = 0;
+  let match: RegExpExecArray | null;
+
+  while ((match = commentPattern.exec(html)) !== null) {
+    result += transform(html.slice(lastIndex, match.index));
+    result += match[0];
+    lastIndex = match.index + match[0].length;
+  }
+  result += transform(html.slice(lastIndex));
+
+  return result;
+}
+
+/**
  * Rewrites an index.html document with route-specific SEO data.
  */
 export function injectSeo(html: string, pathname: string): string {
-  let output = html;
-
   // Remove the build-time placeholder head so we do not emit duplicates.
-  output = output.replace(/<title>[\s\S]*?<\/title>/i, "");
-  output = output.replace(
-    /<meta\s+name=["'](?:description|keywords)["'][^>]*>\s*/gi,
-    ""
+  // Comment bodies are skipped so documentation prose can safely mention tags.
+  let output = replaceOutsideComments(html, chunk =>
+    chunk
+      .replace(/<title>[\s\S]*?<\/title>/i, "")
+      .replace(/<meta\s+name=["'](?:description|keywords)["'][^>]*>\s*/gi, "")
   );
 
   const headTags = buildHeadTags(pathname);
@@ -187,7 +217,7 @@ export function injectSeo(html: string, pathname: string): string {
   if (page) {
     const prerendered = renderPrerenderPage(page);
     output = output.replace(
-      /<div id="root"><\/div>/i,
+      /<div id="root">\s*<\/div>/i,
       `<div id="root">${prerendered}</div>`
     );
   }
